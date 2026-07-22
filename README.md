@@ -2,13 +2,14 @@
 
 Framewright is an asset-aware prompt compiler for AI filmmaking. It turns a director's scene intent and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-Current core version: **2.0.0**  
+Current core version: **2.1.0**
 Author: **Tairan Li**
 
 ## Repository structure
 
 - [`skill/framewright/`](skill/framewright/) — installable Codex Skill
 - [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md) — current authoritative Framewright specification
+- [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
 - [`versions/beta/`](versions/beta/) — Lite and Pro beta branches
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
@@ -28,5 +29,17 @@ Framewright is configured for explicit invocation and prompt generation only. It
 ## Repository policy
 
 This repository intentionally excludes films, image case studies, active projects, generated media, private working files, and third-party tools.
+
+## Versioning policy
+
+Every Framewright patch or feature release preserves the previous version and publishes one matching new version locally and on GitHub:
+
+1. Archive the current authoritative specification as an immutable `framewright-vX.Y.Z.md` snapshot before editing.
+2. Increment the canonical specification's YAML `version`.
+3. Create the matching new release snapshot.
+4. Verify that the desktop canonical file, desktop snapshot, repository reference, and repository snapshot are byte-identical.
+5. Commit and push the same version metadata and README version to GitHub.
+
+Existing versioned snapshots are never overwritten or repurposed.
 
 Copyright © 2026 Tairan Li. All rights reserved. No license for reuse or redistribution is granted unless stated separately.
