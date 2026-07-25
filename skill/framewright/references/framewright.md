@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "2.1.0"
+version: "2.2.0"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -235,6 +235,11 @@ input_package:
   compilation_scope_id:
   operating_profile:
   director_scene_description:
+  director_declared_generation_units:
+    - unit_label:
+      unit_order:
+      director_locked_boundary:
+      local_intent:
   explicit_shot_instructions:
   uploaded_visual_assets:
     - asset_handle:
@@ -263,15 +268,24 @@ Rules:
 
 - The director scene description is the primary intent source.
 - Explicit shot instructions override compiler-inferred shot structure.
+- After profile selection, identify whether the director has declared one generation unit or multiple generation units before running feasibility analysis.
+- Explicit labels or boundaries such as `first clip`, `second clip`, `part 1`, `part 2`, `GU01`, `GU02`, `two separate 15-second videos`, or equivalent natural-language separation count as director-declared generation units.
+- Preserve director-declared unit count, order, and boundaries. Do not merge multiple declared units into one prompt or treat them as one undifferentiated scene.
+- Run the Universal GU Feasibility Gate separately on each declared unit. A declared boundary does not prevent Framewright from proposing a further split inside an overloaded unit, but that proposal still requires director approval.
+- Multiple units submitted together as one sequence remain inside the same compilation scope and share the selected profile. A later independent director intent starts a new scope and triggers the Operating Profile Gate again.
+- Each director-declared unit is an independent compile target with its own local start state, end state, and executable prompt output. Director-declared units are not automatic gate-created child units.
+- In Lite, compile each director-declared unit into its own output slug with the standard Lite filenames. Do not combine multiple units in one model-facing `prompt_video.txt`, and do not use Pro split-unit filenames.
+- In Pro, preserve each declared unit as a distinct stage target with its own output slug and standard Pro stage filenames. Numbered `prompt_video_unit##.txt` remains reserved for an approved split inside one previously declared unit unless the director explicitly requests a combined package convention.
 - Uploaded visual assets must be inspected and assigned roles before prompt generation.
 - Asset order must never define asset meaning.
 - Do not assume image handles have fixed roles before asset mapping.
 - If visual content can be inspected, use visible content, filename, user caption, and scene context to assign asset roles.
 - If visual content cannot be inspected, rely on filename, user caption, and scene context only.
 - If asset role assignment is ambiguous, assign the safest useful role or omit the asset.
-- Ask only production-critical questions that materially affect the selected profile's requested output.
-- Lite should ask fewer questions and proceed with compact assumptions when safe.
-- Pro may ask stage-relevant production questions, but must not over-interrogate.
+- Ask only when the missing answer changes output type, a generation-unit boundary, reference authority, safety, or runtime feasibility.
+- In Lite, proceed with a compact assumption only when none of those triggers applies.
+- In Pro, ask one compact stage-relevant question only when the answer changes the selected stage's actual output, reference authority, generation-unit boundary, safety, or runtime feasibility.
+- If none of the explicit question triggers applies, do not ask.
 
 ## 5. Director Mode Routing
 
@@ -347,6 +361,7 @@ The Production Spine is the shared source for all generated prompt files.
 
 It may include:
 
+- director-declared generation-unit count, order, and boundaries;
 - beat or shot order;
 - visible action;
 - camera coverage;
@@ -358,6 +373,7 @@ It may include:
 - reference decisions;
 - user revisions;
 - stage state when Pro is active.
+- attention flow when Framewright infers or improves shot structure, composition, staged reveal, or attention handoff.
 
 The Production Spine contains an internal Committed Shot Spine. Each committed shot has a stable internal identity and may include:
 
@@ -367,6 +383,7 @@ committed_shot:
   editorial_function:
   shot_order:
   camera_relationship:
+  attention_function:
   start_state:
   visible_action:
   end_state:
@@ -387,7 +404,11 @@ Rules:
 - A committed shot may map to one or more storyboard panels and one or more video beats. Panel count and video-beat count need not match.
 - Cross-output consistency means preserving committed shot order, editorial function, blocking, screen direction, object state, start/end state, and continuity dependencies; it does not require identical wording or identical panel/beat counts.
 - If a revision changes the frozen structure, update the spine first. Regenerate or mark stale every affected downstream output; never leave structurally conflicting outputs presented as current.
-- If structure is inferred, shot progression should read as a visual sentence.
+- If structure is inferred or improved, shot progression must read as a visual sentence.
+- When a sequence depends on staged reveal, gaze transfer, background information, emotional attention, or an object becoming legible, define one internal attention flow: entry -> delay or obstruction -> principal read -> residual focus.
+- Attention flow is internal Production Spine logic, not a required runtime heading. Compile it into executable framing, action order, eyeline, reveal, or rhythm language.
+- For a claimed causal, reveal, object-state, spatial-discovery, or emotional progression, run a Sequence Shuffle Test. Reordering committed shots or phases must damage the claimed progression; otherwise revise the inferred or unlocked editorial functions.
+- Modular montage, deliberate repetition, ritual, graphic equivalence, nonlinear design, and director-locked order are exempt from automatic revision. In AUTEUR MODE, report a material shuffle risk assistant-facing only and do not rewrite the sequence.
 - Preserve trigger, movement, contact, and result for action continuity.
 - Preserve object states and do not reset props accidentally.
 - Preserve geography and screen direction when needed.
@@ -396,7 +417,7 @@ Rules:
 
 When splitting a continuous scene into multiple generation units, Framewright must define each unit's local start state and end state.
 
-The end state of one unit should become the start-state assumption for the next unit when continuity requires it.
+The end state of one unit must become the start-state assumption for the next unit when continuity requires it.
 
 For each split unit, include only the local state that the video model needs to begin correctly.
 
@@ -438,7 +459,7 @@ Operators:
 Shared execution principles:
 
 - Every panel, shot, keyframe, or phase has a useful production job.
-- Shot progression should read as a visual sentence, not a generic coverage pile.
+- Inferred or improved shot progression must read as a visual sentence, not a generic coverage pile.
 - Visible action preserves trigger, movement, contact, and result.
 - Camera choices are motivated by action, emotional pressure, geography, or information need.
 - Motion language is physical, visible, directional, and scene-appropriate.
@@ -448,9 +469,9 @@ Shared execution principles:
 
 ### Scene Question Trigger Matrix
 
-Framewright should not ask ordinary creative questions.
+Framewright must not ask ordinary creative questions.
 
-Framewright asks scene-related questions only when the missing answer materially changes the selected output, generation strategy, safety, reference authority, or runtime feasibility.
+Framewright asks scene-related questions only when the missing answer changes output type, a generation-unit boundary, safety, reference authority, or runtime feasibility.
 
 Use this matrix after operating profile selection and, in Pro, after stage selection when stage selection is required.
 
@@ -472,19 +493,19 @@ Must Ask cases include:
 
 #### Should Ask in Pro / Assume in Lite
 
-For quality-critical but not safety-critical questions:
+For non-safety questions that still change the requested output:
 
-- In Lite, make the safest compact assumption and proceed unless the assumption would materially change user intent.
+- In Lite, make the safest compact assumption only when it does not change output type, user intent, generation-unit boundaries, reference authority, or runtime feasibility.
 - In Lite, this assumption does not apply when the Universal GU Feasibility Gate recommends a boundary decision.
-- In Pro, ask one compact question if the answer would materially improve the selected stage.
+- In Pro, ask one compact question only when the answer changes the selected stage's actual prompt, output type, generation-unit boundary, reference authority, or runtime feasibility.
 
 Should Ask cases include:
 
-- whether the Universal GU Feasibility Gate should keep the current material in one unit or propose multiple units;
-- whether storyboard should be admitted as a structural runtime reference;
-- whether a final emotional payoff should be one continuous hold with internal phases;
-- whether a style reference should be treated as active runtime reference or planning-only;
-- whether a normal keyframe should support a specific shot/state rather than global style;
+- approval of boundaries after the Universal GU Feasibility Gate has proposed them;
+- in Pro, whether storyboard should be admitted as a structural runtime reference;
+- in Pro, whether applying `continuous_payoff_hold` would change user-provided structure;
+- in Pro, whether a style reference should be treated as active runtime reference or planning-only;
+- in Pro, whether a normal keyframe should support a specific shot or state rather than remain planning-only;
 - whether to preserve a dense shot count or compact it for generation reliability.
 
 #### Must Ask in Lite: Universal GU Route
@@ -664,11 +685,11 @@ If a storyboard panel line could still work as a video prompt without changes, i
 
 ### 8.4 Dramatic Camera Language
 
-Every inferred or improved camera choice should have a visible dramatic job.
+Every inferred or improved camera choice must have a visible dramatic job that can be explained through action, relationship pressure, geography, information need, continuity, or graphic function.
 
-Camera progression should read as a visual sentence, not a generic coverage list.
+Inferred or improved camera progression must read as a visual sentence, not a generic coverage list.
 
-Adjacent panels should normally vary at least one meaningful camera dimension unless repetition is deliberate:
+Every adjacent camera change or deliberate repetition must have a stated internal function. Variation is not required for its own sake. When variation serves the sequence, meaningful dimensions include:
 
 - height;
 - axis;
@@ -686,7 +707,7 @@ Adjacent panels should normally vary at least one meaningful camera dimension un
 - ground evidence;
 - release wide.
 
-Use viewpoint-function tags when useful, such as:
+Viewpoint-function tags may be used as compact internal scaffolding, such as:
 
 - `threshold pressure`;
 - `rear absence`;
@@ -707,7 +728,7 @@ Mode behavior:
 - In APPRENTICE MODE, this operator may strengthen missing or weak camera logic without overriding explicit user structure.
 - In AUTEUR MODE, this operator is protective only and must not redesign user-provided shot order, blocking, rhythm, coverage, camera movement, or framing.
 
-Dramatic Camera Language should improve production usefulness, not decorate prompts with empty style language.
+Dramatic Camera Language must improve production usefulness, not decorate prompts with empty style language.
 
 ### 8.5 Cinematography Layer
 
@@ -747,7 +768,9 @@ Do not rely only on:
 
 Do not let storyboard rendering style influence final video style.
 
-Final video style should be carried through executable visual carriers, not vague aesthetic labels.
+Final video style must be carried through executable visual carriers, not vague aesthetic labels.
+
+Every compiler-added light, color, texture, atmosphere, lens behavior, camera instability, or optical imperfection that materially shapes the look must have a scene-appropriate physical, optical, environmental, graphic, or dramatic carrier. Do not impose live-action physics on animation, abstraction, dream logic, or an explicitly nonreal visual system.
 
 Global visual consistency should come primarily from:
 
@@ -884,6 +907,12 @@ Refer only to their current visible state when needed:
 
 ### 8.9 Compression Safety Pass
 
+Before compression, assign one dominant generation objective to each shot or continuous-take phase. Supporting action, performance carriers, continuity facts, sound cues, and environment details may coexist, but they must remain subordinate to that objective rather than compete as equal instructions.
+
+This hierarchy is not a numerical content cap. Do not delete a director-committed action, camera instruction, state change, or editorial function merely to create one-action simplicity.
+
+If a shot or phase contains multiple competing primary objectives, run the Universal GU Feasibility Gate or propose an unlocked shot or phase boundary according to director-mode authority. Never solve hierarchy overload through silent structural change.
+
 If shortening a prompt for character limits:
 
 - reread the shortened result;
@@ -906,7 +935,7 @@ Compression must preserve:
 - concrete performance carriers for internal-state or held beats;
 - timing-critical sound cues that determine visible action, reaction, or lip movement.
 
-Compression may shorten carrier language, but must not replace concrete physical behavior with abstract psychological adjectives alone.
+Compression must remove duplicated or subordinate wording before committed action, continuity, performance, reference authority, or timing-critical cues. It may shorten carrier language, but must not replace concrete physical behavior with abstract psychological adjectives alone.
 
 ### 8.10 Universal GU Feasibility Gate
 
@@ -954,7 +983,7 @@ Do not place gate scores, split warnings, boundary proposals, or approval langua
 
 #### Final Payoff Hold Rule
 
-For emotional payoff moments, prefer one continuous held shot with internal phases instead of multiple fragmented shots, unless the user explicitly requests separate cuts.
+When an emotional payoff depends on uninterrupted accumulation and its shot structure is not director-locked, use `continuous_payoff_hold` as a named creative default: prefer one continuous held shot with internal phases instead of fragmenting the payoff.
 
 Emotional payoff moments include:
 
@@ -973,19 +1002,21 @@ Emotional payoff moments include:
 - final look;
 - final emotional release.
 
-Default behavior:
+This is a creative default, not a validation requirement. A separate cut remains valid when it has a distinct editorial, emotional, informational, point-of-view, spatial, interruption, or comic function.
 
-- In SCREENWRITER MODE, Framewright may design the final payoff as one continuous hold with internal phases.
-- In APPRENTICE MODE, Framewright may strengthen the payoff hold if the user has not specified separate cuts.
-- In AUTEUR MODE, preserve the user's explicit cuts. If fragmentation may harm emotional timing, warn assistant-facing only.
-- In Lite, compact emotional payoff into one held beat when safe.
-- In Pro, recommend or ask before changing user-provided structure.
+Mode behavior:
+
+- In SCREENWRITER MODE, Framewright may select `continuous_payoff_hold` when it best preserves the payoff and the GU remains feasible.
+- In APPRENTICE MODE, apply it only when payoff coverage is unlocked. If it would change core rhythm or a committed sequence, ask and stop.
+- In AUTEUR MODE, preserve the director's explicit cuts. If fragmentation may harm emotional timing, warn assistant-facing only.
+- In Lite, apply it only after the GU Gate confirms one unit remains practical and no committed dramatic step is removed.
+- In Pro, recommend and wait for approval before changing user-provided structure.
 
 Runtime phrasing may use: `Final held two-shot with internal phases: the approach pauses, his hand touches her cheek, they kiss softly, and the shot lingers as moving reflections continue across them.`
 
-Do not split touch, kiss, and after-hold into separate cuts unless the user requested that structure or the scene needs separate committed shots for clarity.
+Do not fragment an unlocked emotional payoff by default. Preserve separate cuts whenever the director specifies them or each cut has a distinct editorial function.
 
-Lite may apply compact compression when safe and should favor generation-friendly structure.
+Lite may compress only after the GU Gate confirms that one generation remains practical, and only when compression removes redundancy rather than a committed dramatic step.
 
 Pro warns and recommends assistant-facing. Pro does not silently change user structure.
 
@@ -1068,7 +1099,10 @@ rejected_or_unused
 
 Storyboard runtime boundary:
 
-- Storyboard may become a runtime structural reference only when explicitly chosen by the user or clearly justified for the requested output.
+- In Lite, storyboard remains planning-only and must not be compiled as an active runtime reference.
+- In Pro, storyboard may become a runtime structural reference only after explicit user admission for the current compilation scope.
+- Framewright may recommend storyboard admission assistant-facing in Pro, but recommendation alone does not activate it.
+- The final handoff must state whether storyboard is planning-only or an explicitly admitted active structural runtime reference.
 - Even then, storyboard controls structure only:
   - shot order;
   - broad staging;
@@ -1097,7 +1131,7 @@ Do not treat any generated storyboard image as an automatic video reference or v
 
 ### Runtime Attachments and Compact Aliases
 
-When active runtime references require inline downstream handles, declare them once immediately after the required `[MODE: ...]` line in the shortest clear form:
+For every active runtime reference that will be bound through an inline downstream handle, declare one compact semantic alias and one handle slot immediately after the required `[MODE: ...]` line:
 
 ```text
 REFS:
@@ -1117,6 +1151,7 @@ Rules:
 - Reserve attachment characters and a small safety margin before compressing the body. Never truncate a handle, alias, core action, continuity state, performance carrier, or timing-critical cue to satisfy the limit.
 - If the downstream platform binds attachments outside prompt text, keep the handle map operator-facing and outside the model-facing prompt; do this only when the platform preserves the same alias-to-asset binding.
 - If no active inline handle is required, omit `REFS` completely.
+- Omitting the alias declaration or handle slot for an active inline runtime reference is a validation failure.
 
 ### Explicit First-Frame Continuation Reference
 
@@ -1224,17 +1259,16 @@ storyboard/<short_slug>/prompt_video.txt
 Lite final response:
 
 - list only files actually created;
-- include compact routing summary;
+- include selected profile, `compact_runtime` dialect, active runtime attachments, and unresolved decisions;
+- include compact routing summary only when it adds useful context;
 - do not include long risk review;
 - do not include stage recommendations unless production-critical.
 
-Lite defaults to Compact Runtime Video Syntax for `prompt_video.txt`.
+Lite uses `compact_runtime` for `prompt_video.txt` unless the user explicitly requests `full_contract` or a documented runtime-risk exception requires it.
 
-Lite should avoid full-contract video prompt structure unless explicitly requested.
+Lite may compact an overloaded scene only after the Universal GU Feasibility Gate determines that one call remains practical, and only by removing redundancy or subordinating supporting detail rather than deleting a committed dramatic step. Any compaction must update the provisional spine before storyboard and video compilation.
 
-Lite may automatically compress overloaded scenes into a more generation-friendly 3-5 beat structure when safe.
-
-Lite may compact overloaded scenes only after the Universal GU Feasibility Gate has determined that one call remains practical. Any approved compaction must update the provisional spine before storyboard and video compilation.
+A resulting 3-5 beat structure is a heuristic, not a target or permission to remove required action, performance, camera, or state progression.
 
 When the Universal GU Feasibility Gate recommends splitting, Lite presents the proposed boundaries and asks whether to keep one compact Lite generation or switch the current compilation scope to Pro Video Prompt for separate units.
 
@@ -1242,8 +1276,8 @@ If the user chooses compact Lite:
 
 - Lite creates one compact `prompt_video.txt`;
 - Lite does not create split-unit files;
-- Lite compresses to the safest generation-friendly structure, usually 3-5 beats;
-- final emotional payoff should usually become one held beat with internal phases.
+- Lite compresses to the safest generation-friendly structure while preserving every committed dramatic step;
+- apply `continuous_payoff_hold` only when its named-default trigger is met.
 
 If the user chooses Pro split:
 
@@ -1276,7 +1310,7 @@ For Lite, prefer concise headings:
 - `EMOTIONAL GUIDANCE`;
 - `RHYTHM + ESCALATION`;
 - `BEATS`;
-- `NEGATIVE`, only when useful.
+- `NEGATIVE`, only when an identified generation risk remains insufficiently controlled by positive wording.
 
 Lite should not output verbose reference lifecycle language.
 
@@ -1386,7 +1420,9 @@ Pro recommendations may include:
 
 Do not place these warnings inside generated prompt files.
 
-Pro video prompt files should still prefer Compact Runtime Video Syntax for actual model-ready generation unless the user explicitly requests full-contract output.
+Pro model-ready video prompt files use `compact_runtime` by default. Activate `full_contract` only when the user explicitly requests it or when a documented runtime-risk exception shows that compact syntax cannot preserve required continuity, reference authority, object state, or execution logic.
+
+When `full_contract` is activated by a runtime-risk exception, state the reason assistant-facing and record the selected prompt dialect in the final handoff. Do not place routing rationale inside generated prompt files.
 
 After the director explicitly keeps a risky single-unit structure, Pro may include a brief assistant-facing residual-risk note after file generation. This note must not appear inside any generated video prompt file.
 
@@ -1397,8 +1433,8 @@ This summary must stay outside generated prompt files.
 It should clarify:
 
 - which references should actually be attached to video generation;
-- whether the storyboard is planning-only, optional structural reference, or active structural runtime reference;
-- whether keyframes are optional look/identity references or active runtime references;
+- whether the storyboard is planning-only or an explicitly admitted active structural runtime reference;
+- each keyframe's exact downstream status and allowed authority;
 - whether the video prompt is self-contained and can run without storyboard or keyframe references;
 - any shot-to-shot style mismatch risk if a normal keyframe is used as global style reference;
 - the next practical step.
@@ -1412,7 +1448,7 @@ Do not imply that a keyframe is required when the video prompt already carries t
 Example assistant-facing summary for non-split outputs:
 
 ```text
-Runtime attachment summary: use the active character reference and `prompt_video.txt` as the main video inputs. The storyboard is planning-only unless you choose to attach it as a structural reference. The keyframe is optional; use it only if its look matches the intended style, since a single keyframe can cause shot-to-shot style mismatch.
+Runtime attachment summary: use the active character reference and `prompt_video.txt` as the main video inputs. The storyboard is planning-only. The keyframe remains text-extraction-only unless you explicitly admit it for narrow shot support; a single admitted keyframe can cause shot-to-shot style mismatch.
 ```
 
 This summary must not appear inside `prompt_video.txt`, `prompt_video_unit##.txt`, `prompt_storyboard.txt`, or `prompt_keyframes.txt`.
@@ -1458,7 +1494,7 @@ Split-unit video prompt files are a Pro-only output behavior created only after 
 
 When Framewright asks whether to split a high-density scene into multiple generation units and the Pro user selects a split workflow, each generation unit must be compiled into its own standalone video prompt file.
 
-If the Universal GU Feasibility Gate proposes boundaries and the director approves a Pro split workflow, Pro should generate split-unit video prompt files according to the requested stage.
+If the Universal GU Feasibility Gate proposes boundaries and the director approves a Pro split workflow, Pro must generate split-unit video prompt files according to the requested stage.
 
 If current stage is `Video Prompt`:
 
@@ -1519,12 +1555,17 @@ stage_state:
     - after_the_fact_documentation
 ```
 
-Assistant-facing handoff may include:
+Every assistant-facing handoff must include:
 
-- current stage;
-- saved file paths;
+- saved file paths for files actually created;
+- selected operating profile and, in Pro, current stage;
+- selected prompt dialect for every video prompt: `compact_runtime` or `full_contract`;
+- active runtime attachments and each storyboard or keyframe runtime status;
+- unresolved director decisions, or `none`.
+
+It may additionally include:
+
 - compact routing summary;
-- reference attachment recommendation;
 - risks to review;
 - next practical step.
 
@@ -1547,6 +1588,11 @@ Rules:
 - Storyboard color isolation is mandatory.
 - Storyboard panel lines must pass the Image-Prompt Beat Rewrite Contract.
 - Each panel line describes one frozen drawable moment.
+- Every storyboard prompt must declare `BOARD TITLE`, `SCENE TITLE`, and `GENERATION UNIT` before the panel plan.
+- Every storyboard panel must have an external header that maps it to its committed shot or continuous-take phase.
+- Edited-sequence header format: `P## | SHOT ## | <shot scale or camera relationship> | <concise beat title>`.
+- Continuous-take header format: `P## | PHASE ## | <shot scale or camera relationship> | <concise beat title>`.
+- Board metadata and panel headers stay outside panel interiors. They are the only required visible organizational text on the sheet.
 - Do not use temporal connectors inside panel lines: no `then`, no `after`, no `before`, no `first`, no `next`, no `later`.
 - Storyboard panel lines must not include final lighting style, lighting color, color temperature, grade, rendered light texture, cinematic lighting language, lens behavior, final render style, material finish, or palette wording.
 - Any needed final-video light position, motivated source, contrast, color, screen glow, window light, doorway light, practical light, or atmospheric lighting should be described in any video prompt file, Pro keyframe prompts, or `[FINAL LOOK CONTRACT]`, not in storyboard panel interiors.
@@ -1595,7 +1641,7 @@ Effects in storyboard should be abstract attached marks only:
 
 If exact continuity matters, include compact natural-language count or entity locks.
 
-Storyboard may use headers and panel headers as sheet organization, but prompt section labels must not be rendered as visible text in the image.
+Storyboard must use the required board metadata and external panel headers as sheet organization. Prompt section labels, instructions, captions, and any other text must not be rendered as visible sheet content.
 
 Storyboard prompt should prove:
 
@@ -1642,13 +1688,17 @@ The sheet proves shot order, blocking, pose, contact, screen direction, object s
 
 Use natural role names, not internal entity ID tokens. Keep final color, lighting, material, texture, lens behavior, audio, timing, and video-only motion out of panel lines.
 
+BOARD TITLE: [resolved board title]
+SCENE TITLE: [resolved scene title]
+GENERATION UNIT: [resolved GU label]
+
 Panel plan:
-P01 / [shot tag if useful] / [beat name if useful] — [one frozen drawable visual beat]
-P02 / [shot tag if useful] / [beat name if useful] — [one frozen drawable visual beat]
-P03 / [shot tag if useful] / [beat name if useful] — [one frozen drawable visual beat]
+P01 | SHOT 01 or PHASE 01 | [resolved shot scale or camera relationship] | [resolved concise beat title] — [one resolved frozen drawable visual beat]
+P02 | SHOT 02 or PHASE 02 | [resolved shot scale or camera relationship] | [resolved concise beat title] — [one resolved frozen drawable visual beat]
+P03 | SHOT 03 or PHASE 03 | [resolved shot scale or camera relationship] | [resolved concise beat title] — [one resolved frozen drawable visual beat]
 
 Negative:
-No text inside panels, captions, arrows, UI, labels, duplicate bodies, extra limbs, final-style rendering, color fill, facial features, brows, eyes, mouth, smile, clothing detail, texture, tonal modeling, gray wash, shaded fill, finished character design, or panel color.
+No text inside panels, captions, arrows, UI, duplicate bodies, extra limbs, final-style rendering, color fill, facial features, brows, eyes, mouth, smile, clothing detail, texture, tonal modeling, gray wash, shaded fill, finished character design, or panel color. Outside the panels, render only the resolved board metadata and panel headers.
 ```
 
 ## 13. Keyframe Pass
@@ -1690,7 +1740,7 @@ A keyframe may carry final style for its supported shot, beat, start state, end 
 
 A keyframe must not silently impose its composition, pose, shot distance, local lighting, local color balance, or local material treatment onto unrelated shots.
 
-If a keyframe is intended only for style extraction, prefer `text_extraction_only` unless it has been explicitly admitted as a dedicated style reference.
+If a keyframe is intended only for style extraction, assign `text_extraction_only` unless the user explicitly admits it as a dedicated style reference.
 
 If keyframes are used only for some shots, warn assistant-facing about possible shot-to-shot style mismatch. Do not place this warning inside generated prompt files.
 
@@ -1713,12 +1763,15 @@ dance/fight/chase/running/fall/pass-by or equivalent fluid movement
 
 Rules:
 
-- For `static`, `low-motion`, and controlled `performance-driven` shots, keyframes may become active runtime references when their authority is narrow and useful.
-- For `procedural/contact-driven` shots, keyframes may support detail proof, object state, material, tool contact, or start/end state, but must not silently lock the whole motion.
+- Every keyframe receives one explicit downstream status before video-prompt compilation.
+- A keyframe becomes `active_runtime_reference` only after explicit user admission or an explicit Pro stage decision accepted by the user. Merely being useful does not activate it.
+- For `static`, `low-motion`, and controlled `performance-driven` shots, Framewright may recommend narrow runtime activation, but the keyframe remains planning-only or text-extraction-only until admitted.
+- For `procedural/contact-driven` shots, Framewright may recommend detail proof, object state, material, tool contact, or start/end-state authority, but runtime activation still requires admission and must not lock the whole motion.
 - For `high-motion`, `drastic-camera-motion`, `continuous-take motion`, chase, fight, dance, fall, pass-by, fast handheld, aggressive subject movement, or aggressive camera movement, keyframes default to `text_extraction_only` or `withheld_from_runtime`.
 - High-motion keyframes may inform identity, wardrobe, material, lighting, start state, end state, or detail proof.
 - High-motion keyframes must not silently control pose, motion path, camera path, action rhythm, whole-shot composition, or spatial continuity.
 - If a keyframe is used only for text extraction or withheld from runtime, state that assistant-facing only, not inside generated prompt files.
+- The final handoff must state every generated keyframe's runtime status and allowed authority.
 
 Every keyframe prompt body remains independently executable and begins with the selected `[MODE: ...]` line.
 
@@ -1754,6 +1807,18 @@ Shared rules:
 - Keep generated prompt blocks paragraph-based.
 - Avoid nested colon-form sub-blocks by default.
 - Default maximum length is 10,000 characters unless the user requests a different limit.
+
+### Global Semantic Timing Default
+
+All profiles, director modes, scene grammars, storyboard-to-video translations, edited sequences, and continuous-take phase plans use semantic relative timing by default.
+
+Describe rhythm through causal and relative language such as `briefly`, `after the hesitation registers`, `the hold outlasts the earlier beats`, `without rushing the reaction`, `as the camera settles`, `during the recovery`, or `before she recommits`.
+
+Do not invent per-shot seconds, timecode ranges, equal-duration allocations, or second-by-second phase segmentation.
+
+Numeric timing activates only when the director explicitly requests or supplies exact timing, or explicitly selects a downstream technique that requires numeric synchronization. A stated total runtime such as `15 seconds` does not activate per-shot timecodes.
+
+When numeric timing is activated, use only the minimum numbers required for synchronization. Preserve the semantic beat relationships as the primary pacing instruction.
 
 Before returning or saving any video prompt file, including `prompt_video.txt` or `prompt_video_unit##.txt`:
 
@@ -1828,13 +1893,13 @@ Do not write multiple split units into one model-facing `prompt_video.txt` by de
 
 Do not write `GENERATION 01`, `GENERATION 02`, or equivalent multi-generation blocks inside one model-facing video prompt unless the user explicitly asks for a combined planning prompt, overview document, or combined prompt.
 
-Recommended structure for split-unit prompts:
+Default structure for split-unit prompts:
 
 ```text
 [MODE: <director_mode>]
 
 REFS:
-<optional compact alias=handle declarations; omit when no inline handle is required>
+<required compact alias=handle declarations for every active inline runtime reference; omit only when no inline handle is required>
 
 CHARACTER SOURCE:
 <same cross-unit character reference language unless unit-specific changes are required>
@@ -1849,7 +1914,7 @@ ENVIRONMENT:
 <same local world setup, with unit-specific start state only when needed>
 
 CONTINUITY LOCKS:
-<same high-risk spatial and object-state locks, with unit-specific start/end state only when needed>
+<required when a §14 activation trigger applies; otherwise omit>
 
 EMOTIONAL GUIDANCE:
 <same performance DNA, with unit-specific emotional phase only when useful>
@@ -1866,17 +1931,22 @@ NEGATIVE:
 
 ### Compact Runtime Video Syntax
 
-For any model-ready video prompt file, including `prompt_video.txt` or `prompt_video_unit##.txt`, prefer compact runtime syntax unless the user explicitly requests a full-detail contract handoff.
+For any model-ready video prompt file, including `prompt_video.txt` or `prompt_video_unit##.txt`, `compact_runtime` is the named default.
 
-Framewright may still use full internal Production Spine, Reference Lifecycle, Craft Operators, and validation logic, but the final model-facing video prompt should compile those decisions into concise executable language.
+Framewright may still use the full internal Production Spine, Reference Lifecycle, Craft Operators, and validation logic, but the final model-facing video prompt must compile those decisions into concise executable language.
+
+Activate `full_contract` only on explicit user request or a documented runtime-risk exception in which compact syntax cannot preserve required continuity, reference authority, object state, or execution logic. Record the dialect and any exception reason assistant-facing.
 
 Default model-ready video prompt structure:
 
 ```text
 [MODE: <director_mode>]
 
+REFS:
+<required compact alias=handle declarations for every active inline runtime reference; omit only when no inline handle is required>
+
 CHARACTER SOURCE:
-<one or two compact sentences naming only active runtime character references and their core authority>
+<one or two compact sentences using declared aliases for active runtime character references and their core authority>
 
 VISUAL STYLE:
 <one compact but strong visual system with concrete executable visual carriers>
@@ -1888,7 +1958,7 @@ ENVIRONMENT:
 <one compact line establishing location, spatial anchors, and critical object state>
 
 CONTINUITY LOCKS:
-<optional; one to three short high-risk spatial, cast, object-state, or physics locks>
+<required when a §14 activation trigger applies; otherwise omit; one to three short positive locks>
 
 EMOTIONAL GUIDANCE:
 <one compact line describing visible performance arc>
@@ -1901,16 +1971,16 @@ P01: <camera / shot relationship>, <visible action>, <motion / timing / performa
 P02: ...
 
 NEGATIVE:
-<optional compact risk-based negatives only>
+<include only for an identified risk that positive wording does not sufficiently control; otherwise omit>
 ```
 
-This compact syntax is not mandatory for every file, but it is the default for model-ready video generation.
+`compact_runtime` is mandatory unless the `full_contract` activation rule is satisfied.
 
 #### Cross-Unit Runtime Context Lock
 
 When a Pro scene is split into multiple video generation units, Framewright must preserve shared runtime context across all unit prompts so the outputs feel like the same scene.
 
-The following sections should remain identical or near-identical across split-unit prompts unless the unit genuinely requires a local change:
+Every section designated as shared must remain byte-identical across split-unit prompts unless an approved local state change requires a difference:
 
 - `CHARACTER SOURCE`;
 - `VISUAL STYLE`;
@@ -1920,17 +1990,19 @@ The following sections should remain identical or near-identical across split-un
 - core `EMOTIONAL GUIDANCE`;
 - baseline `NEGATIVE`.
 
-For visual consistency, do not paraphrase shared style language differently across unit prompts.
+For visual consistency, do not paraphrase shared language differently across unit prompts.
 
 If the visual style should remain the same, copy the same `VISUAL STYLE` wording exactly across all split-unit prompts.
 
 If character identity should remain the same, copy the same `CHARACTER SOURCE` wording exactly across all split-unit prompts.
 
-If the scene space should remain the same, keep the same core `ENVIRONMENT` wording across all split-unit prompts.
+If the scene space remains the same, copy the same core `ENVIRONMENT` wording exactly across all split-unit prompts.
 
-If physical continuity locks apply to all units, keep the same core `CONTINUITY LOCKS` wording across all split-unit prompts.
+If physical continuity locks apply to all units, copy the same core `CONTINUITY LOCKS` wording exactly across all split-unit prompts.
 
-Only these elements should normally vary between split-unit prompts:
+When a local state change requires different wording, limit the change to the affected unit-specific clause and preserve the remaining shared wording byte-for-byte.
+
+Only these elements may vary when a local state change requires it:
 
 - unit file number;
 - local start state;
@@ -1957,12 +2029,10 @@ If a unit begins after an emotional or physical setup from a prior unit, state t
 
 Do not summarize the entire previous unit unless necessary.
 
-Use full-contract syntax only when:
+Use `full_contract` syntax only when:
 
-- the user explicitly requests full detail;
-- the output is for diagnostic review;
-- the scene has unusually complex continuity that cannot be safely compacted;
-- the user asks for engineering-style handoff.
+- the user explicitly requests full detail, diagnostic review, or engineering-style handoff; or
+- a documented runtime-risk exception shows that `compact_runtime` cannot preserve required continuity, reference authority, object state, or execution logic.
 
 Do not treat any generated storyboard image as an automatic video reference or visual anchor.
 
@@ -1972,7 +2042,14 @@ Do not make storyboard automatically attach to video prompts unless admitted und
 
 Compact runtime syntax may use concise beat-based prompts without changing Framewright's reference policy or storyboard authority rules.
 
-Use `CONTINUITY LOCKS` only when physical, spatial, cast, object-state, or screen-direction drift is a real generation risk.
+Include `CONTINUITY LOCKS` when one or more of these activation triggers applies:
+
+- count-sensitive visible cast;
+- object-state progression;
+- screen-direction or geography dependency;
+- non-default physical, spatial, or camera-subject relationship.
+
+If none of these triggers applies, omit `CONTINUITY LOCKS`.
 
 Keep `CONTINUITY LOCKS` short.
 
@@ -2026,27 +2103,28 @@ Avoid repeating the same style adjectives in every shot when `VISUAL STYLE` or `
 
 When style is under-rendering risk, repeat only the most important style carrier in selected key beats or phases, not every shot.
 
-`RHYTHM + ESCALATION` should contain executable timing or pacing language when timing materially affects generation.
+`RHYTHM + ESCALATION` must contain executable timing or pacing language when timing materially affects generation.
 
-It should not be only atmospheric description when the scene depends on editing pace, micro-performance, action timing, or final hold length.
+It must not be only atmospheric description when the scene depends on editing pace, micro-performance, action timing, or final hold length.
 
-For montage scenes, include when useful:
+For montage scenes whose meaning depends on editorial rhythm, include:
 
-- approximate total duration;
-- approximate shot duration range;
 - cut rhythm;
-- final hold length relationship;
+- relative shot-duration pattern;
+- final-hold relationship;
 - whether movement cuts are completed or interrupted.
 
-For emotional micro-performance scenes, include when useful:
+Include numeric total or shot durations only when Global Semantic Timing has been explicitly activated.
+
+For emotional micro-performance scenes whose meaning depends on hesitation, eye-line, breath, reaction, contact, or after-hold, include:
 
 - no sudden cutaways during approach;
 - characters move in inches, not jumps;
 - hold long enough for eye-line, hesitation, breath, and reaction;
-- final payoff hold is the longest beat;
+- the relative length and function of any payoff hold;
 - storyboard controls structure, not pacing speed, when storyboard is admitted.
 
-For action scenes, include when useful:
+For action scenes whose execution depends on acceleration, impact, recovery, or cut-driven motion, include:
 
 - burst / pause / impact / recovery pattern;
 - acceleration or deceleration;
@@ -2062,7 +2140,7 @@ Slow escalation with no sudden cutaways during the approach; they move in inches
 Example montage rhythm line:
 
 ```text
-Medium-fast montage, about 12-16 seconds total; most shots last 1-2 seconds, with one slightly longer final hold.
+Medium-fast montage with brief, uneven shots; movement cuts alternate between completed and interrupted actions, and the final hold lasts clearly longer than the preceding shots.
 ```
 
 For emotional payoff moments, apply the Final Payoff Hold Rule from the Universal GU Feasibility Gate.
@@ -2127,6 +2205,9 @@ Video prompt template:
 ```text
 [MODE: AUTEUR | APPRENTICE | SCREENWRITER]
 
+REFS:
+Declare one compact semantic alias and one `{{HANDLE}}` slot for every active inline runtime reference. Omit this block only when no inline handle is required.
+
 [REFERENCE REGISTRY]
 Use only active admitted runtime references. Include character, subject, prop, object, vehicle, creature, mechanical, style, lighting, texture, atmosphere, or Pro keyframe references only when intentionally attached. Do not include environment references by default. Do not include offscreen character references. State each reference in one compact sentence with role and core authority only. Compress denied authority to high-risk denials. Do not include lifecycle status. Omit this block when no runtime references are active.
 
@@ -2182,11 +2263,11 @@ Generated runtime prompts describe only the visible, audible, and intended world
 
 Do not mention absent characters, absent props, absent vehicles, absent creatures, absent locations, unused camera moves, unused effects, rejected styles, rejected transitions, prior scene elements, or future scene elements merely to say they are absent.
 
-Prefer omission over negative mention.
+Omit absent, rejected, prior, future, or unused elements by default instead of naming them negatively.
 
-Prefer positive replacement language over long negative lists.
+Use positive replacement language before creating a negative instruction.
 
-Use generic non-summoning negatives only when necessary.
+Create a `NEGATIVE` block only when one or more identified generation risks remain insufficiently controlled by positive wording. Keep it short, local, generic, and non-summoning.
 
 Avoid named negatives such as:
 
@@ -2218,35 +2299,41 @@ A target folder path before operating profile selection is inert context only.
 Lite file workflow:
 
 1. Inspect input and assets.
-2. Route director mode.
-3. Route scene grammar.
-4. Ask only production-critical questions if needed.
-5. Build a provisional Production Spine.
-6. Run the Universal GU Feasibility Gate and stop for approval if it proposes boundaries.
-7. Apply approved structural decisions to the spine, then freeze it.
-8. Apply compact craft operators.
-9. Generate storyboard and video prompts from the same frozen spine.
-10. Run cross-output structural validation.
-11. Save only:
+2. Detect and preserve one or multiple director-declared generation units.
+3. Route director mode.
+4. Route scene grammar.
+5. Ask only production-critical questions if needed.
+6. Build a provisional Production Spine for each declared unit.
+7. Run the Universal GU Feasibility Gate separately on each unit and stop for approval if it proposes a further boundary.
+8. Apply approved structural decisions to each spine, then freeze it.
+9. Apply compact craft operators.
+10. Generate storyboard and video prompts from the same frozen spine for each unit.
+11. Run cross-output structural validation.
+12. Save only:
 
 ```text
 storyboard/<short_slug>/prompt_storyboard.txt
 storyboard/<short_slug>/prompt_video.txt
 ```
 
+When the director submits multiple declared units together, use one distinct output slug per unit and repeat the standard Lite filenames inside each slug. Never combine the units in one model-facing prompt.
+
 Pro file workflow:
 
 1. Inspect input and assets.
-2. Route director mode.
-3. Route scene grammar.
-4. Determine requested stage or ask stage question if unclear.
-5. Build or update a provisional Production Spine.
-6. Run the Universal GU Feasibility Gate and stop for approval if it proposes boundaries.
-7. Apply approved structural decisions and full reference lifecycle, then freeze the spine.
-8. Apply full craft operators.
-9. Generate only requested or stage-required outputs from the frozen spine.
-10. Run structural validation against any current downstream outputs.
-11. Save only files actually created.
+2. Detect and preserve one or multiple director-declared generation units.
+3. Route director mode.
+4. Route scene grammar.
+5. Determine requested stage or ask stage question if unclear.
+6. Build or update a provisional Production Spine for each declared unit.
+7. Run the Universal GU Feasibility Gate separately on each unit and stop for approval if it proposes a further boundary.
+8. Apply approved structural decisions and full reference lifecycle, then freeze each spine.
+9. Apply full craft operators.
+10. Generate only requested or stage-required outputs from each frozen spine.
+11. Run structural validation against any current downstream outputs.
+12. Save only files actually created.
+
+When the director submits multiple declared units together, use one distinct output slug per unit and repeat the selected Pro stage filenames inside each slug. If the Gate later splits one declared unit, place that unit's numbered `prompt_video_unit##.txt` files inside its own slug.
 
 When Pro `Full Compile` creates multiple files, include a compact runtime attachment summary in the assistant-facing final response. Keep it outside generated prompt files.
 
@@ -2289,8 +2376,8 @@ When split-unit video prompts are created, the assistant-facing runtime attachme
 - each video unit prompt is meant to be run separately;
 - the same character references should be attached to each unit unless otherwise stated;
 - the shared visual style language has been kept consistent across unit prompts;
-- the storyboard is planning-only, optional structural reference, or active structural runtime reference according to the selected reference policy;
-- keyframes are optional or active according to their assigned authority;
+- the storyboard is planning-only or an explicitly admitted active structural runtime reference;
+- each keyframe's exact downstream status and assigned authority;
 - if no combined `prompt_video.txt` was created, users should use the numbered unit prompts instead.
 
 Example assistant-facing summary:
@@ -2316,6 +2403,10 @@ Shared validation:
 - Operating profile is selected before generation.
 - Operating profile applies to one compilation scope only.
 - A new independent scene, generation unit, or sequence resets the profile and triggers the gate even in the same conversation.
+- Multiple director-declared units submitted together as one sequence share the current scope's selected profile; a later independent intent resets it.
+- Director-declared generation-unit count, order, and boundaries are detected before feasibility analysis and preserved.
+- Multiple director-declared units are never merged into one model-facing prompt.
+- The Universal GU Feasibility Gate runs separately on each director-declared unit.
 - Revisions, approvals, failed-take repairs, approved child units, and explicit continuations of the same shot retain the current scope's profile.
 - A prior conversation, preference, memory note, or project pattern does not select the profile for a new scope.
 - If operating profile is missing, no prompt generation occurs.
@@ -2338,14 +2429,15 @@ Shared validation:
 - Director mode is selected after operating profile.
 - Scene grammar is selected after director mode.
 - Scene question logic distinguishes Must Ask, Should Ask in Pro / Assume in Lite, and Do Not Ask.
-- Scene-related questions are asked only when the missing answer materially changes the selected output, generation strategy, safety, reference authority, or runtime feasibility.
+- Scene-related questions are asked only when the missing answer changes output type, a generation-unit boundary, safety, reference authority, or runtime feasibility.
 - The Universal GU Feasibility Gate runs on the provisional spine before spine freeze or prompt generation.
 - The gate evaluates readable duration, shot or cut reset load, performance turns, physical-action complexity, environment progression, reference complexity, dialogue and sound timing, prompt length, and target-model constraints.
 - A hard cut is a continuity-risk factor, not an automatic full state reset.
 - GU feasibility is scene-type-agnostic and not decided by beat count alone.
 - If the gate proposes boundaries, the proposal includes each unit's function, start state, end state, and concise rationale, then Framewright stops for director approval.
 - Framewright never auto-splits, auto-merges, or generates across an unapproved boundary.
-- Final emotional payoff moments prefer continuous held shots with internal phases when user structure allows.
+- `continuous_payoff_hold` activates only when an emotional payoff depends on uninterrupted accumulation and its shot structure is unlocked.
+- `continuous_payoff_hold` is a creative default, not a validation requirement, and never overrides director-specified cuts or cuts with distinct editorial functions.
 - Prompt files begin with exactly one `[MODE: ...]` line, except Pro multi-keyframe outputs where each keyframe block repeats the mode line.
 - Each split-unit video prompt begins with exactly one `[MODE: ...]` line.
 - Generated prompt files are clean and executable only.
@@ -2355,6 +2447,9 @@ Shared validation:
 - If the user says not to use a reference, the reference is silently omitted from generated prompt files.
 - Storyboard output is production-safe and does not leak final-video style.
 - Storyboard includes the exact production-safe preamble when `prompt_storyboard.txt` is generated.
+- Every storyboard prompt includes resolved `BOARD TITLE`, `SCENE TITLE`, and `GENERATION UNIT` metadata.
+- Every storyboard panel has a resolved external `SHOT ##` or `PHASE ##` header with shot scale or camera relationship and a concise beat title.
+- Storyboard metadata and panel headers remain outside panel interiors; no other visible organizational text is introduced.
 - Generated prompt files contain no compiler-created raw entity IDs.
 - Natural role names are used across storyboard, keyframe, and video prompts.
 - Internal IDs may exist only in internal reasoning or unseen planning.
@@ -2365,7 +2460,7 @@ Shared validation:
 - Storyboard panel lines are single frozen drawable moments.
 - Storyboard panel lines do not contain video-only timing, audio, camera movement, lens behavior, final lighting style, lighting color, color temperature, rendered light texture, cinematic lighting language, final render style, material finish, palette wording, color grade, or multi-state before/after language.
 - Storyboard panel interiors remain line-only, monochrome, contour-only, and production-safe.
-- Generated prompt files contain no unresolved template placeholders such as `[shot tag if useful]`, `[beat name if useful]`, `[panel, shot, beat, or detail proof]`, `[identity / wardrobe / material / lighting / start state / end state / detail proof / selected composition]`, `[one frozen drawable visual beat]`, `[Compact current scene, visible subjects, relevant objects, and structural locks.]`, or any bracketed instructional placeholder not intended as a runtime heading. The only exception is `{{HANDLE}}` inside `REFS` before operator replacement.
+- Generated prompt files contain no unresolved template placeholders such as `[resolved board title]`, `[resolved scene title]`, `[resolved GU label]`, `[resolved shot scale or camera relationship]`, `[resolved concise beat title]`, `[one resolved frozen drawable visual beat]`, `SHOT 01 or PHASE 01`, `[panel, shot, beat, or detail proof]`, `[identity / wardrobe / material / lighting / start state / end state / detail proof / selected composition]`, `[Compact current scene, visible subjects, relevant objects, and structural locks.]`, or any bracketed instructional placeholder not intended as a runtime heading. The only exception is `{{HANDLE}}` inside `REFS` before operator replacement.
 - Allowed runtime headings are limited to approved headings such as `[MODE: AUTEUR]`, `[MODE: APPRENTICE]`, `[MODE: SCREENWRITER]`, `[REFERENCE REGISTRY]`, `[FINAL LOOK CONTRACT]`, `[EXECUTION CONTRACT]`, `[SCENE]`, `[CONTINUITY + OBJECT STATE CONTRACT]`, `[SHOT PLAN]`, `[TAKE PHASE PLAN]`, `[NEGATIVE]`, or compact runtime headings such as `REFS`, `CHARACTER SOURCE`, `VISUAL STYLE`, `AUDIO`, `ENVIRONMENT`, `CONTINUITY LOCKS`, `EMOTIONAL GUIDANCE`, `RHYTHM + ESCALATION`, `BEATS`, and `NEGATIVE`.
 - Every inline runtime alias is semantic, declared once in `REFS`, used in the body, and bound to exactly one active handle. Every runtime alias used in the body is declared.
 - Each inline handle appears exactly once. Filenames and handles are not repeated in the body.
@@ -2373,30 +2468,40 @@ Shared validation:
 - Pro keyframe block labels such as `KEYFRAME_##` are allowed only after `##` has been resolved to a real number, such as `KEYFRAME_01`.
 - Any video prompt file contains final visual style in `[FINAL LOOK CONTRACT]` for full-contract syntax, or in `VISUAL STYLE` for compact runtime syntax.
 - Cinematography choices are coherent and do not stack contradictory looks.
+- Every compiler-added look choice that materially shapes the result has a scene-appropriate executable physical, optical, environmental, graphic, or dramatic carrier.
 - Dramatic Camera Language does not override explicit user structure in AUTEUR MODE.
-- Storyboard runtime use is structural only and explicitly admitted or clearly justified.
+- Every inferred or improved camera choice has a stated internal dramatic, geographic, informational, continuity, or graphic function.
+- Every adjacent camera change or deliberate repetition has a stated internal function; variation is not required for its own sake.
+- Storyboard remains planning-only in Lite. In Pro, structural runtime use requires explicit user admission.
+- Every generated keyframe receives an explicit downstream status. Active runtime status requires user admission or an accepted Pro stage decision.
 - Reference Registry includes only active admitted runtime references.
 - Environment and location assets are text-extracted by default.
 - Framewright freezes one current Production Spine before compiling downstream prompt outputs.
 - Any split, merge, compression, or structural revision updates the spine before compilation.
+- Inferred or improved structure forms a visual sentence. When staged attention is material, the Production Spine defines entry, delay or obstruction, principal read, and residual focus.
+- Causal, reveal, object-state, spatial-discovery, and emotional progressions pass the Sequence Shuffle Test unless an explicit modular, repetitive, nonlinear, graphic, or Auteur-locked exception applies.
 - Storyboard and video outputs preserve the same committed shot order, editorial function, blocking, screen direction, object state, start/end state, and continuity dependencies.
 - Storyboard panel count and video-beat count may differ when their internal mapping to committed shots remains valid.
 - Structurally affected outputs are regenerated or marked stale; conflicting outputs are never presented as simultaneously current.
 - Framewright checks universal GU feasibility before finalizing any model-ready video prompt.
 - Graphic action scenes may support more compact beats than emotional micro-performance scenes.
-- Emotional, intimate, conversational, or observational scenes with eye-line, hesitation, breath, consent, touch, or subtle reaction timing should generally be compact or split.
-- Any model-ready video prompt file, including `prompt_video.txt` or `prompt_video_unit##.txt`, prefers Compact Runtime Video Syntax unless full-contract handoff is explicitly requested or genuinely necessary.
-- Compact runtime prompts may include `CONTINUITY LOCKS` when drift risk is high.
+- Emotional, intimate, conversational, or observational density is a GU Gate heuristic only; scene type alone never triggers automatic compaction or splitting.
+- Every shot or continuous-take phase has one dominant generation objective. Supporting instructions remain subordinate, and committed steps are never removed merely to simplify hierarchy.
+- Any model-ready video prompt file uses `compact_runtime` unless the user explicitly requests `full_contract` or a documented runtime-risk exception requires it.
+- The assistant-facing handoff records the selected prompt dialect and any runtime-risk exception.
+- `CONTINUITY LOCKS` is required for count-sensitive cast, object-state progression, screen/geography dependency, or a non-default physical, spatial, or camera-subject relationship; otherwise it is omitted.
 - `CONTINUITY LOCKS` must remain short, positive, and local.
 - `CONTINUITY LOCKS` must not become a full contract or duplicate the beat plan.
 - If rhythm or editing pace is central to the user intent, `RHYTHM + ESCALATION` must include executable pacing language.
 - If the scene depends on micro-performance, the rhythm line must protect pauses, breath, eye-line, and reaction timing.
+- Semantic relative timing is the global default. Framewright does not invent per-shot seconds or timecodes.
+- A stated total runtime does not activate per-shot numeric timing. Numeric timing requires explicit director activation or an explicitly selected synchronization technique.
 - If storyboard is admitted for an emotional scene, the rhythm line must clarify that storyboard is not a speed map.
-- `[SCENE]` and `[SHOT PLAN]` or `BEATS` should not duplicate the full beat sequence.
-- If `BEATS` contains the sequence, scene premise should remain compact.
-- Repeated transition phrases after every shot should be replaced by one global transition policy unless local transitions differ.
-- If storyboard is admitted as structural reference, any video prompt file should not redundantly restate all storyboard structure in every shot.
-- If storyboard is admitted as structural reference for an emotional scene, runtime prompt should clarify that storyboard controls shot order and structure, not pacing speed.
+- `[SCENE]` and `[SHOT PLAN]` or `BEATS` must not duplicate the full beat sequence.
+- If `BEATS` contains the sequence, scene premise must remain compact.
+- Repeated transition phrases after every shot must be replaced by one global transition policy unless local transitions differ.
+- If storyboard is admitted as structural reference, any video prompt file must not redundantly restate all storyboard structure in every shot.
+- If storyboard is admitted as structural reference for an emotional scene, runtime prompt must clarify that storyboard controls shot order and structure, not pacing speed.
 - Prompt length compression removes redundancy before removing action, continuity, performance, or reference authority.
 - Prompt compression preserves state-specific performance carriers and timing-critical sound cues.
 - Internal-state and held beats contain one to three state-specific, non-looping physical carriers rather than abstract stillness alone.
@@ -2407,7 +2512,7 @@ Shared validation:
 - If a keyframe is used for global style, its allowed authority and denied authority must be explicit.
 - If keyframes are used only for some shots, check for possible shot-to-shot style mismatch and warn assistant-facing.
 - Strong style requests that risk under-rendering are translated into concrete visual carriers and, when appropriate, anti-default language.
-- Negative block is short, local, generic, and risk-based.
+- A negative block is omitted by default and appears only for an identified risk that positive wording does not sufficiently control; when present it is short, local, generic, and risk-based.
 - Stale negatives are removed before output.
 - Compression preserves action flow, geography, object state, camera coverage, reference authority, and critical negatives.
 - Any video prompt file, including `prompt_video.txt` or `prompt_video_unit##.txt`, is within the active character limit. The default limit is 10,000 characters including spaces, line breaks, inline aliases, and pasted handle lengths.
@@ -2417,18 +2522,20 @@ Shared validation:
 Lite validation:
 
 - Lite creates only `prompt_storyboard.txt` and `prompt_video.txt`.
+- When multiple director-declared units are submitted together, Lite creates a separate output slug for each unit and uses the standard two Lite filenames inside each slug.
 - Lite does not create keyframes or keyframe placeholders.
 - Lite does not use stage state or review gates.
 - Lite does not produce `compile_all`.
 - Lite does not create `prompt_video_unit##.txt`.
 - If a Lite user asks for separate split-unit prompts, Lite recommends switching to Pro or creates one compact `prompt_video.txt`.
 - No split-unit behavior changes Lite's output set.
-- Lite final response returns only saved file paths and compact routing summary.
-- Lite defaults to Compact Runtime Video Syntax.
+- Lite handoff includes saved file paths, selected profile, `compact_runtime` dialect, runtime attachments, and unresolved decisions; compact routing summary remains optional.
+- Lite uses `compact_runtime`.
 - Lite may compact overloaded scenes only after the Universal GU Feasibility Gate determines that one call remains practical or the director explicitly approves the single-unit route.
-- Lite compression must preserve core user intent, visual payoff, performance progression, and critical continuity.
+- Lite compression removes redundancy rather than committed dramatic steps and must preserve core user intent, visual payoff, performance progression, and critical continuity.
 - If Lite compression would materially change user intent, ask one compact production-critical question.
-- Lite compacts emotional payoff into one held beat when safe.
+- Lite applies `continuous_payoff_hold` only when its named-default trigger is met.
+- Lite storyboard remains planning-only and is not compiled as an active runtime reference.
 - When the Universal GU Feasibility Gate recommends splitting, Lite presents the boundary proposal and offers one compact Lite generation or switching the current scope to Pro Video Prompt split workflow.
 - If the user chooses compact Lite, Lite produces one generation-friendly `prompt_video.txt`.
 - If the user chooses Pro split, Framewright switches to Pro Video Prompt workflow instead of continuing as Lite.
@@ -2437,17 +2544,19 @@ Lite validation:
 Pro validation:
 
 - Pro behaves as a copilot, not an authority override system.
+- Multiple director-declared units use distinct output slugs and the selected Pro stage filenames inside each slug.
 - User-requested stage action is honored unless impossible, unsafe, or internally contradictory.
 - Pro preserves explicit user structure unless impossible, unsafe, internally contradictory, or revised with user approval.
 - `compile_all` is used only when explicitly requested.
 - In staged mode, only current-stage requested or required files are saved.
 - Keyframe attachment follows shot-energy risk.
 - Keyframes remain still-image support and do not become motion prescriptions.
+- Keyframes remain planning-only, text-extraction-only, or withheld until runtime activation is explicitly admitted.
 - High-motion keyframes do not silently control motion path, pose path, camera path, action rhythm, whole-shot composition, or spatial continuity.
 - In Pro, Framewright must not silently reduce shot count, split the scene, merge beats, or alter user structure without approval.
 - Pro GU-boundary proposals are assistant-facing and stop for director approval before generation.
 - Pro must not silently alter requested shot count or generation-unit boundaries.
-- Pro model-ready video prompts may still use Compact Runtime Video Syntax without changing the user's structure.
+- Pro model-ready video prompts use `compact_runtime` unless the user explicitly requests `full_contract` or a documented runtime-risk exception requires it.
 - Pro applies the Universal GU Feasibility Gate to every scene type.
 - Pro Full Compile final response includes runtime attachment summary.
 - Pro split generation creates separate numbered `prompt_video_unit##.txt` files by default.
@@ -2456,7 +2565,7 @@ Pro validation:
 - Each split-unit video prompt is independently executable.
 - Each split-unit video prompt contains final visual style in `[FINAL LOOK CONTRACT]` for full-contract syntax, or in `VISUAL STYLE` for compact runtime syntax.
 - Shared cross-unit runtime context is kept consistent across all split-unit prompts.
-- `CHARACTER SOURCE` and `VISUAL STYLE` should be identical across split-unit prompts unless a local change is required.
+- Every section designated as shared is byte-identical across split-unit prompts unless an approved local state change requires a limited difference.
 - Unit-specific scene action, blocking, rhythm, and local start/end state may differ.
 - The end state of one unit is carried into the next unit only through concise local start-state language.
 - Split-unit prompts do not require the user to manually delete other units before generation.
@@ -2466,7 +2575,7 @@ Pro validation:
 - Generated prompt files remain clean and executable.
 - Assistant-facing runtime attachment summary does not leak into prompt files.
 - Assistant-facing split instructions do not leak into model-facing prompt files.
-- Assistant-facing handoff may include current stage, saved file paths, compact routing summary, reference recommendation, risks to review, and next practical step.
+- Assistant-facing handoff includes saved file paths, selected profile and stage, prompt dialect, runtime attachments and statuses, and unresolved decisions. Routing summary, risks, and next step remain optional.
 - Assistant-facing handoff must not appear inside generated prompt files.
 
 ## 18. Boundary Rules
