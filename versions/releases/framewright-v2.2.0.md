@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "2.2.1"
+version: "2.2.0"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -349,7 +349,7 @@ Scene grammar controls:
 - feedback intensity;
 - camera execution phrasing;
 - rhythm language;
-- local environmental and action-sound detail without changing the universal generated-sound policy.
+- audio-planning language when relevant.
 
 Scene grammar does not override explicit user instruction.
 
@@ -454,7 +454,7 @@ Operators:
 9. Compression Safety Pass
 10. Universal GU Feasibility Gate
 11. Performance Vitality / Living Stillness
-12. Default Generated Diegetic Sound
+12. Lightweight Sound Dependency
 
 Shared execution principles:
 
@@ -838,7 +838,7 @@ Before saving generated prompts:
 - preserve camera and panel alignment;
 - preserve setup and payoff logic;
 - preserve state-specific performance carriers;
-- preserve the default environmental sound bed and synchronized action cues;
+- preserve timing-critical sound cues;
 - preserve active runtime alias declarations and their single handle occurrence.
 
 Lite should be especially compact.
@@ -856,7 +856,7 @@ When compressing any video prompt file, including `prompt_video.txt` or `prompt_
 5. Repeated screen-direction statements already covered in continuity or storyboard authority.
 6. Repeated transition phrases such as `Cut clean` after every shot; replace with one global transition policy.
 7. Redundant shot titles when the action line is clear.
-8. Overlong audio detail; keep one compact environmental sound bed and only the synchronized action cues needed by the current unit.
+8. Overlong `post_only` audio lists; keep `timing_critical` sound cues inside the beat they control.
 9. Soft negatives.
 10. Duplicate continuity statements.
 11. Redundant scene synopsis content already covered in `BEATS` or `[SHOT PLAN]`.
@@ -869,7 +869,7 @@ Preserve:
 - final look carriers;
 - performance rhythm;
 - state-specific, non-looping performance carriers;
-- the compact environmental sound bed and synchronized action cues;
+- `timing_critical` sound cues;
 - user-explicit shot order in Pro unless user approves changes;
 - visible action;
 - object-state changes;
@@ -933,9 +933,9 @@ Compression must preserve:
 - transition policy;
 - critical negatives;
 - concrete performance carriers for internal-state or held beats;
-- environmental sound and synchronized action cues that determine visible action, reaction, or lip movement.
+- timing-critical sound cues that determine visible action, reaction, or lip movement.
 
-Compression must remove duplicated or subordinate wording before committed action, continuity, performance, reference authority, or synchronized action cues. It may shorten carrier language, but must not replace concrete physical behavior with abstract psychological adjectives alone.
+Compression must remove duplicated or subordinate wording before committed action, continuity, performance, reference authority, or timing-critical cues. It may shorten carrier language, but must not replace concrete physical behavior with abstract psychological adjectives alone.
 
 ### 8.10 Universal GU Feasibility Gate
 
@@ -1036,25 +1036,15 @@ Do not apply Living Stillness mechanically to beats dominated by clear outward a
 
 Named performance carriers are protected content. Compactness may shorten their wording but must not replace them with abstract mood language alone.
 
-### 8.12 Default Generated Diegetic Sound
+### 8.12 Lightweight Sound Dependency
 
-Every model-ready video prompt defaults to in-model generated sound, regardless of operating profile, director mode, scene grammar, genre, tone, or story content.
+Classify sound internally only when it affects compilation:
 
-Use one compact sound contract:
+- `post_only`: score, ambience, and most effects intended for post; omit or keep extremely compact by default.
+- `timing_critical`: sound that triggers or times visible action, reaction, breathing, footsteps, lip movement, or a reveal; place it inside the beat it controls and preserve it during compression.
+- `generate_in_model`: use only when the user explicitly requests model-generated sound and the target model supports it.
 
-- generate scene-appropriate environmental ambience;
-- generate synchronized diegetic, practical, and action sound effects for visible events;
-- do not generate music, score, soundtrack, song, melody, or rhythmic musical accompaniment.
-
-Do not classify sound into separate internal routing categories.
-
-Story content, emotional intensity, montage rhythm, romance, action, suspense, or a dramatic payoff must never activate music by inference.
-
-Do not invent dialogue, narration, singing, or other vocal performance. Preserve director-supplied dialogue or explicitly requested vocal content as locked content, but keep it separate from the universal ambience-and-effects default.
-
-State the environmental bed once in `AUDIO`. Place only action-synchronized sound cues inside the beat they directly control. Keep both concise and preserve them during compression.
-
-An explicit director request may override the no-music default. Without that explicit override, every video prompt must request environmental sound and effects only, with no music.
+Do not generate a verbose audio contract when a short beat-level cue is sufficient.
 
 ## 9. Reference Policy and Lifecycle
 
@@ -1158,7 +1148,7 @@ Rules:
 - Every declared alias must be used in the body, and every runtime alias used in the body must be declared.
 - `{{HANDLE}}` is the only unresolved placeholder allowed, only inside `REFS`, and only until the operator pastes the downstream handle.
 - Count the complete `REFS` block, including pasted handle length, against the active character limit.
-- Reserve attachment characters and a small safety margin before compressing the body. Never truncate a handle, alias, core action, continuity state, performance carrier, or synchronized action cue to satisfy the limit.
+- Reserve attachment characters and a small safety margin before compressing the body. Never truncate a handle, alias, core action, continuity state, performance carrier, or timing-critical cue to satisfy the limit.
 - If the downstream platform binds attachments outside prompt text, keep the handle map operator-facing and outside the model-facing prompt; do this only when the platform preserves the same alias-to-asset binding.
 - If no active inline handle is required, omit `REFS` completely.
 - Omitting the alias declaration or handle slot for an active inline runtime reference is a validation failure.
@@ -1315,7 +1305,7 @@ For Lite, prefer concise headings:
 - `REFS`, only when inline handles are required;
 - `CHARACTER SOURCE`;
 - `VISUAL STYLE`;
-- `AUDIO`, required with environmental ambience, synchronized diegetic or action effects, and no music;
+- `AUDIO`;
 - `ENVIRONMENT`;
 - `EMOTIONAL GUIDANCE`;
 - `RHYTHM + ESCALATION`;
@@ -1496,7 +1486,7 @@ storyboard/<short_slug>/prompt_video_unit02.txt
 storyboard/<short_slug>/prompt_video_unit03.txt
 ```
 
-Only save files actually requested or required by the current stage. Required stage outputs are saved by default after all applicable gates are satisfied; do not wait for a second file-creation authorization.
+Only save files actually requested or required by the current stage.
 
 ### Split Generation Output Contract
 
@@ -1808,7 +1798,7 @@ Shared rules:
 - Any video prompt file, including `prompt_video.txt` or `prompt_video_unit##.txt`, must be self-contained and executable without hidden context.
 - It describes only the visible, audible, and intended world of the current clip or segment.
 - It uses natural role names, not compiler-created raw entity IDs.
-- It carries motion, timing, the required generated environmental-sound and effects contract, lens behavior, final color, lighting, material, texture, choreography, and final visual style.
+- It carries motion, timing, audio-planning language when relevant, lens behavior, final color, lighting, material, texture, choreography, and final visual style.
 - It translates from the same Production Spine as storyboard and keyframes.
 - It must not rely on storyboard images unless the user explicitly admits storyboard as a structural reference.
 - If storyboard is admitted, it controls structure only.
@@ -1887,7 +1877,7 @@ NEGATIVE
 - performance pressure;
 - motion intensity;
 - micro-motion;
-- the required in-model environmental-sound and effects contract, with no music.
+- audio-planning language when relevant.
 
 Multi-shot sequences use clean hard cuts unless otherwise requested.
 
@@ -1918,7 +1908,7 @@ VISUAL STYLE:
 <same cross-unit visual style language>
 
 AUDIO:
-<same generated environmental sound bed across units, no music; add only unit-specific synchronized action effects>
+<same base sound world, with unit-specific audio cues only when needed>
 
 ENVIRONMENT:
 <same local world setup, with unit-specific start state only when needed>
@@ -1962,7 +1952,7 @@ VISUAL STYLE:
 <one compact but strong visual system with concrete executable visual carriers>
 
 AUDIO:
-<required; one compact line requesting in-model environmental ambience and synchronized diegetic or action effects, with no music>
+<omit when sound is post-only and nonessential; otherwise one compact line for timing-critical or explicitly generated sound>
 
 ENVIRONMENT:
 <one compact line establishing location, spatial anchors, and critical object state>
@@ -2225,7 +2215,7 @@ Use only active admitted runtime references. Include character, subject, prop, o
 Write one compact paragraph defining the final visual world through medium or visual system, palette logic, motivated lighting, contrast, lens or focal feel, atmosphere or texture layer, material and surface behavior, and forbidden drift. Only include storyboard structure-only language when storyboard is admitted as a runtime structural reference. Environment assets are text-extracted only unless the user explicitly requested direct matching.
 
 [EXECUTION CONTRACT]
-Write one compact paragraph defining pacing, rhythm, camera coverage grammar, transition policy, performance pressure, motion intensity, micro-motion, and the required in-model environmental ambience and synchronized action effects. State that there is no music. Multi-shot sequences use clean hard cuts unless otherwise requested. Continuous takes use true continuous camera movement with no hidden cuts, dissolve, overlap transition, or crossfade simulation.
+Write one compact paragraph defining pacing, rhythm, camera coverage grammar, transition policy, performance pressure, motion intensity, micro-motion, and audio-planning language when relevant. Multi-shot sequences use clean hard cuts unless otherwise requested. Continuous takes use true continuous camera movement with no hidden cuts, dissolve, overlap transition, or crossfade simulation.
 
 [SCENE]
 Write the current clip action only. Include only visible, audible, and intended elements of this clip. Do not mention prior segments, future segments, absent characters, absent props, or offscreen named entities.
@@ -2306,24 +2296,6 @@ Before step 5, no file generation, file creation, file saving, asset mapping, st
 
 A target folder path before operating profile selection is inert context only.
 
-### Default Prompt Artifact Delivery
-
-`prompt-only` defines Framewright's production boundary: Framewright creates prompt artifacts and does not automatically execute downstream image, video, editing, or other production tools. It does not mean that prompts should be delivered only as inline chat text.
-
-For a requested Framewright compilation, once the operating profile and every applicable Pro stage, reference, and generation-unit boundary gate are resolved:
-
-- save every output required by the selected profile and current stage as a `.txt` file;
-- use the standard `storyboard/<short_slug>/` path when the director does not provide another permitted Framewright destination;
-- treat creation of these required Framewright prompt files as part of the compilation itself, without asking for separate file-creation authorization;
-- return saved file paths and the required compact assistant-facing handoff;
-- do not paste complete prompt bodies into the assistant response.
-
-Inline prompt delivery is an override, not the default. Use it only when the director explicitly requests inline delivery or when file writing is unavailable. If file writing is unavailable, explain the limitation and do not claim that files were created.
-
-Do not substitute inline output for required `.txt` files when a permitted writable destination is available.
-
-This default authorization covers only the Framewright prompt files required by the selected profile and stage. It does not authorize ChatCut, OpenMontage, image generation, video generation, unrelated file mutation, or any other downstream production action.
-
 Lite file workflow:
 
 1. Inspect input and assets.
@@ -2359,7 +2331,7 @@ Pro file workflow:
 9. Apply full craft operators.
 10. Generate only requested or stage-required outputs from each frozen spine.
 11. Run structural validation against any current downstream outputs.
-12. Save every prompt file required by the current Pro stage.
+12. Save only files actually created.
 
 When the director submits multiple declared units together, use one distinct output slug per unit and repeat the selected Pro stage filenames inside each slug. If the Gate later splits one declared unit, place that unit's numbered `prompt_video_unit##.txt` files inside its own slug.
 
@@ -2421,9 +2393,6 @@ If the output is not split, keep the existing single-prompt runtime attachment s
 For both profiles:
 
 - Only list files actually created.
-- Save required Framewright prompt outputs as `.txt` files by default after all applicable gates are satisfied.
-- Do not require a second file-creation authorization for outputs required by the selected profile and stage.
-- Do not return complete prompt bodies inline unless the director explicitly requests inline delivery or file writing is unavailable.
 - Generated prompt files must stay clean and executable.
 - Assistant-facing summaries must stay outside generated prompt files.
 
@@ -2431,10 +2400,6 @@ For both profiles:
 
 Shared validation:
 
-- Default Framewright prompt delivery is saved `.txt` artifacts, not complete inline prompt bodies.
-- `prompt-only` limits Framewright to prompt artifacts and does not disable default `.txt` file creation.
-- After all applicable gates are satisfied, required profile and stage outputs are saved without a second file-creation authorization.
-- Inline prompt delivery occurs only on explicit director request or when file writing is unavailable.
 - Operating profile is selected before generation.
 - Operating profile applies to one compilation scope only.
 - A new independent scene, generation unit, or sequence resets the profile and triggers the gate even in the same conversation.
@@ -2538,13 +2503,10 @@ Shared validation:
 - If storyboard is admitted as structural reference, any video prompt file must not redundantly restate all storyboard structure in every shot.
 - If storyboard is admitted as structural reference for an emotional scene, runtime prompt must clarify that storyboard controls shot order and structure, not pacing speed.
 - Prompt length compression removes redundancy before removing action, continuity, performance, or reference authority.
-- Prompt compression preserves state-specific performance carriers, the environmental sound bed, and action cues synchronized to visible events.
+- Prompt compression preserves state-specific performance carriers and timing-critical sound cues.
 - Internal-state and held beats contain one to three state-specific, non-looping physical carriers rather than abstract stillness alone.
 - Living Stillness is not applied as a mechanical blink-and-breath template.
-- Every video prompt requests in-model environmental ambience and synchronized diegetic or action effects by default, regardless of story content.
-- Every video prompt excludes music unless the director explicitly overrides the default.
-- Sound is not classified into separate internal routing categories.
-- Director-supplied dialogue or explicitly requested vocal content is preserved, but Framewright does not invent dialogue, narration, singing, or other vocal performance.
+- `post_only` sound is first to trim; `timing_critical` sound remains inside the beat it controls; `generate_in_model` requires explicit user request and target-model support.
 - `first_frame_reference` activates only on explicit director request, only in Pro, and controls the next unit's start state rather than later motion, rhythm, camera path, or global style.
 - A normal keyframe is not treated as a global style-lock reference unless explicitly assigned.
 - If a keyframe is used for global style, its allowed authority and denied authority must be explicit.

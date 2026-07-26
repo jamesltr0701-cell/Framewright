@@ -1,7 +1,7 @@
 interface:
   display_name: "Framewright"
-  short_description: "Storyboard, keyframe, and video prompt compiler"
-  default_prompt: "Use $framewright to turn my scene idea into production-ready visual prompts."
+  short_description: "Storyboard, keyframe, and video prompt-file compiler"
+  default_prompt: "Use $framewright to turn my scene idea into saved production-ready visual prompt files."
 
 policy:
   allow_implicit_invocation: false
