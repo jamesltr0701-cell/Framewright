@@ -2,7 +2,7 @@
 
 Framewright is an asset-aware prompt compiler for AI filmmaking. It turns a director's scene intent and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-Current core version: **2.2.1**
+Current core version: **3.0.0**
 Author: **Tairan Li**
 
 ## Repository structure
@@ -11,7 +11,7 @@ Author: **Tairan Li**
 - [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md) — current authoritative Framewright specification
 - [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
-- [`versions/beta/`](versions/beta/) — Lite and Pro beta branches
+- [`versions/beta/`](versions/beta/) — preserved historical beta experiments
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
 
 The GitHub repository is the source of truth. An installed local Skill is a runtime copy that can be replaced whenever the repository is updated.
@@ -24,7 +24,7 @@ Ask Codex:
 
 After installation, invoke it explicitly with `$framewright`.
 
-Framewright is configured for explicit invocation and saved prompt-file generation only. After the required profile and stage gates are satisfied, it saves the applicable `.txt` prompt artifacts by default. It does not automatically run ChatCut, OpenMontage, image generation, or video generation.
+Framewright is configured for explicit invocation and saved prompt-file generation only. It uses one unified director intake, asks one consolidated batch of material questions, and then runs exactly one selected stage: Storyboard, Keyframes, or Video Prompt. After the intake and stage gates are satisfied, it saves the applicable `.txt` prompt artifact by default. It does not automatically run ChatCut, OpenMontage, image generation, or video generation.
 
 ## Repository policy
 
