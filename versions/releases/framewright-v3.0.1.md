@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "3.1.0"
+version: "3.0.1"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -209,10 +209,9 @@ Infer a committed structure from visible action, geography, continuity, and risk
 Rules:
 
 - In AUTEUR MODE, do not redesign user-provided shot order, blocking, rhythm, coverage, camera movement, or framing.
-- Continuous-take language alone does not select APPRENTICE MODE. Use APPRENTICE MODE only when the director also supplies partial shot structure, framing, camera direction, staging, or comparable shot intent.
-- In APPRENTICE MODE, add only necessary execution detail. Do not reorder, delete, or redesign user-locked shots. A compiler-added shot must have one fixed place and one dramatic, continuity, informational, or editorial function.
+- In APPRENTICE MODE, add only necessary execution detail. A compiler-added shot must have one fixed place and function.
 - Ask before an Apprentice addition changes core rhythm or a generation-unit boundary.
-- In SCREENWRITER MODE, infer structure actively but respect every explicit lock. Build a committed Shot Spine before compiling any prompt.
+- In SCREENWRITER MODE, infer structure actively but respect every explicit lock.
 - Produce one committed edit sequence, not optional coverage.
 
 Every generated prompt file or independently executable prompt block starts with exactly one of:
@@ -257,15 +256,10 @@ production_spine:
   active_stage:
   generation_unit:
   storyboard_layout:
-  storyboard_asset_bindings:
   visible_entities:
   start_state:
   end_state:
   shot_or_phase_plan:
-  committed_shot_spine:
-  attention_flow:
-  transition_policy:
-  rhythm_shape:
   object_state_progression:
   spatial_geography:
   continuity_locks:
@@ -293,8 +287,6 @@ The spine must preserve:
 - performance timing and reaction holds;
 - final visual look;
 - environmental sound and synchronized action cues.
-- editorial, attention, and camera function for every compiler-inferred or improved shot;
-- transition policy and relative rhythm shape.
 
 ## 8. Shared Craft Operators
 
@@ -303,19 +295,16 @@ Apply these operators to every relevant stage:
 1. Entity Token Isolation
 2. Storyboard Color Isolation
 3. Storyboard Layout Contract
-4. Storyboard Asset Use
-5. Shot Design and Editorial Logic
-6. Image-Prompt Beat Rewrite
-7. Dramatic Camera Language
-8. Cinematography Layer
-9. Count / Entity / Single-Instant Locks
-10. Compactness Pass
-11. Stale-Negative Pass
-12. Compression Safety Pass
-13. Generation-Unit Feasibility Gate
-14. Editing and Semantic Timing
-15. Performance Vitality / Living Stillness
-16. Default Generated Diegetic Sound
+4. Image-Prompt Beat Rewrite
+5. Dramatic Camera Language
+6. Cinematography Layer
+7. Count / Entity / Single-Instant Locks
+8. Compactness Pass
+9. Stale-Negative Pass
+10. Compression Safety Pass
+11. Generation-Unit Feasibility Gate
+12. Performance Vitality / Living Stillness
+13. Default Generated Diegetic Sound
 
 The craft layer adds directing intelligence, not authority.
 
@@ -359,46 +348,6 @@ Every storyboard is one landscape `16:9` board with a declared, model-facing lay
 - Render the resolved `SCENE TITLE` and `GENERATION UNIT` as compact exterior metadata only. Board title, metadata, and any panel headers remain outside panel image areas.
 - Do not add any other board-level text, captions, notes, diagrams, UI, or production paperwork.
 
-### 8.2.2 Storyboard Asset Use
-
-Use every supplied visual asset that has a safe, useful storyboard role. Resolve its storyboard authority before compiling; do not merely inspect it internally and then omit its visual information from the prompt.
-
-- Character, subject, creature, vehicle, mechanical, prop, and object assets contribute only the relevant identity, silhouette, proportions, key geometry, orientation, count, contact, and continuity facts to the panels where they appear.
-- When direct image reference is useful for that structural fidelity, state its natural-language binding in the prompt, for example: `Use the attached dragon character board only for the creature's long horned head, serpentine proportions, four-limbed anatomy, and silhouette.` Do not expose raw internal IDs.
-- Environment and location assets are text-extraction sources by default. Convert them into only the spatial anchors needed for action, path, obstruction, scale, geography, or continuity; attach or describe direct visual matching only when the director explicitly requires it.
-- Style, lighting, material, texture, and atmosphere assets do not control storyboard panel rendering. Preserve only any structural geometry they safely provide.
-- Keep asset-derived final color, material, texture, lighting, grade, and finish out of storyboard panels.
-- Omit assets that have no safe useful storyboard role. An omitted asset must not leave an empty reference instruction behind.
-- Storyboard asset use is for the current planning image only. It does not admit the resulting storyboard as a downstream video reference.
-
-### 8.2.3 Shot Design and Editorial Logic
-
-Before compiling a storyboard or video prompt, build a committed Shot Spine whenever Framewright infers, improves, or adds shot structure.
-
-```yaml
-committed_shot:
-  shot_id:
-  editorial_function:
-  attention_function:
-  camera_relationship:
-  start_state:
-  visible_action:
-  end_state:
-  continuity_dependencies:
-```
-
-`shot_id` and function labels are internal scaffolding only. Do not expose them as diagnostic metadata in generated prompt files.
-
-Rules:
-
-- Inferred or improved progression must read as a visual sentence, not as a generic coverage list or event inventory.
-- Every committed shot has one clear editorial function: establish, orient, delay, reveal, prove contact, transfer attention, intensify pressure, release, aftermath, or another equally specific job.
-- When staged reveal, gaze transfer, background information, emotional attention, or an object becoming legible matters, resolve one attention flow: `entry -> delay or obstruction -> principal read -> residual focus`. Compile it into framing, action order, eye-line, reveal, or rhythm; never print the chain as workflow language.
-- For causal, reveal, object-state, spatial-discovery, or emotional progression, run the Sequence Shuffle Test. Reordering the inferred or unlocked shots must damage the intended progression. If it does not, revise the unlocked editorial functions or structure.
-- Modular montage, deliberate repetition, ritual, graphic equivalence, nonlinear design, and director-locked order are exempt. In AUTEUR MODE, report a material shuffle risk assistant-facing only; do not rewrite the supplied sequence.
-- Preserve trigger, movement, contact, and result; start state and end state; geography and screen direction; count-sensitive entities; and explicit user camera choices.
-- A storyboard panel may map to one or more video beats and vice versa, but every mapping must preserve the current Shot Spine's editorial function, state progression, and continuity dependencies.
-
 ### 8.3 Image-Prompt Beat Rewrite
 
 Rewrite every storyboard panel and keyframe as one drawable frozen instant.
@@ -422,12 +371,6 @@ Use concrete camera-subject relationships. Avoid decorative lens jargon and arbi
 
 Preserve director-locked camera instructions. When camera movement would contradict geography, physical action, or a continuous-take lock, ask before changing it.
 
-Every adjacent inferred camera change or deliberate repetition needs an internal function. Do not vary height, axis, distance, foreground obstruction, subject scale, negative space, geometry, screen direction, compression, threshold framing, reflection, or point of view merely for variety.
-
-For every user-requested, strongly implied, or compiler-added production-critical move, commit the camera inside the relevant beat: start position or frame, path or combined behavior, landing position or frame, spatial direction, visible evidence of movement, and action-based motivation. Broad labels such as `dynamic camera`, `tracking`, or `orbit` are insufficient when the execution changes story clarity, geography, action proof, or continuity.
-
-In APPRENTICE MODE, strengthen missing camera logic without overriding explicit structure. In SCREENWRITER MODE, actively infer a dramatic camera progression. In AUTEUR MODE, this operator remains protective only.
-
 ### 8.5 Cinematography Layer
 
 Translate look choices into executable carriers:
@@ -441,15 +384,6 @@ Translate look choices into executable carriers:
 - color relationships for final imagery only.
 
 Do not rely on abstract labels such as `cinematic`, `premium`, `beautiful`, or `moody` without concrete carriers.
-
-### 8.5.1 Style Survival and Surface Fidelity
-
-When explicit direction or admitted non-storyboard visual assets carry a distinctive final medium, edge behavior, material finish, texture, grain, wear, imperfection, handmade quality, or stylization boundary, preserve it in the video prompt through concise executable carriers.
-
-- Style Survival states only the final-image qualities that would otherwise drift: visual system, palette logic, edge behavior, surface or material finish, lighting and shadow behavior, shape language, subject-environment integration, and forbidden cleanup direction.
-- Add a dedicated Surface Fidelity lock only when the user explicitly locks a surface property, an admitted asset makes that property identity-critical, the asset role grants it authority, or a shot depends on close surface readability.
-- Storyboard rendering never supplies Style Survival or Surface Fidelity authority.
-- Omit this material when no real trigger exists; do not create a generic texture block.
 
 ### 8.6 Count, Entity, and Single-Instant Locks
 
@@ -466,13 +400,7 @@ Use explicit wording for:
 
 Do not overload negative prompts with impossible exhaustive lists.
 
-When materially different scales share a shot, state the relevant relative scale in direct scene terms; never rely on an image reference alone to preserve it. For procedural, mechanical, contact, or transformation scenes, resolve the initial, intermediate, and final object states and prevent final-state objects from appearing early.
-
 ### 8.7 Compactness and Compression Safety
-
-Before compression, assign one dominant generation objective to each shot or continuous-take phase. Supporting action, performance, continuity, sound, and environment detail remain subordinate to that objective; they must not compete as equal instructions.
-
-If a shot or phase contains multiple competing primary objectives, use the Generation-Unit Feasibility Gate or propose an unlocked boundary according to director-mode authority. Do not silently alter committed structure to make a prompt shorter.
 
 Remove in this order:
 
@@ -493,8 +421,6 @@ Never remove:
 - environmental sound bed;
 - synchronized action cues;
 - active reference bindings.
-
-After compression, reread the prompt and repair any broken action flow, prop pickup/held/dropped/broken/returned continuity, screen direction, camera or panel mismatch, missing setup, impossible logic jump, lost camera coverage, or missing transition policy.
 
 ### 8.8 Stale-Negative Pass
 
@@ -533,16 +459,6 @@ Never auto-split, auto-merge, or generate across an unapproved boundary.
 After approval, each child unit receives an independently executable prompt. Shared continuity context remains consistent across child units.
 
 If the director explicitly keeps a risky single unit, preserve the decision and make the prompt generation-friendly without deleting a committed dramatic step. Keep residual-risk notes assistant-facing only.
-
-### 8.9.1 Editing and Semantic Timing
-
-Use semantic relative timing by default. Describe rhythm through causal, relational language such as `briefly`, `after the hesitation registers`, `the hold outlasts the earlier beats`, `without rushing the reaction`, `as the camera settles`, `during recovery`, or `before recommitment`.
-
-- Do not invent per-shot seconds, timecode ranges, equal-duration allocations, or second-by-second phase segmentation merely because the director supplied a total runtime.
-- Use numeric timing only when the director explicitly supplies or requests it, or when an explicitly selected synchronization technique needs it. Even then, use the minimum numbers and preserve the semantic beat relationship.
-- For an edited sequence, use clean hard cuts by default unless the director requests another transition. Do not add dissolve, crossfade, ghost overlap, blended transition, or morphing transition by default.
-- For a continuous take, describe one uninterrupted camera path. Its phases are not cuts; do not simulate continuity with hidden cuts, resets, dissolves, or overlap transitions.
-- Every video prompt declares or embodies one transition policy and one rhythm shape. Avoid flattening all shots into equal duration and equal energy.
 
 ### 8.10 Final Payoff Hold
 
@@ -695,9 +611,6 @@ LAYOUT CONTRACT:
 - Panels: equal-size landscape 16:9 rectangles only; uniform gutters and outer margins; no portrait, square, strip, merged, or irregular panels.
 - BOARD TITLE: render the resolved title value once as the readable top masthead, outside all panels.
 - SCENE TITLE and GENERATION UNIT: compact exterior metadata only, outside all panels.
-
-STORYBOARD ASSET BINDINGS:
-- [resolved natural-language binding for each relevant supplied visual asset, with its limited storyboard authority]
 ```
 
 Include resolved:
@@ -706,7 +619,6 @@ Include resolved:
 - `SCENE TITLE`
 - `GENERATION UNIT`
 - a resolved grid and any intentional blank cells;
-- resolved storyboard asset bindings for every relevant supplied visual asset;
 - ordered external panel labels;
 - shot scale or camera relationship;
 - one frozen visible beat per panel;
@@ -734,8 +646,6 @@ P02 | SHOT 02 or PHASE 02 | [resolved shot scale or camera relationship] | [reso
 ```
 
 The compiler resolves every bracketed field before saving. The title, metadata, panel labels, and any permitted panel headers are exterior sheet organization, not panel-interior text.
-
-Asset bindings must be direct model-facing instructions, not compiler notes. Use natural asset descriptions and limited authority language; omit the section entirely when no supplied asset has a relevant storyboard role.
 
 The storyboard artifact remains planning-only unless the director later admits a generated storyboard image as a structural runtime reference.
 
@@ -776,12 +686,10 @@ Every video prompt must:
 - include active runtime references only;
 - state final visual style through executable carriers;
 - preserve start state, end state, and continuity;
-- preserve the committed Shot Spine's editorial function, attention progression, and camera logic;
 - use visible, directional motion language;
 - protect reaction timing, breath, eye-line, and holds when performance matters;
 - include environmental ambience and synchronized diegetic/action effects;
 - exclude music unless explicitly requested;
-- use semantic timing and the resolved transition policy;
 - remain independently executable;
 - stay within the active character limit.
 
@@ -798,22 +706,11 @@ ENVIRONMENT
 CONTINUITY LOCKS
 EMOTIONAL GUIDANCE
 RHYTHM + ESCALATION
-CAMERA EXECUTION
-SCALE LOCK
-OBJECT-STATE TIMELINE
 BEATS
 NEGATIVE
 ```
 
 Omit headings that add no value. Use paragraph-based prompt blocks and avoid nested colon-heavy formatting.
-
-For edited sequences, every beat must state visible action, object state when relevant, performance pressure, camera relationship, and any local transition exception. Use hard cuts as the shared default rather than repeating `cut` after every beat.
-
-For continuous takes, every phase must state visible action, object state when relevant, camera relationship, continuous path, framing, subject placement, and no-cut continuity. A phase must not reset the camera, geography, identity, object state, or current optical behavior.
-
-When camera execution is production-critical, write it in the beat that needs it: start frame, path, landing frame, direction, visible movement evidence, and motivation. Do not rely on `RHYTHM + ESCALATION` as a substitute for shot-level camera execution.
-
-When relevant, include direct Scale Lock, Object-State Timeline, reaction-target, threshold-crossing, and Surface Fidelity language. Keep each conditional block only when it materially prevents drift.
 
 ### Split-Unit Video Outputs
 
@@ -937,10 +834,6 @@ Before saving, verify:
 - No hidden batch or paired-output behavior is active.
 - Director mode and scene grammar are resolved.
 - Explicit user structure is preserved.
-- APPRENTICE additions have one fixed place and one necessary function; user-locked shots were not reordered, deleted, or redesigned.
-- SCREENWRITER structure has a committed Shot Spine with editorial function, attention function, camera relationship, start state, visible action, end state, and continuity dependencies.
-- Inferred or improved shot progression reads as a visual sentence; applicable causal, reveal, state, spatial, or emotional sequences pass the Sequence Shuffle Test.
-- Every inferred or improved camera choice and adjacent camera change has a dramatic, geographic, informational, continuity, or graphic function.
 - Generation-unit boundaries are declared or approved.
 - The Production Spine is current and frozen.
 - Each prompt block starts with the required mode line.
@@ -951,14 +844,8 @@ Before saving, verify:
 - Storyboard interiors remain monochrome line-only planning drawings.
 - Every storyboard prompt declares one landscape 16:9 board, equal landscape 16:9 panels, a resolved grid, and intentional blank-cell positions where applicable.
 - Every storyboard prompt positively requires its resolved BOARD TITLE as one readable exterior top masthead; it is not merely metadata in the prompt body.
-- Every supplied visual asset has a resolved storyboard role, and every relevant asset has a natural-language storyboard binding that preserves only its allowed structural authority.
 - Keyframes are frozen production-purpose images.
 - Video prompts include final look, continuity, and visible motion.
-- Video prompts use semantic relative timing unless numeric timing was explicitly requested or required for an approved synchronization technique.
-- Edited sequences use a stated hard-cut transition policy unless overridden; continuous takes have one uninterrupted camera path with no hidden reset.
-- Production-critical camera moves state start, path, landing, direction, visible movement evidence, and motivation in the relevant beat.
-- Relevant scale, object-state, reaction-target, threshold-crossing, Style Survival, and Surface Fidelity locks are present without unnecessary generic blocks.
-- Compression preserves action flow, geography, object state, camera coverage, transition policy, reference authority, and critical negatives.
 - Video prompts request environmental ambience and synchronized effects.
 - Video prompts exclude music unless explicitly overridden.
 - No invented dialogue, narration, singing, or vocal performance appears.
