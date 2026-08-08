@@ -2,7 +2,7 @@
 
 Framewright is an asset-aware prompt compiler for AI filmmaking. It turns a director's scene intent and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-Current core version: **3.1.0**
+Current core version: **3.2.0**
 Author: **Tairan Li**
 
 ## Repository structure
@@ -24,7 +24,7 @@ Ask Codex:
 
 After installation, invoke it explicitly with `$framewright`.
 
-Framewright is configured for explicit invocation and saved prompt-file generation only. It uses one unified director intake, asks one consolidated batch of material questions, and then runs exactly one selected stage: Storyboard, Keyframes, or Video Prompt. After the intake and stage gates are satisfied, it saves the applicable `.txt` prompt artifact by default. It does not automatically run ChatCut, OpenMontage, image generation, or video generation.
+Framewright is configured for explicit invocation and one active stage at a time. It uses one unified director intake, asks one consolidated batch of material questions, then runs Storyboard, Keyframes, or Video Prompt. After the gates are satisfied, it saves the applicable `.txt` prompt artifact by default. A resolved Storyboard stage additionally generates exactly one initial board image as part of the same stage package; automatic retries, variants, Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 
 ## Repository policy
 
