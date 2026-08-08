@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.0.0"
+profile_version: "1.1.0"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -94,6 +94,40 @@ Rules:
 - Inactive, withheld, planning-only, rejected, and text-extraction-only materials obey core Silent Reference Exclusion.
 - Native references are surface bindings for the current run; they do not replace stable core material identity.
 
+### 4.1 Native Material Mention Serialization
+
+Seedance `@` is a structured material-selection operation, not a stable word stored by Framewright.
+
+Resolve three surface forms from the same Material Registry record:
+
+```yaml
+surface_binding:
+  ui_mention: operator selects the intended uploaded material through @
+  text_surrogate: "@Image 1 | @Video 1 | @Audio 1"
+  api_binding: provider asset field or asset ID
+```
+
+Rules:
+
+- A UI may display a thumbnail, filename, chip, or index after selection. That display does not define material role or authority.
+- A `.txt` file cannot preserve the interactive UI chip. It carries the plain-text surrogate, and the Run Card maps that surrogate to the intended file and stable `material_key`.
+- An API binding may use a provider-specific ID outside the prompt text. Preserve the same role and authority semantics.
+- Do not assume `@Image 1` remains the same physical asset across runs or upload orders.
+- Use the native mention itself as the subject when one subject is clear: `@Image 1 crosses the room and stops at the window.`
+- With multiple possible subjects, add only a compact disambiguator: `the woman in @Image 1`, `the red vehicle in @Image 2`, or equivalent.
+- Avoid padded forms such as `The character from @Image 1` when the mention is already unambiguous.
+
+When active materials need explicit authority, place one compact model-facing block after the Framewright mode line:
+
+```text
+MATERIAL ROLES
+@Image 1: subject identity and wardrobe only; do not inherit source pose, crop, camera, or composition.
+@Video 1: phase-2 motion timing only; do not inherit identity, environment, or final style.
+@Audio 1: voice timbre only; dialogue text, emotion, accent, and pacing remain separately specified.
+```
+
+Include only active runtime materials. Every listed mention must be used, every used mention must be listed or unambiguously bound by its task schema, and all text surrogates count against the character limit.
+
 ## 5. Task Router
 
 ### 5.1 Omni Reference
@@ -144,8 +178,7 @@ Use exactly one task schema as the serialization owner. Do not combine it with c
 
 ```text
 GENERATION GOAL
-MATERIAL-TO-ROLE MAP
-ALLOWED / DENIED AUTHORITY
+MATERIAL ROLES
 SHOT OR PHASE PROGRESSION
 CONTINUITY + END STATE
 AUDIO
@@ -167,7 +200,7 @@ AUDIO EDIT POLICY
 
 ```text
 GENERATION GOAL
-MATERIAL-TO-ROLE MAP
+MATERIAL ROLES
 STAGE PLAN
 CONTINUITY + END STATE
 AUDIO
@@ -198,6 +231,18 @@ NEGATIVE
 ```
 
 Omit a heading when it adds no executable value, except Smart Edit must retain explicit edit scope and content-to-preserve language.
+
+### 6.1 Serialization Procedure
+
+Serialize in this order:
+
+1. emit exactly one Framewright mode line;
+2. emit `MATERIAL ROLES` only when active references need model-facing role or authority limits;
+3. emit exactly one selected task schema;
+4. use native mentions directly inside the action, edit, endpoint, continuation, dialogue, or sound clauses they control;
+5. run core Compactness, Compression Safety, Silent Reference Exclusion, Runtime Cleanliness, and character-limit validation.
+
+Do not print UI setup, upload order, chip-selection instructions, Run Card fields, rejected materials, or operator reminders in the prompt. The Run Card owns file-to-mention mapping; the clean prompt owns only model-facing semantics.
 
 ## 7. Storyboard Runtime Admission
 
@@ -233,7 +278,7 @@ The Run Card is an extension of the core assistant-facing handoff. Do not save `
 
 Save only the clean model-facing `prompt_video.txt` or approved split-unit prompt files. The saved prompt must not contain UI instructions, upload procedure, risk commentary, approval status, rejected materials, workflow explanation, or the Run Card itself.
 
-## 9. Sound Boundary
+## 9. Sound and Visible-Text Policy
 
 When the user has not made an explicit sound request, inherit core Framewright unchanged:
 
@@ -243,7 +288,97 @@ When the user has not made an explicit sound request, inherit core Framewright u
 
 Only an explicit request activates audio-reference, audio-edit, dialogue, subtitle, ambience, SFX, or music policy for the requested scope. These policies never change director mode, scene grammar, active stage, or generation-unit boundaries.
 
-## 10. Runtime Validation
+When explicit sound control is active, resolve one adapter-local policy without changing the core route:
+
+```yaml
+seedance_audio_policy:
+  scope:
+  source_audio_master:
+  dialogue: inherit | preserve | generate_locked_text | replace | remove
+  ambience: inherit_core_default | preserve | replace | remove
+  sfx: inherit_core_default | preserve | generate | replace | remove
+  music: no_music | preserve | generate_explicit_request | replace | remove
+  audio_reference_authority:
+  subtitle_or_visible_text: none | preserve | generate_locked_text | replace | remove
+```
+
+Rules:
+
+- Do not activate this policy merely because audio material is attached; the user's requested scope controls it.
+- Keep dialogue text, speaker, language, and any locked delivery exact. Timbre authority does not grant new wording, emotion, accent, or pacing.
+- Map an admitted audio reference with `@Audio n` only to its allowed properties and active beats.
+- In Smart Edit, source-video audio remains part of the sole editing master unless the explicit edit scope says preserve, remove, or replace a named component.
+- State the environmental bed once. Keep synchronized action SFX in the beat that visibly causes them.
+- Music remains `no_music` unless the user explicitly requests music or an explicit Smart Edit operation preserves / replaces existing music.
+- Subtitle or visible-text control uses exact locked text, language, placement purpose, and persistence only when requested. Do not invent subtitles from unstated dialogue.
+- Preserve room tone, reverb, noise floor, and action-sound continuity across Extend unless the user explicitly requests an audio change.
+
+Use concise markers only when they improve task execution:
+
+```text
+DIALOGUE:
+AMBIENCE:
+SFX:
+MUSIC:
+SUBTITLE / VISIBLE TEXT:
+```
+
+Omit inactive markers. Never add an empty `MUSIC` block to a default no-music prompt when one compact no-music instruction is sufficient.
+
+## 10. Advanced Task Feasibility
+
+Before serialization, verify route prerequisites and target-surface support:
+
+- Omni Reference has every material required by the selected control profiles.
+- Smart Edit has exactly one admitted source-video editing master and a bounded edit scope.
+- Long Video remains within the declared 30-second ceiling and its stages do not conceal overloaded cuts, references, dialogue, or state changes.
+- First and Last Frames has explicit endpoint assignments and compatible requested aspect / composition logic.
+- Extend has an admitted source video and a recoverable actual ending boundary.
+- Storyboard control has explicit runtime admission and limited structural authority.
+- Audio, dialogue, and subtitle control has an explicit requested scope.
+
+If a required material or assignment is missing, ask one compact Intake question. Do not switch routes silently. If the route is valid but execution remains dense, return to the core Generation-Unit Feasibility Gate; never auto-split or auto-merge.
+
+Count the final plain-text prompt, including mode line, material-role declarations, native mention surrogates, dialogue, audio cues, negatives, spaces, and line breaks. UI chip rendering does not excuse an over-limit `.txt` artifact.
+
+## 11. Generation Evidence and Repair
+
+Prompt compilation never starts a generation. When generation is separately authorized and a result exists, extend the core assistant-facing evidence record with:
+
+```yaml
+seedance_generation_evidence:
+  target_surface:
+  profile_version:
+  task_route:
+  control_profiles:
+  surface_binding_map:
+  source_master_check:
+  duration_and_aspect:
+  prompt_fingerprint:
+  attempt_index:
+  retry_or_credit_cost:
+  observed_result:
+  primary_failure_layer:
+  scene_local_repair:
+  evidence_status:
+```
+
+Use one primary failure layer:
+
+```text
+planning
+serialization
+rendering
+reference_authority
+runtime_or_surface
+model_behavior
+```
+
+Repair the smallest affected scope. Examples: correct one material binding for a reference-authority failure; rewrite one task clause for a serialization failure; revise the Shot / Phase or feasibility plan only for a demonstrated planning failure. Do not use prompt wording to pretend a runtime outage or model limitation is a planning defect.
+
+One successful generation is scene-local evidence, not a global adapter rule. A retry or regeneration requires its own applicable authorization and should record attempt and cost when known.
+
+## 12. Runtime Validation
 
 Before saving, verify:
 
@@ -252,10 +387,16 @@ Before saving, verify:
 - the 30-second ceiling was not used as default duration or feasibility proof;
 - the director's route override was honored when valid;
 - each active material has limited allowed and denied authority;
+- every text surrogate maps to the intended file and stable Material Registry role; UI labels and upload order do not define authority;
+- every listed native mention is used and every used mention is mapped;
+- unambiguous single-subject mentions are not padded, while ambiguous multi-subject mentions are compactly qualified;
 - Smart Edit has exactly one source-video editing master and preserves all unedited content;
 - first-frame, last-frame, both-endpoint, and Extend assignments are explicit;
 - storyboard material is absent unless explicitly admitted for Video Prompt runtime;
 - continuous-take phases remain phases, not cuts;
 - inactive materials and UI instructions do not enter the prompt;
+- unspecified sound inherits ambience plus synchronized diegetic/action SFX and no music;
+- explicit dialogue, audio, music, SFX, and subtitle policies affect only their requested scope;
 - the Run Card remains assistant-facing and the clean prompt is saved;
+- generation evidence is recorded only after separately authorized generation and does not promote one result into a global rule;
 - core timing, sound, continuity, performance, compression, and character-limit checks pass.
