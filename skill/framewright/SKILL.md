@@ -1,11 +1,11 @@
 ---
 name: framewright
-description: Compile a scene idea, screenplay fragment, or visual brief into a saved production-ready storyboard, keyframe, or video-generation prompt file through Framewright's unified director intake and auteur, apprentice, or screenwriter director modes. Use only when the user explicitly invokes Framewright or asks to apply the Framewright system.
+description: Preserve cinematic intent while compiling a scene idea, screenplay fragment, or visual brief into a saved production-ready storyboard, keyframe, or video-generation prompt file through Framewright's adaptive director intake and auteur, apprentice, or screenwriter director modes. Use only when the user explicitly invokes Framewright or asks to apply the Framewright system.
 ---
 
 # Framewright
 
-Use Framewright as a prompt compiler for AI filmmaking pre-production.
+Use Framewright as a director-steered, intent-preserving cinematic compiler whose primary executable output is a prompt artifact for AI filmmaking pre-production.
 
 ## Required reference
 
@@ -19,14 +19,18 @@ Before any Framewright output, read the `version` value from the reference YAML 
 
 If the version or reference cannot be read, stop and explain the problem instead of using remembered or reconstructed rules.
 
+Preserve the exact version suffix. When the reference reports a local experimental candidate such as `3.5.0-local`, load and identify that candidate exactly; do not relabel it as a stable release or silently substitute its stable fallback.
+
 ## Workflow
 
 1. Start each new compilation scope with the Unified Director Intake from the reference.
-2. Present a compact understanding and production reading, then ask one consolidated batch of no more than five material questions.
-3. If the user delegates judgment, state the assumptions and continue unless an explicit safety, reference-authority, or generation-unit decision is still required.
-4. Run exactly one selected stage: Storyboard, Keyframes, or Video Prompt.
-5. Save the completed artifact as the required `.txt` file, preserve the user's creative intent, and distinguish locked facts from reasonable interpretation.
-6. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
+2. Present a compact understanding and production reading, classify material gaps, and schedule questions by dependency: ask only the highest-impact question when its answer can change later questions; combine only genuinely independent questions, with five retained as the maximum batch size.
+3. After each dependent answer, update the Production Spine's nested Intent Ledger and recalculate the question queue. Protect intentional freedom, omit low-impact decoration, and stop when remaining gaps cannot materially change a downstream contract.
+4. Treat requested advice or delegated judgment as a named, current-scope authority grant. Record material assumptions and continue only within that grant unless an explicit safety, reference-authority, generation-unit, stage, or feasibility decision still requires the user.
+5. Run exactly one selected stage: Storyboard, Keyframes, or Video Prompt.
+6. Save the completed artifact as the required `.txt` file, run Semantic Preflight, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
+7. Return the compact assistant-facing Intent Delta required by the reference, outside the clean prompt and without creating a second default artifact.
+8. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
 
 ## Tool boundary
 
