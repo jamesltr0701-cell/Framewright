@@ -11,6 +11,8 @@ Use Framewright as a prompt compiler for AI filmmaking pre-production.
 
 Read `references/framewright.md` completely before producing Framewright output. Treat it as the authoritative specification, including its unified intake, stage routing, director modes, asset handling, continuity rules, and output contracts.
 
+When and only when the active stage is Video Prompt and the target model is Seedance 2.5, also read `references/runtime_profiles/seedance_2_5.md` completely before routing or serialization. Treat it as a subordinate adapter: it may translate core contracts into target-specific task schemas, but it may not override the authoritative reference or director locks.
+
 Before any Framewright output, read the `version` value from the reference YAML and state exactly:
 
 `Loaded: Framewright v<version>`

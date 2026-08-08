@@ -2,13 +2,14 @@
 
 Framewright is an asset-aware prompt compiler for AI filmmaking. It turns a director's scene intent and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-Current core version: **3.2.0**
+Current core version: **3.3.0**
 Author: **Tairan Li**
 
 ## Repository structure
 
 - [`skill/framewright/`](skill/framewright/) — installable Codex Skill
 - [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md) — current authoritative Framewright specification
+- [`skill/framewright/references/runtime_profiles/`](skill/framewright/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
 - [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
