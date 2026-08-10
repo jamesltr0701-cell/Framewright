@@ -2,11 +2,10 @@
 
 Framewright is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It turns a director's approved scene intent, decision state, and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-- Local experimental candidate: **3.5.0-local**
-- Last synchronized stable: **3.4.0**
-- Desktop Framewright mirror: **3.4.0**
-- GitHub `main`: **3.4.0**
-- Local branch: **`codex/framewright-v3.5-local-experiment` (not published; no upstream)**
+- Current core version: **3.5.0**
+- Release status: **stable**
+- Desktop Framewright mirror: **3.5.0**
+- GitHub `main`: **3.5.0**
 
 Author: **Tairan Li**
 
@@ -20,17 +19,17 @@ Author: **Tairan Li**
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
 
-GitHub `main` remains the source of truth for the last synchronized stable release. This branch is a local-only experimental candidate for production testing; it is not a release and must not be used to infer that the Desktop mirror or GitHub has moved beyond 3.4.0.
+GitHub `main` is the source of truth for the synchronized stable release. Framewright 3.5.0 is the current release across the local source repository, Desktop mirror, and GitHub `main`.
 
 ## Install in Codex
 
-For the synchronized stable 3.4.0 release, ask Codex:
+For the synchronized stable 3.5.0 release, ask Codex:
 
 > Install the Framewright skill from `https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright`
 
 After installation, invoke it explicitly with `$framewright`.
 
-Framewright is configured for explicit invocation and one active stage at a time. The 3.5.0-local candidate adds dependency-sensitive Adaptive Questioning, a nested Intent Ledger, causal-state and blocking readiness passes, and Semantic Preflight while preserving the existing Material Registry and stage contracts. Seedance 2.5 Video Prompt routing remains a subordinate task-native adapter with surface-aware `@` material mentions, scoped audio/edit authority, a clean saved prompt, and an assistant-facing Run Card. A resolved Storyboard stage still generates exactly one initial board image as part of the same stage package; automatic retries, variants, Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
+Framewright is configured for explicit invocation and one active stage at a time. The 3.5.0 release adds dependency-sensitive Adaptive Questioning, a nested Intent Ledger, causal-state and blocking readiness passes, and Semantic Preflight while preserving the existing Material Registry and stage contracts. Seedance 2.5 Video Prompt routing remains a subordinate task-native adapter with surface-aware `@` material mentions, scoped audio/edit authority, a clean saved prompt, and an assistant-facing Run Card. A resolved Storyboard stage still generates exactly one initial board image as part of the same stage package; automatic retries, variants, Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 
 ## Repository policy
 
