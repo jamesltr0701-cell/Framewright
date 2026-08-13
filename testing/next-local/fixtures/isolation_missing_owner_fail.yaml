@@ -1,0 +1,10 @@
+kind: compile_trace
+expected: fail
+expected_errors: [serialization_owner_missing]
+director_modes: [apprentice]
+conversation_mode_declared: true
+artifact_stage: video_prompt
+target_model: seedance_2_0
+adapter_id: null
+compiler_instruction_sources: [skill/framewright/SKILL.md, skill/framewright/references/framewright.md]
+prompt: "A clean prompt with room tone and no music."

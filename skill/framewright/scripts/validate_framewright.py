@@ -76,6 +76,26 @@ H3_ROUTES = {"t2va", "i2va", "fl2va", "l2va", "ref2va"}
 H3_API_ROLES = {"first_frame", "last_frame", "reference_image", "reference_video", "reference_audio"}
 H3_VISIBLE_RELATIONSHIPS = {"fully_preserved", "partially_preserved", "attribute_transfer", "weak_reference"}
 H3_AUDIO_RELATIONSHIPS = {"fully_copy", "partially_copy", "reference", "weak_reference"}
+DEFAULT_REGISTRY = (
+    Path(__file__).resolve().parent.parent
+    / "references"
+    / "runtime_profiles"
+    / "adapter_registry.yaml"
+)
+OWNERSHIP_PROMPT_TERMS = (
+    "target_model",
+    "serialization_owner",
+    "adapter_id",
+    "compiler_instruction_sources",
+    "framewright_core_native",
+    "framewright_adapter_seedance_2_5",
+    "framewright_adapter_minimax_h3",
+)
+PLATFORM_SERIALIZER_KEY_RE = re.compile(
+    r"(?:platform|surface|provider|jimeng|libtv).*(?:dialect|serializ|owner)"
+    r"|(?:dialect|serializ|owner).*(?:platform|surface|provider|jimeng|libtv)",
+    re.IGNORECASE,
+)
 
 
 def issue(code: str, message: str, **context: Any) -> dict[str, Any]:
@@ -99,6 +119,201 @@ def frontmatter(path: Path) -> tuple[dict[str, Any], str]:
     if not isinstance(data, dict):
         raise ValueError(f"frontmatter must be a mapping: {path}")
     return data, text
+
+
+def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict):
+        return [issue("adapter_registry_invalid", "Adapter registry must be a mapping.")]
+    sources = document.get("compiler_instruction_sources")
+    if not isinstance(sources, list) or not sources or any(not isinstance(value, str) or not value for value in sources):
+        errors.append(issue("compiler_source_registry_invalid", "Registry compiler instruction sources must be non-empty scalar paths."))
+    targets = document.get("registered_targets")
+    if not isinstance(targets, dict) or not targets:
+        return errors + [issue("adapter_registry_targets_missing", "Adapter registry has no registered target mappings.")]
+
+    owners: list[str] = []
+    adapter_ids: list[str] = []
+    package_root = registry_path.resolve().parents[2]
+    repository_root = package_root.parents[1]
+    if isinstance(sources, list):
+        for source in sources:
+            if not isinstance(source, str) or not source:
+                continue
+            resolved_source = (repository_root / source).resolve()
+            if (resolved_source != package_root and package_root not in resolved_source.parents) or not resolved_source.is_file():
+                errors.append(issue("compiler_source_registry_path_invalid", "Registered compiler instruction source is missing or outside the Framewright package.", source=source))
+    for target_model, record in targets.items():
+        if not isinstance(target_model, str) or not target_model or not isinstance(record, dict):
+            errors.append(issue("adapter_registry_record_invalid", "Every registered target requires a mapping.", target_model=target_model))
+            continue
+        owner = record.get("serialization_owner")
+        if not isinstance(owner, str) or not owner:
+            errors.append(issue("adapter_registry_owner_invalid", "Every target requires one scalar serialization owner.", target_model=target_model))
+        else:
+            owners.append(owner)
+        adapter_id = record.get("adapter_id")
+        profile = record.get("profile")
+        if (adapter_id is None) != (profile is None):
+            errors.append(issue("adapter_registry_profile_pair_invalid", "Adapter ID and profile must both be null or both be scalar values.", target_model=target_model))
+        if adapter_id is not None:
+            if not isinstance(adapter_id, str) or not adapter_id:
+                errors.append(issue("adapter_registry_id_invalid", "Adapter ID must be a non-empty scalar.", target_model=target_model))
+            else:
+                adapter_ids.append(adapter_id)
+            if not isinstance(profile, str) or not profile:
+                errors.append(issue("adapter_registry_profile_invalid", "Adapter profile must be a non-empty scalar path.", target_model=target_model))
+            else:
+                resolved = (registry_path.parent / profile).resolve()
+                if package_root not in resolved.parents or not resolved.is_file():
+                    errors.append(issue("adapter_registry_profile_missing", "Registered adapter profile is missing or outside the Framewright package.", target_model=target_model, profile=profile))
+    if len(owners) != len(set(owners)):
+        errors.append(issue("adapter_registry_owner_duplicate", "Serialization owners must be unique across registered targets."))
+    if len(adapter_ids) != len(set(adapter_ids)):
+        errors.append(issue("adapter_registry_id_duplicate", "Adapter IDs must be unique across registered targets."))
+    return errors
+
+
+def load_adapter_registry(path: Path = DEFAULT_REGISTRY) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    try:
+        document = load_yaml(path)
+    except (OSError, yaml.YAMLError) as exc:
+        return {}, [issue("adapter_registry_unreadable", str(exc), path=str(path))]
+    errors = validate_registry_data(document, path)
+    return document if isinstance(document, dict) else {}, errors
+
+
+def registered_profile_source(profile: str) -> str:
+    return f"skill/framewright/references/runtime_profiles/{profile}"
+
+
+def ownership_validation_required(data: dict[str, Any]) -> bool:
+    return data.get("artifact_stage") == "video_prompt" or any(
+        key in data
+        for key in (
+            "target_model",
+            "serialization_owner",
+            "serialization_owners",
+            "adapter_id",
+            "compiler_instruction_sources",
+            "adapter_profile_contract",
+            "seedance25",
+            "minimax_h3",
+        )
+    )
+
+
+def find_platform_serializer_fields(value: Any, prefix: str = "") -> list[str]:
+    matches: list[str] = []
+    if isinstance(value, dict):
+        for key, child in value.items():
+            path = f"{prefix}.{key}" if prefix else str(key)
+            if PLATFORM_SERIALIZER_KEY_RE.search(str(key)):
+                matches.append(path)
+            matches.extend(find_platform_serializer_fields(child, path))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            matches.extend(find_platform_serializer_fields(child, f"{prefix}[{index}]"))
+    return matches
+
+
+def validate_serialization_ownership(
+    data: dict[str, Any],
+    prompt: str,
+    registry_path: Path = DEFAULT_REGISTRY,
+) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    registry, registry_errors = load_adapter_registry(registry_path)
+    errors.extend(registry_errors)
+    targets = registry.get("registered_targets", {}) if isinstance(registry, dict) else {}
+
+    if "serialization_owners" in data:
+        errors.append(issue("serialization_owner_plural_forbidden", "Use one scalar serialization_owner; plural owner lists are forbidden."))
+    owner = data.get("serialization_owner")
+    if owner is None:
+        errors.append(issue("serialization_owner_missing", "Video Prompt validation requires one scalar serialization_owner."))
+    elif not isinstance(owner, str):
+        errors.append(issue("serialization_owner_not_scalar", "serialization_owner must be a scalar string."))
+    elif not owner.strip():
+        errors.append(issue("serialization_owner_empty", "serialization_owner must not be empty."))
+
+    target_model = data.get("target_model")
+    if target_model is None:
+        errors.append(issue("target_model_missing", "Video Prompt validation requires a resolved target_model."))
+    elif not isinstance(target_model, str) or not target_model.strip():
+        errors.append(issue("target_model_invalid", "target_model must be a non-empty scalar string."))
+
+    registered = targets.get(target_model) if isinstance(targets, dict) and isinstance(target_model, str) else None
+    if target_model is not None and not isinstance(registered, dict):
+        errors.append(issue("target_model_unregistered", "Target model is not registered for Framewright serialization.", target_model=target_model))
+    if isinstance(owner, str) and owner and targets:
+        owners = {
+            record.get("serialization_owner")
+            for record in targets.values()
+            if isinstance(record, dict)
+        }
+        if owner not in owners:
+            errors.append(issue("serialization_owner_unregistered", "Serialization owner is not registered for Framewright.", serialization_owner=owner))
+    if isinstance(registered, dict) and isinstance(owner, str) and owner != registered.get("serialization_owner"):
+        errors.append(issue("target_owner_mismatch", "Target model and serialization owner do not match the registry.", target_model=target_model, serialization_owner=owner))
+
+    expected_adapter = registered.get("adapter_id") if isinstance(registered, dict) else None
+    actual_adapter = data.get("adapter_id")
+    if expected_adapter is None:
+        if actual_adapter is not None:
+            errors.append(issue("core_native_adapter_forbidden", "Core Native must not claim an adapter ID."))
+        if data.get("adapter_profile_contract") is not None or "seedance25" in data or "minimax_h3" in data:
+            errors.append(issue("core_native_profile_forbidden", "Core Native must not claim an adapter profile contract."))
+    else:
+        if actual_adapter is None:
+            errors.append(issue("adapter_id_missing", "Adapter-owned serialization requires the registered adapter ID.", expected=expected_adapter))
+        elif actual_adapter != expected_adapter:
+            errors.append(issue("adapter_id_mismatch", "Adapter ID does not match the registered target and owner.", expected=expected_adapter, actual=actual_adapter))
+        matching_contract = (
+            isinstance(data.get("seedance25"), dict)
+            if expected_adapter == "seedance_2_5"
+            else isinstance(data.get("minimax_h3"), dict)
+            if expected_adapter == "minimax_h3"
+            else data.get("adapter_profile_contract") == expected_adapter
+        )
+        if not matching_contract and data.get("adapter_profile_contract") != expected_adapter:
+            errors.append(issue("adapter_profile_contract_missing", "Adapter owner requires its matching profile contract.", expected=expected_adapter))
+        foreign_contract = (
+            expected_adapter == "seedance_2_5" and "minimax_h3" in data
+        ) or (
+            expected_adapter == "minimax_h3" and "seedance25" in data
+        )
+        if foreign_contract:
+            errors.append(issue("adapter_profile_contract_mismatch", "A foreign adapter profile contract is present."))
+
+    sources = data.get("compiler_instruction_sources")
+    if not isinstance(sources, list) or not sources or any(not isinstance(value, str) or not value for value in sources):
+        errors.append(issue("compiler_instruction_sources_invalid", "Compiler instruction sources must be a non-empty list of scalar paths."))
+    else:
+        base_sources = registry.get("compiler_instruction_sources", []) if isinstance(registry, dict) else []
+        required_sources = set(base_sources if isinstance(base_sources, list) else [])
+        allowed_sources = set(required_sources)
+        allowed_sources.add("skill/framewright/references/runtime_profiles/adapter_registry.yaml")
+        profile = registered.get("profile") if isinstance(registered, dict) else None
+        if isinstance(profile, str):
+            profile_source = registered_profile_source(profile)
+            required_sources.add(profile_source)
+            allowed_sources.add(profile_source)
+        missing_sources = sorted(required_sources - set(sources))
+        foreign_sources = sorted(set(sources) - allowed_sources)
+        if missing_sources:
+            errors.append(issue("compiler_instruction_source_missing", "Required compiler instruction source is missing.", values=missing_sources))
+        if foreign_sources:
+            errors.append(issue("compiler_instruction_source_unregistered", "Compiler instruction source is not registered for this ownership route.", values=foreign_sources))
+
+    platform_fields = sorted(set(find_platform_serializer_fields(data)))
+    if platform_fields:
+        errors.append(issue("platform_serializer_forbidden", "Platform or surface fields may not own or select Framewright serialization.", values=platform_fields))
+
+    leaked = sorted(token for token in OWNERSHIP_PROMPT_TERMS if token.lower() in prompt.lower())
+    if leaked:
+        errors.append(issue("ownership_metadata_leak", "Clean prompt contains compiler ownership metadata.", values=leaked))
+    return errors
 
 
 def validate_prompt_text(
@@ -558,9 +773,8 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
             )
         )
 
-    owners = data.get("serialization_owners")
-    if owners is not None and (not isinstance(owners, list) or len(owners) != 1):
-        errors.append(issue("serialization_owner_count", "Exactly one serialization owner must be active."))
+    if ownership_validation_required(data):
+        errors.extend(validate_serialization_ownership(data, prompt if isinstance(prompt, str) else ""))
     for field, code in (
         ("active_stages", "active_stage_count"),
         ("director_modes", "director_mode_count"),
@@ -735,7 +949,13 @@ def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     return errors, data
 
 
-def validate_core(core: Path, skill: Path, profiles: list[Path], manifest: Path) -> list[dict[str, Any]]:
+def validate_core(
+    core: Path,
+    skill: Path,
+    profiles: list[Path],
+    manifest: Path,
+    registry: Path = DEFAULT_REGISTRY,
+) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     try:
         core_meta, core_text = frontmatter(core)
@@ -744,8 +964,8 @@ def validate_core(core: Path, skill: Path, profiles: list[Path], manifest: Path)
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.2-local":
-        errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.2-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.3-local":
+        errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.3-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
@@ -767,6 +987,58 @@ def validate_core(core: Path, skill: Path, profiles: list[Path], manifest: Path)
             str(anchor) in profile_text for _, profile_text in loaded_profiles
         ):
             errors.append(issue("protected_anchor_missing", "A protected semantic anchor is missing.", anchor=anchor))
+    registry_data, registry_errors = load_adapter_registry(registry)
+    errors.extend(registry_errors)
+    registered_profiles = {
+        str(record.get("profile"))
+        for record in registry_data.get("registered_targets", {}).values()
+        if isinstance(record, dict) and record.get("profile")
+    }
+    supplied_profiles = {profile.name for profile in profiles}
+    if supplied_profiles != registered_profiles:
+        errors.append(
+            issue(
+                "registered_profile_set_mismatch",
+                "Core validation must load exactly the adapter profiles declared by the registry.",
+                registered=sorted(registered_profiles),
+                supplied=sorted(supplied_profiles),
+            )
+        )
+    return errors
+
+
+def validate_video_prompt_path(
+    path: Path,
+    target_model: str,
+    serialization_owner: str,
+    adapter_id: str | None,
+    profile_contract: str | None,
+    compiler_sources: list[str] | None,
+    registry: Path = DEFAULT_REGISTRY,
+    character_limit: int = 10_000,
+) -> list[dict[str, Any]]:
+    registry_data, registry_errors = load_adapter_registry(registry)
+    errors = list(registry_errors)
+    if errors:
+        return errors
+    targets = registry_data.get("registered_targets", {})
+    record = targets.get(target_model) if isinstance(targets, dict) else None
+    sources = compiler_sources
+    if sources is None:
+        sources = list(registry_data.get("compiler_instruction_sources", []) or [])
+        if isinstance(record, dict) and isinstance(record.get("profile"), str):
+            sources.append(registered_profile_source(record["profile"]))
+    data: dict[str, Any] = {
+        "artifact_stage": "video_prompt",
+        "target_model": target_model,
+        "serialization_owner": serialization_owner,
+        "adapter_id": adapter_id,
+        "adapter_profile_contract": profile_contract,
+        "compiler_instruction_sources": sources,
+    }
+    text = path.read_text(encoding="utf-8")
+    errors.extend(validate_prompt_text(text, character_limit))
+    errors.extend(validate_serialization_ownership(data, text, registry))
     return errors
 
 
@@ -823,6 +1095,16 @@ def main() -> int:
     prompt_parser.add_argument("path", type=Path)
     prompt_parser.add_argument("--character-limit", type=int, default=10_000)
 
+    video_prompt_parser = subparsers.add_parser("video-prompt")
+    video_prompt_parser.add_argument("path", type=Path)
+    video_prompt_parser.add_argument("--target-model", required=True)
+    video_prompt_parser.add_argument("--serialization-owner", required=True)
+    video_prompt_parser.add_argument("--adapter-id")
+    video_prompt_parser.add_argument("--profile-contract")
+    video_prompt_parser.add_argument("--compiler-source", action="append")
+    video_prompt_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
+    video_prompt_parser.add_argument("--character-limit", type=int, default=10_000)
+
     state_parser = subparsers.add_parser("state")
     state_parser.add_argument("path", type=Path)
     state_parser.add_argument("--check-locators", action="store_true")
@@ -838,10 +1120,26 @@ def main() -> int:
     core_parser.add_argument("--skill", type=Path, required=True)
     core_parser.add_argument("--profile", type=Path, required=True, action="append")
     core_parser.add_argument("--manifest", type=Path, required=True)
+    core_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
 
     args = parser.parse_args()
     if args.command == "prompt":
         return emit(str(args.path), validate_prompt_text(args.path.read_text(encoding="utf-8"), args.character_limit), args.json)
+    if args.command == "video-prompt":
+        return emit(
+            str(args.path),
+            validate_video_prompt_path(
+                args.path,
+                args.target_model,
+                args.serialization_owner,
+                args.adapter_id,
+                args.profile_contract,
+                args.compiler_source,
+                args.registry,
+                args.character_limit,
+            ),
+            args.json,
+        )
     if args.command == "state":
         return emit(str(args.path), validate_state_data(load_yaml(args.path), args.path, args.check_locators), args.json)
     if args.command == "fixture":
@@ -852,7 +1150,7 @@ def main() -> int:
     if args.command == "core":
         return emit(
             str(args.core),
-            validate_core(args.core, args.skill, args.profile, args.manifest),
+            validate_core(args.core, args.skill, args.profile, args.manifest, args.registry),
             args.json,
         )
     return 2

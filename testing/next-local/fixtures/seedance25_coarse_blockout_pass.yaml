@@ -2,6 +2,13 @@ kind: compile_trace
 expected: pass
 director_modes: [screenwriter]
 conversation_mode_declared: true
+target_model: seedance_2_5
+serialization_owner: framewright_adapter_seedance_2_5
+adapter_id: seedance_2_5
+compiler_instruction_sources:
+  - skill/framewright/SKILL.md
+  - skill/framewright/references/framewright.md
+  - skill/framewright/references/runtime_profiles/seedance_2_5.md
 prompt: "Use the blockout for paths, blocking, and camera only; render final identity and materials from admitted references."
 seedance25:
   route: omni_reference

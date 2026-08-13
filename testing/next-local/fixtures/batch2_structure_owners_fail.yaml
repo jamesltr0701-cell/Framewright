@@ -3,7 +3,10 @@ director_modes: [apprentice]
 conversation_mode_declared: true
 expected: fail
 expected_errors:
-  - serialization_owner_count
+  - serialization_owner_plural_forbidden
+  - serialization_owner_missing
+  - target_model_missing
+  - compiler_instruction_sources_invalid
   - active_stage_count
   - production_spine_count
   - split_state_missing

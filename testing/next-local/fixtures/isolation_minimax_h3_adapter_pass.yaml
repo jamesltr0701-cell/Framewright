@@ -1,8 +1,8 @@
 kind: compile_trace
-expected: fail
-expected_errors: [h3_default_no_music_missing]
-director_modes: [apprentice]
+expected: pass
+director_modes: [screenwriter]
 conversation_mode_declared: true
+artifact_stage: video_prompt
 target_model: minimax_h3
 serialization_owner: framewright_adapter_minimax_h3
 adapter_id: minimax_h3
@@ -11,9 +11,9 @@ compiler_instruction_sources:
   - skill/framewright/references/framewright.md
   - skill/framewright/references/runtime_profiles/minimax_h3.md
 prompt: |-
-  integrated_multimodal_description: [Shot 1] Cinematic wide shot of a woman crossing an empty station platform while the camera tracks beside her.
-  overall_soundscape: Distant ventilation, footsteps, and a low electrical hum.
-  non_diegetic_music: Sparse piano and low strings.
+  integrated_multimodal_description: [Shot 1] A courier enters a quiet station and stops beneath the departure board as the camera tracks beside her.
+  overall_soundscape: Ventilation, footsteps, and distant platform announcements without intelligible speech.
+  non_diegetic_music: N/A
 minimax_h3:
   explicit_target_selection: true
   route: t2va

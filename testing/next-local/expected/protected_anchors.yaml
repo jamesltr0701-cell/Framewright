@@ -1,4 +1,4 @@
-candidate_version: "3.5.2-local"
+candidate_version: "3.5.3-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -28,3 +28,7 @@ protected_anchors:
   - "Semantic timing remains the default."
   - "Music remains `no_music` unless the user explicitly requests music"
   - "The storyboard recommendation does not override core one-generation-unit / one-board authority"
+  - "Framewright owns compilation for every explicit Framewright request."
+  - "Core Native currently targets Seedance 2.0"
+  - "The target model selects the dialect"
+  - "A Video Prompt cannot pass by claiming multiple owners"

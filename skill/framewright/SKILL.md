@@ -11,12 +11,14 @@ Use Framewright as a director-steered, intent-preserving cinematic compiler whos
 
 Read `references/framewright.md` completely before producing Framewright output. Treat it as the authoritative specification, including its unified intake, stage routing, director modes, asset handling, continuity rules, and output contracts.
 
-When and only when the active stage is Video Prompt and the director explicitly selects a supported target model, also read that model's subordinate runtime profile completely before routing or serialization:
+For Video Prompt, read `references/runtime_profiles/adapter_registry.yaml` and resolve exactly one registered target-model / serialization-owner pair. Core Native currently targets Seedance 2.0 and does not load an adapter profile. When and only when the director explicitly selects a registered adapter target, also read that model's subordinate runtime profile completely before routing or serialization:
 
 - Seedance 2.5: `references/runtime_profiles/seedance_2_5.md`
 - MiniMax H3: `references/runtime_profiles/minimax_h3.md`
 
-Do not infer MiniMax H3 from supplied media, prompt style, or profile availability. Route to its profile only after an explicit H3 target request. Load exactly one target profile for the current prompt. A runtime profile may translate core contracts into target-specific task schemas, but it may not override the authoritative reference or director locks.
+Do not infer MiniMax H3 or Seedance 2.5 from supplied media, prompt style, platform, provider, surface, or profile availability. Target model—not platform—selects the dialect. Load no adapter for Core Native Seedance 2.0 and exactly one adapter profile for an explicitly selected adapter target. If the requested target is unsupported or ambiguous, ask one compact target-model question. A runtime profile may translate core contracts into target-specific task schemas, but it may not override the authoritative reference or director locks.
+
+Framewright is the exclusive compiler whenever the user explicitly invokes Framewright. Do not treat another installed model-prompt skill as an implicit compiler source and do not merge its rules into the active Framewright compile. A separately requested comparison may remain outside the clean artifact and must not change the active serialization owner.
 
 Before any Framewright output, read the `version` value from the reference YAML and state exactly:
 
@@ -35,7 +37,7 @@ Preserve the exact version suffix. When the reference reports a local experiment
 5. When the reference's conditional state trigger is active, read or update the project-local `framewright_state.yaml` before compilation. Reconcile it with the latest explicit user decision and active artifacts; never treat it as a second Production Spine or target-model input.
 6. Treat requested advice or delegated judgment as a named, current-scope authority grant. Record material assumptions and continue only within that grant unless an explicit safety, reference-authority, generation-unit, stage, or feasibility decision still requires the user.
 7. Run exactly one selected stage: Storyboard, Keyframes, or Video Prompt.
-8. Save the completed artifact as the required `.txt` file, run the bundled deterministic validator and Semantic Preflight, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
+8. For Video Prompt, resolve `target_model`, scalar `serialization_owner`, adapter contract, and compiler instruction sources from the registry, then validate the actual `.txt` artifact with the bundled ownership-aware `video-prompt` command. For Storyboard and Keyframes, run the applicable generic deterministic validator. In every stage, run Semantic Preflight, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
 9. Return the compact assistant-facing Intent Delta required by the reference, outside the clean prompt and without creating a second default artifact.
 10. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
 
