@@ -1,0 +1,48 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+serialization_owners: [minimax_h3_ref2va]
+prompt: |-
+  subject_definitions:
+  <Subject 1> is the character in <Picture 1>; preserve identity, proportions, hairstyle, outfit, colors, and silhouette while denying source pose, crop, camera, and environment authority.
+  <Audio 1> is a rhythm and editing reference only; do not copy its music, voices, or complete audio signal.
+  summary:
+  [reference generation + audio reference] A five-environment character montage uses <Audio 1> only to guide the intensity curve and cut accents while preserving <Subject 1>.
+  retention_analysis:
+  <Subject 1> (appears in [Shot 1], [Shot 2], [Shot 3], [Shot 4], [Shot 5]): fully_preserved - identity and outfit remain consistent across environments.
+  <Audio 1>: reference - only its beat, rhythm, and phrasing guide the edit; the signal is not copied.
+  detailed_description:
+  [Shot 1] Cinematic wide shot of <Subject 1> standing in a rain-lit alley as the camera pushes in briefly on the opening accent. [Shot 2] At 00:03.000, the camera cuts to a low-angle tracking view of <Subject 1> crossing a windswept rooftop. [Shot 3] At 00:06.000, the camera cuts to a medium side view inside a quiet train carriage. [Shot 4] At 00:09.000, the camera cuts to a wide arc shot in a bright desert basin. [Shot 5] At 00:12.000, the camera cuts to a full-body hero frame in a dark studio and holds through the ending. Environment changes and camera accents follow the phrasing reference from <Audio 1> without copying its soundtrack.
+  overall_soundscape: Each environment has its own coherent ambience and synchronized physical sounds; no source music or voices from <Audio 1> are copied.
+  non_diegetic_music: N/A
+minimax_h3:
+  explicit_target_selection: true
+  route: ref2va
+  parameter_contract:
+    duration_seconds: {provenance: user_settable, resolved_value: 15}
+    resolution: {provenance: user_settable, resolved_value: 2K}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  input_bindings:
+    - material_key: char_ref
+      media_type: image
+      api_role: reference_image
+      model_labels: ["<Subject 1>", "<Picture 1>"]
+      allowed_authority: [identity, proportions, hairstyle, outfit, colors, silhouette]
+      denied_authority: [pose, crop, camera, environment]
+    - material_key: audio_ref
+      media_type: audio
+      api_role: reference_audio
+      model_labels: ["<Audio 1>"]
+      allowed_authority: [beat, rhythm, editing_phrasing]
+      denied_authority: [signal_copy, voices, dialogue, music_copy]
+  media_limits:
+    reference_image_count: 1
+    reference_audio_count: 1
+    reference_audio_combined_seconds: 15
+    request_body_mb: 10
+  relationships:
+    visible: [fully_preserved]
+    audio: [reference]
+  music_requested: false
+  prompt_enhancement: framewright_compile

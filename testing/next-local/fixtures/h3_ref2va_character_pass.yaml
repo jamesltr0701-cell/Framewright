@@ -1,0 +1,35 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+serialization_owners: [minimax_h3_ref2va]
+prompt: |-
+  subject_definitions:
+  <Subject 1> is the character in <Picture 1>; preserve identity, face, body proportions, hairstyle, outfit, colors, materials, and silhouette while denying source pose, crop, camera, composition, and environment authority.
+  summary:
+  [reference generation] A controlled four-shot character introduction reveals <Subject 1> from a defining detail to a full-body hero pose.
+  retention_analysis:
+  <Subject 1> (appears in [Shot 1], [Shot 2], [Shot 3], [Shot 4]): fully_preserved - the character identity and approved design remain consistent.
+  detailed_description:
+  [Shot 1] Cinematic close shot of <Subject 1>'s boots settling into position as the camera tilts upward slowly and the clothing hem moves in the wind. [Shot 2] At 00:04.000, the camera cuts to a medium-wide three-quarter rear view and arcs slowly around <Subject 1>, revealing the silhouette without changing the outfit. [Shot 3] At 00:08.000, the camera cuts to a tight portrait as <Subject 1> lifts the chin slightly and turns toward the lens. [Shot 4] At 00:12.000, the camera cuts to a low-angle full-body hero frame; <Subject 1> settles into a natural final pose and holds through the ending.
+  overall_soundscape: Steady environmental air and soft fabric movement continue throughout; footsteps and clothing movement remain synchronized to the visible action.
+  non_diegetic_music: N/A
+minimax_h3:
+  explicit_target_selection: true
+  route: ref2va
+  parameter_contract:
+    duration_seconds: {provenance: user_settable, resolved_value: 15}
+    resolution: {provenance: user_settable, resolved_value: 2K}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  input_bindings:
+    - material_key: char_ref
+      media_type: image
+      api_role: reference_image
+      model_labels: ["<Subject 1>", "<Picture 1>"]
+      allowed_authority: [identity, face, proportions, hairstyle, wardrobe, colors, materials, silhouette]
+      denied_authority: [pose, crop, camera, composition, environment]
+  media_limits: {reference_image_count: 1, request_body_mb: 2}
+  relationships:
+    visible: [fully_preserved]
+  music_requested: false
+  prompt_enhancement: framewright_compile

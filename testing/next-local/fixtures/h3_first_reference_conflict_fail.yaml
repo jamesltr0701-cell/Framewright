@@ -1,0 +1,33 @@
+kind: compile_trace
+expected: fail
+expected_errors: [h3_role_family_conflict]
+director_modes: [auteur]
+conversation_mode_declared: true
+serialization_owners: [minimax_h3_i2va]
+prompt: |-
+  For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.
+  integrated_multimodal_description: [Shot 1] The subject in <Picture 1> turns toward the window while the identity in <Subject 1> remains consistent.
+  overall_soundscape: Quiet room tone and soft clothing movement.
+  non_diegetic_music: N/A
+minimax_h3:
+  explicit_target_selection: true
+  route: i2va
+  parameter_contract:
+    duration_seconds: {provenance: user_settable, resolved_value: 8}
+    resolution: {provenance: user_settable, resolved_value: 2K}
+    aspect_ratio: {provenance: locked_to_endpoint_image, resolved_value: adaptive}
+  input_bindings:
+    - material_key: first_frame
+      media_type: image
+      api_role: first_frame
+      model_labels: ["<Picture 1>"]
+      allowed_authority: [opening_composition, opening_state]
+      denied_authority: [later_motion, global_camera]
+    - material_key: identity_ref
+      media_type: image
+      api_role: reference_image
+      model_labels: ["<Subject 1>"]
+      allowed_authority: [identity]
+      denied_authority: [pose, composition]
+  music_requested: false
+  prompt_enhancement: framewright_compile

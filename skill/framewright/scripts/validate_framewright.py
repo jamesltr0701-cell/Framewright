@@ -21,6 +21,7 @@ except ImportError as exc:  # pragma: no cover - explicit runtime diagnostic
 
 MODE_RE = re.compile(r"^\[MODE: (AUTEUR|APPRENTICE|SCREENWRITER)\]$")
 NATIVE_MENTION_RE = re.compile(r"@(Image|Video|Audio)\s+\d+")
+H3_LABEL_RE = re.compile(r"<(Subject|Picture|Video|Audio)\s+\d+>")
 UNRESOLVED_RE = re.compile(
     r"\[(?:resolved|required|insert|todo|tbd)[^\]\n]*\]", re.IGNORECASE
 )
@@ -71,6 +72,10 @@ CHANGE_CLASSES = {
 RISKS = {"low", "medium", "high"}
 SEEDANCE_ROUTES = {"omni_reference", "smart_edit", "long_video", "first_last_frames", "extend"}
 SEEDANCE_CONTROLS = {"multi_keyframe", "blockout_coarse", "blockout_fine", "seamless_transition"}
+H3_ROUTES = {"t2va", "i2va", "fl2va", "l2va", "ref2va"}
+H3_API_ROLES = {"first_frame", "last_frame", "reference_image", "reference_video", "reference_audio"}
+H3_VISIBLE_RELATIONSHIPS = {"fully_preserved", "partially_preserved", "attribute_transfer", "weak_reference"}
+H3_AUDIO_RELATIONSHIPS = {"fully_copy", "partially_copy", "reference", "weak_reference"}
 
 
 def issue(code: str, message: str, **context: Any) -> dict[str, Any]:
@@ -391,6 +396,156 @@ def validate_seedance25(data: Any, prompt: str) -> list[dict[str, Any]]:
     return errors
 
 
+def validate_minimax_h3(data: Any, prompt: str) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(data, dict):
+        return [issue("h3_contract_invalid", "MiniMax H3 qualification data must be a mapping.")]
+
+    if data.get("explicit_target_selection") is not True:
+        errors.append(issue("h3_target_not_explicit", "MiniMax H3 adapter requires explicit target-model selection."))
+
+    route = data.get("route")
+    if route not in H3_ROUTES:
+        errors.append(issue("h3_route_invalid", "MiniMax H3 route is missing or unsupported.", route=route))
+
+    if len(prompt) > 7000:
+        errors.append(issue("h3_prompt_limit_exceeded", "MiniMax H3 prompt exceeds 7,000 characters.", actual=len(prompt)))
+
+    parameters = data.get("parameter_contract")
+    if not isinstance(parameters, dict):
+        errors.append(issue("h3_parameter_contract_missing", "MiniMax H3 requires duration, resolution, and aspect-ratio provenance."))
+    else:
+        duration = parameters.get("duration_seconds", {})
+        resolution = parameters.get("resolution", {})
+        aspect = parameters.get("aspect_ratio", {})
+        duration_value = duration.get("resolved_value") if isinstance(duration, dict) else None
+        if not isinstance(duration_value, int) or not 4 <= duration_value <= 15:
+            errors.append(issue("h3_duration_invalid", "MiniMax H3 duration must be an integer from 4 through 15."))
+        if not isinstance(resolution, dict) or resolution.get("resolved_value") not in {"768P", "2K"}:
+            errors.append(issue("h3_resolution_invalid", "MiniMax H3 resolution must be 768P or 2K."))
+        aspect_value = aspect.get("resolved_value") if isinstance(aspect, dict) else None
+        concrete_ratios = {"21:9", "16:9", "4:3", "1:1", "3:4", "9:16"}
+        if route == "t2va" and aspect_value not in concrete_ratios:
+            errors.append(issue("h3_t2v_ratio_invalid", "H3 T2VA requires a concrete non-adaptive aspect ratio."))
+        if route in {"i2va", "fl2va", "l2va"}:
+            if not isinstance(aspect, dict) or aspect.get("provenance") != "locked_to_endpoint_image" or aspect_value != "adaptive":
+                errors.append(issue("h3_endpoint_ratio_invalid", "H3 endpoint-image routes require an image-locked adaptive ratio."))
+        if route == "ref2va" and aspect_value not in concrete_ratios | {"adaptive"}:
+            errors.append(issue("h3_reference_ratio_invalid", "H3 Ref2VA ratio is unsupported."))
+
+    bindings = data.get("input_bindings", []) or []
+    if not isinstance(bindings, list):
+        errors.append(issue("h3_bindings_invalid", "H3 input bindings must be a list."))
+        bindings = []
+    roles: list[str] = []
+    labels: list[str] = []
+    for index, binding in enumerate(bindings):
+        if not isinstance(binding, dict):
+            errors.append(issue("h3_binding_invalid", "H3 input binding must be a mapping.", index=index))
+            continue
+        role = binding.get("api_role")
+        if role not in H3_API_ROLES:
+            errors.append(issue("h3_api_role_invalid", "H3 input binding uses an unsupported API role.", index=index, role=role))
+        else:
+            roles.append(role)
+        if not binding.get("material_key") or not binding.get("allowed_authority") or not binding.get("denied_authority"):
+            errors.append(issue("h3_binding_authority_missing", "H3 input binding requires stable identity and limited authority.", index=index))
+        for label in binding.get("model_labels", []) or []:
+            if not H3_LABEL_RE.fullmatch(str(label)):
+                errors.append(issue("h3_label_invalid", "H3 model label has invalid syntax.", index=index, label=label))
+            else:
+                labels.append(str(label))
+
+    endpoint_roles = {"first_frame", "last_frame"} & set(roles)
+    reference_roles = {"reference_image", "reference_video", "reference_audio"} & set(roles)
+    if endpoint_roles and reference_roles:
+        errors.append(issue("h3_role_family_conflict", "H3 endpoint roles and reference roles are mutually exclusive."))
+    if route == "t2va" and roles:
+        errors.append(issue("h3_t2v_material_present", "H3 T2VA must not contain media bindings."))
+    if route == "i2va" and roles != ["first_frame"]:
+        errors.append(issue("h3_i2v_role_invalid", "H3 I2VA requires exactly one first-frame binding."))
+    if route == "l2va" and roles != ["last_frame"]:
+        errors.append(issue("h3_l2v_role_invalid", "H3 L2VA requires exactly one last-frame binding."))
+    if route == "fl2va" and sorted(roles) != ["first_frame", "last_frame"]:
+        errors.append(issue("h3_fl2v_role_invalid", "H3 FL2VA requires exactly one first-frame and one last-frame binding."))
+    if route == "fl2va" and data.get("endpoint_aspect_compatible") is not True:
+        errors.append(issue("h3_endpoint_aspect_mismatch", "H3 FL2VA endpoint images must have compatible aspect ratios."))
+    if route == "ref2va" and (not roles or any(role not in {"reference_image", "reference_video", "reference_audio"} for role in roles)):
+        errors.append(issue("h3_ref_roles_invalid", "H3 Ref2VA requires one or more reference-role bindings only."))
+
+    media = data.get("media_limits", {})
+    if isinstance(media, dict):
+        images = int(media.get("reference_image_count", 0) or 0)
+        videos = int(media.get("reference_video_count", 0) or 0)
+        audio = int(media.get("reference_audio_count", 0) or 0)
+        video_seconds = float(media.get("reference_video_combined_seconds", 0) or 0)
+        audio_seconds = float(media.get("reference_audio_combined_seconds", 0) or 0)
+        request_mb = float(media.get("request_body_mb", 0) or 0)
+        if images > 9 or videos > 3 or audio > 3 or images + videos + audio > 12 or video_seconds > 15 or audio_seconds > 15 or request_mb > 64:
+            errors.append(issue("h3_material_hard_limit_exceeded", "MiniMax H3 reference count, duration, or request size exceeds a hard limit."))
+
+    used_labels = sorted(set(match.group(0) for match in H3_LABEL_RE.finditer(prompt)))
+    declared_labels = sorted(set(labels))
+    if sorted(set(used_labels) - set(declared_labels)):
+        errors.append(issue("h3_label_unmapped", "An H3 prompt label has no declared material binding.", values=sorted(set(used_labels) - set(declared_labels))))
+    if sorted(set(declared_labels) - set(used_labels)):
+        errors.append(issue("h3_binding_unused", "A declared H3 label is unused in the prompt.", values=sorted(set(declared_labels) - set(used_labels))))
+
+    if route in {"t2va", "i2va", "fl2va", "l2va"}:
+        required = ["integrated_multimodal_description:", "overall_soundscape:", "non_diegetic_music:"]
+    else:
+        required = ["subject_definitions:", "summary:", "retention_analysis:", "detailed_description:", "overall_soundscape:", "non_diegetic_music:"]
+    positions = [prompt.find(field) for field in required]
+    if any(position < 0 for position in positions) or positions != sorted(positions):
+        errors.append(issue("h3_schema_invalid", "H3 prompt fields are missing or out of order.", route=route))
+
+    relationships = data.get("relationships", {})
+    if isinstance(relationships, dict):
+        for value in relationships.get("visible", []) or []:
+            if value not in H3_VISIBLE_RELATIONSHIPS:
+                errors.append(issue("h3_visible_relationship_invalid", "H3 visible relationship marker is invalid.", value=value))
+        for value in relationships.get("audio", []) or []:
+            if value not in H3_AUDIO_RELATIONSHIPS:
+                errors.append(issue("h3_audio_relationship_invalid", "H3 audio relationship marker is invalid.", value=value))
+
+    timeline_field = "detailed_description:" if route == "ref2va" else "integrated_multimodal_description:"
+    timeline_start = prompt.find(timeline_field)
+    timeline_end = prompt.find("overall_soundscape:", timeline_start + len(timeline_field)) if timeline_start >= 0 else -1
+    timeline_text = prompt[timeline_start:timeline_end] if timeline_start >= 0 and timeline_end > timeline_start else ""
+    shot_matches = list(re.finditer(r"\[Shot\s+(\d+)\](?:\s+At\s+(\d{2}):(\d{2})\.(\d{3}),)?", timeline_text))
+    if shot_matches:
+        shot_numbers = [int(match.group(1)) for match in shot_matches]
+        if shot_numbers != list(range(1, len(shot_numbers) + 1)):
+            errors.append(issue("h3_shot_sequence_invalid", "H3 shot numbers must be consecutive from Shot 1."))
+        if shot_matches[0].group(2) is not None:
+            errors.append(issue("h3_shot1_timestamped", "H3 Shot 1 must not have a timestamp."))
+        duration_limit = 15.0
+        if isinstance(parameters, dict) and isinstance(parameters.get("duration_seconds"), dict):
+            duration_limit = float(parameters["duration_seconds"].get("resolved_value", 15) or 15)
+        previous = 0.0
+        for match in shot_matches[1:]:
+            if match.group(2) is None:
+                errors.append(issue("h3_cut_timestamp_missing", "Every H3 shot after Shot 1 requires a cut timestamp."))
+                break
+            value = int(match.group(2)) * 60 + int(match.group(3)) + int(match.group(4)) / 1000
+            if value <= previous or value >= duration_limit:
+                errors.append(issue("h3_cut_timestamp_invalid", "H3 cut timestamps must increase and remain inside the duration."))
+                break
+            previous = value
+
+    music_requested = data.get("music_requested") is True
+    music_match = re.search(r"non_diegetic_music:\s*([^\n]*)", prompt)
+    if not music_requested and (music_match is None or music_match.group(1).strip() != "N/A"):
+        errors.append(issue("h3_default_no_music_missing", "H3 prompt must serialize non_diegetic_music: N/A unless music was explicitly requested."))
+
+    enhancement = data.get("prompt_enhancement", "framewright_compile")
+    if enhancement not in {"framewright_compile", "context_ir_opt_in"}:
+        errors.append(issue("h3_prompt_enhancement_invalid", "H3 prompt-enhancement mode is unsupported."))
+    if enhancement == "context_ir_opt_in" and data.get("context_ir_authorized") is not True:
+        errors.append(issue("h3_context_ir_unauthorized", "H3 Context-IR requires separate explicit authorization."))
+    return errors
+
+
 def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     prompt = data.get("prompt")
@@ -424,6 +579,10 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     seedance = data.get("seedance25")
     if seedance is not None:
         errors.extend(validate_seedance25(seedance, prompt if isinstance(prompt, str) else ""))
+
+    minimax_h3 = data.get("minimax_h3")
+    if minimax_h3 is not None:
+        errors.extend(validate_minimax_h3(minimax_h3, prompt if isinstance(prompt, str) else ""))
 
     for unit in data.get("split_units", []) or []:
         if not isinstance(unit, dict) or not unit.get("unit_label"):
@@ -576,12 +735,12 @@ def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     return errors, data
 
 
-def validate_core(core: Path, skill: Path, profile: Path, manifest: Path) -> list[dict[str, Any]]:
+def validate_core(core: Path, skill: Path, profiles: list[Path], manifest: Path) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     try:
         core_meta, core_text = frontmatter(core)
         skill_meta, skill_text = frontmatter(skill)
-        profile_meta, profile_text = frontmatter(profile)
+        loaded_profiles = [frontmatter(profile) for profile in profiles]
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
@@ -589,17 +748,24 @@ def validate_core(core: Path, skill: Path, profile: Path, manifest: Path) -> lis
         errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.2-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
-    if not profile_meta.get("profile_version"):
-        errors.append(issue("profile_frontmatter_invalid", "Runtime profile version is missing."))
+    for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
+        if not profile_meta.get("profile_version") or profile_meta.get("profile_role") != "subordinate_video_prompt_adapter":
+            errors.append(issue("profile_frontmatter_invalid", "Runtime profile version or role is missing.", profile=str(profile)))
 
-    for name, text in (("core", core_text), ("skill", skill_text), ("profile", profile_text)):
+    documents = [("core", core_text), ("skill", skill_text)] + [
+        (f"profile:{profile.name}", profile_text)
+        for profile, (_, profile_text) in zip(profiles, loaded_profiles)
+    ]
+    for name, text in documents:
         if len(re.findall(r"^```", text, re.MULTILINE)) % 2:
             errors.append(issue("markdown_fence_unbalanced", "Markdown fences are unbalanced.", file=name))
 
     manifest_data = load_yaml(manifest)
     anchors = manifest_data.get("protected_anchors", []) if isinstance(manifest_data, dict) else []
     for anchor in anchors:
-        if str(anchor) not in core_text and str(anchor) not in skill_text and str(anchor) not in profile_text:
+        if str(anchor) not in core_text and str(anchor) not in skill_text and not any(
+            str(anchor) in profile_text for _, profile_text in loaded_profiles
+        ):
             errors.append(issue("protected_anchor_missing", "A protected semantic anchor is missing.", anchor=anchor))
     return errors
 
@@ -670,7 +836,7 @@ def main() -> int:
     core_parser = subparsers.add_parser("core")
     core_parser.add_argument("--core", type=Path, required=True)
     core_parser.add_argument("--skill", type=Path, required=True)
-    core_parser.add_argument("--profile", type=Path, required=True)
+    core_parser.add_argument("--profile", type=Path, required=True, action="append")
     core_parser.add_argument("--manifest", type=Path, required=True)
 
     args = parser.parse_args()

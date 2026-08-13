@@ -11,7 +11,12 @@ Use Framewright as a director-steered, intent-preserving cinematic compiler whos
 
 Read `references/framewright.md` completely before producing Framewright output. Treat it as the authoritative specification, including its unified intake, stage routing, director modes, asset handling, continuity rules, and output contracts.
 
-When and only when the active stage is Video Prompt and the target model is Seedance 2.5, also read `references/runtime_profiles/seedance_2_5.md` completely before routing or serialization. Treat it as a subordinate adapter: it may translate core contracts into target-specific task schemas, but it may not override the authoritative reference or director locks.
+When and only when the active stage is Video Prompt and the director explicitly selects a supported target model, also read that model's subordinate runtime profile completely before routing or serialization:
+
+- Seedance 2.5: `references/runtime_profiles/seedance_2_5.md`
+- MiniMax H3: `references/runtime_profiles/minimax_h3.md`
+
+Do not infer MiniMax H3 from supplied media, prompt style, or profile availability. Route to its profile only after an explicit H3 target request. Load exactly one target profile for the current prompt. A runtime profile may translate core contracts into target-specific task schemas, but it may not override the authoritative reference or director locks.
 
 Before any Framewright output, read the `version` value from the reference YAML and state exactly:
 

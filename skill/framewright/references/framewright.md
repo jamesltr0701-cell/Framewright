@@ -6,7 +6,10 @@ language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
 product_identity: "director_steered_intent_preserving_cinematic_compiler"
 storyboard_target_model: "ChatGPT Image 2"
-video_target_model: "Seedance"
+video_target_model_default: "Seedance"
+video_target_models:
+  - "Seedance 2.5"
+  - "MiniMax H3"
 output_stages:
   - "storyboard"
   - "keyframes"
@@ -1010,6 +1013,8 @@ For Seedance 2.5, `@` is a structured asset-mention operation, not a permanent l
 
 Every native mention must map to one active runtime material, and every mapped active material must be used. Count plain-text surrogates against the character limit. Do not include upload instructions in the clean prompt.
 
+For MiniMax H3, the loaded profile owns its semantic label system (`<Subject N>`, `<Picture N>`, `<Video N>`, and `<Audio N>`). These labels describe prompt-local subject and source relationships; they are not upload-order handles, API asset IDs, or replacements for stable Material Registry identity. Use them only after the director explicitly selects H3 and map each label to the intended active material in the Run Card.
+
 ### First-Frame Continuation
 
 Activate `first_frame_reference` only when the director explicitly requests continuation of the same shot using a prior final frame.
@@ -1148,6 +1153,10 @@ Generate model-ready video prompts only when Video Prompt is the active stage.
 Core Framewright remains the highest authority for director intent, explicit locks, director mode, scene grammar, Production Spine, Visual Strategy, Shot / Phase / Panel logic, continuity, performance, sound defaults, reference authority, active stage, and generation-unit boundaries.
 
 When the target model is Seedance 2.5, load the complete subordinate profile at `references/runtime_profiles/seedance_2_5.md` before routing or serialization. Its UI mode and control profiles remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. The profile may translate the approved core contract into target-specific task schemas and syntax, but it may not override explicit direction or any core lock.
+
+When the director explicitly selects MiniMax H3, load the complete subordinate profile at `references/runtime_profiles/minimax_h3.md` before routing or serialization. Do not infer H3 from materials, prompt wording, project history, or adapter availability. Its H3 route, input roles, semantic labels, and prompt fields remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. If `H3` is ambiguous in context, ask one compact target-model question before loading the profile.
+
+Load exactly one target runtime profile for one model-facing prompt. If the user requests a comparison across target models, compile separate candidate prompts from the same approved Core Spine and keep their adapter traces distinct; do not combine two serialization schemas into one prompt.
 
 The router may recommend a Seedance task and explain the reason assistant-facing; the director may override it. First-Frame Continuation, First and Last Frames, and Extend remain distinct authority contracts. Obey explicit first / last / both / Extend assignments; if the assignment is ambiguous, return to the Intake Hard Stop and ask before freezing the Spine.
 
@@ -1376,6 +1385,8 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Keyframes are frozen production-purpose images.
 - Video prompts include final look, continuity, and visible motion.
 - When Video Prompt targets Seedance 2.5, the subordinate runtime profile was loaded completely; its task route does not alter director mode, scene grammar, active stage, or generation-unit boundaries.
+- When Video Prompt explicitly targets MiniMax H3, the subordinate runtime profile was loaded completely; H3 was not inferred, and its route, input roles, labels, timing syntax, and sound fields do not alter director mode, scene grammar, active stage, or generation-unit boundaries.
+- Exactly one target runtime profile and one serialization owner apply to each model-facing prompt.
 - A target capability ceiling is not treated as default duration or feasibility proof.
 - Storyboard material appears in Video Prompt runtime only after explicit admission, with structural authority and denied sheet/final-look authority recorded.
 - Target-specific Run Card and UI instructions remain assistant-facing; only the clean prompt file is saved and no default `run_card.md` exists.

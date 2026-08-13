@@ -1,0 +1,21 @@
+kind: compile_trace
+expected: fail
+expected_errors: [h3_context_ir_unauthorized]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+serialization_owners: [minimax_h3_t2va]
+prompt: |-
+  integrated_multimodal_description: [Shot 1] Cinematic wide shot of a woman crossing an empty station platform while the camera tracks beside her.
+  overall_soundscape: Distant ventilation, footsteps, and a low electrical hum.
+  non_diegetic_music: N/A
+minimax_h3:
+  explicit_target_selection: true
+  route: t2va
+  parameter_contract:
+    duration_seconds: {provenance: user_settable, resolved_value: 8}
+    resolution: {provenance: adapter_default, resolved_value: 768P}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  input_bindings: []
+  music_requested: false
+  prompt_enhancement: context_ir_opt_in
+  context_ir_authorized: false
