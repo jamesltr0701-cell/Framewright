@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "3.5.0"
+version: "3.5.1"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -84,6 +84,40 @@ latest explicit user decision
 ```
 
 When a revision changes an approved material decision, update the ledger entry and its dependent Spine fields before regenerating the requested artifact. If the revision preserves a surface action but breaks the approved rationale, report the conflict assistant-facing and request a decision instead of silently overwriting it.
+
+For scopes that need continuity beyond the current turn, maintain one conditional project control file at `Framewright/outputs/[project_slug]/framewright_state.yaml`. Create or continue it only when at least one of these triggers is true:
+
+- the project contains two or more approved generation units;
+- the same artifact enters a second material revision;
+- the director selects a generated take for repair or downstream continuity;
+- the director explicitly continues the same Framewright production across tasks.
+
+Do not create this file for a one-off, single-unit, single-revision compilation without a generation loop. The state file is a reviewable serialization of the current approved Production Spine and Intent Ledger subset, not a second editable Spine, a target-model attachment, or an additional prompt artifact. A later explicit user decision always outranks stored state. Reconcile the state before compiling when it conflicts with the latest decision, an active artifact, or an existing `PROGRESS.md`; do not silently choose one record or rewrite `PROGRESS.md`.
+
+Use this minimum state shape:
+
+```yaml
+framewright_state:
+  schema_version:
+  core_version:
+  project_slug:
+  current_scope:
+  active_stage:
+  director_mode:
+  approved_generation_units:
+  active_artifacts:
+  superseded_artifacts:
+  active_intent_entries:
+  intentional_freedom:
+  unresolved_material_decisions:
+  active_material_roles:
+  cross_gu_continuity:
+  selected_generated_takes:
+  last_approved_revision:
+  last_updated:
+```
+
+Each tracked artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one revision may be active for the same artifact identity; replaced revisions move to `superseded_artifacts` and retain their provenance. Classify a material change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director may enter `selected_generated_takes` or become continuity truth. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
 
 Do not carry stage choice, reference authority, generation-unit boundaries, or unstated assumptions into a different scope.
 
@@ -619,6 +653,38 @@ Every adjacent inferred camera change or deliberate repetition needs an internal
 
 For every user-requested, strongly implied, or compiler-added production-critical move, commit the camera inside the relevant beat: start position or frame, path or combined behavior, landing position or frame, spatial direction, visible evidence of movement, and action-based motivation. Broad labels such as `dynamic camera`, `tracking`, or `orbit` are insufficient when the execution changes story clarity, geography, action proof, or continuity.
 
+When subjective camera, embodied handheld observation, running, impact, instability, or attention transfer is production-critical, derive the relevant detail inside `camera_logic`:
+
+```yaml
+camera_agency:
+  operator_goal:
+  body_path:
+  lens_target:
+  distance_change:
+  orientation_or_horizon:
+  framing_error_behavior:
+  recovery_behavior:
+  viewer_attachment:
+```
+
+Keep the operator's physical path separate from the lens target. State whether occlusion, lag, overshoot, temporary subject loss, horizon error, or correction is permitted and why the camera continues looking, stops following, or transfers attention. Do not add instability or framing errors to an ordinary stable shot merely to make it feel dynamic.
+
+For a relevant cross-generation-unit continuation, extend the existing `continuity_locks` with one motion-state handoff:
+
+```yaml
+motion_state_handoff:
+  camera_velocity_and_direction:
+  horizon_and_body_inertia:
+  focal_focus_exposure_state:
+  subject_and_world_motion:
+  sound_continuity:
+  opening_only_constraints:
+  persistent_constraints:
+  selected_take_source:
+```
+
+Separate constraints that only restore the opening boundary from constraints that must persist across the unit. `selected_take_source` may name only a director-selected generated result; otherwise derive the handoff from the approved Production Spine rather than an arbitrary generation.
+
 In APPRENTICE MODE, strengthen missing camera logic without overriding explicit structure. In SCREENWRITER MODE, actively infer a dramatic camera progression. In AUTEUR MODE, this operator remains protective only.
 
 ### 8.5 Cinematography Layer
@@ -661,6 +727,27 @@ Do not overload negative prompts with impossible exhaustive lists.
 
 When materially different scales share a shot, state the relevant relative scale in direct scene terms; never rely on an image reference alone to preserve it. For procedural, mechanical, contact, or transformation scenes, resolve the initial, intermediate, and final object states and prevent final-state objects from appearing early.
 
+For production-critical physical actions, extend the existing `object_state_progression` only as far as needed to preserve visible causality:
+
+```yaml
+physical_causality:
+  object_or_system:
+  initial_state:
+  trigger:
+  force_or_acceleration:
+  resistance:
+  contact:
+  release_or_lock:
+  rebound_or_settling:
+  aftermath:
+  part_provenance:
+  load_bearing_state:
+```
+
+Use `part_provenance` and `load_bearing_state` only for mechanical transformation, procedural action, or another process whose topology or support state is narratively material. Preserve where a visible part comes from, how it remains connected, when it bears load, how mass changes speed or impact, and which intermediate state prevents a morph-like jump. Do not turn ordinary gestures into engineering descriptions.
+
+For a demonstrated scene-local generation failure, a repair may combine a positive terminal state with the shortest necessary negative containment. The Stale-Negative Pass still applies; do not promote one repair into a global negative template.
+
 ### 8.7 Compactness and Compression Safety
 
 Before compression, assign one dominant generation objective to each shot or continuous-take phase. Supporting action, performance, continuity, sound, and environment detail remain subordinate to that objective; they must not compete as equal instructions.
@@ -686,6 +773,7 @@ Never remove:
 - environmental sound bed;
 - synchronized action cues;
 - active reference bindings.
+- the rationale protected by an approved material carrier or structural beat.
 
 After compression, reread the prompt and repair any broken action flow, prop pickup/held/dropped/broken/returned continuity, screen direction, camera or panel mismatch, missing setup, impossible logic jump, lost camera coverage, or missing transition policy.
 
@@ -704,13 +792,19 @@ Run this gate on the provisional spine before freezing it or generating any prom
 Assess:
 
 - readable duration;
-- shot or cut reset load;
-- performance turns and holds;
-- physical-action complexity;
-- environment and object-state progression;
+- dialogue and other vocal turns;
+- blocking, character handoff, shot, or cut reset load;
+- camera path and attention-transfer load;
+- performance turns, silence, and held reactions;
+- physical action, transformation, and VFX complexity;
+- world response and environment or object-state progression;
 - active-reference complexity;
-- dialogue and sound timing;
+- sound timing;
 - prompt length and target-model constraints.
+
+For any material risk, identify the weakest beat, the objectives competing for the same generation attention, and the highest-priority viewer experience that could be damaged. Report only an explained `low`, `medium`, or `high` risk for each relevant system; do not invent a combined score, fixed beat quota, or universal timing threshold.
+
+When objectives conflict, derive a scene-local Experience Priority Stack from the approved scene intent and Visual Strategy. Use it only to explain what must survive and what may be simplified; never turn one scene's ordering into a global priority list or silently delete lower-priority material.
 
 Treat a runtime profile's maximum duration as a capability ceiling supplied to this gate, never as a default duration or proof that a dense unit is feasible. For Seedance 2.5, the declared ceiling is 30 seconds; action load, cuts, state changes, references, dialogue, sound, and continuity still determine practical feasibility. A higher ceiling never authorizes automatic splitting or merging.
 
@@ -728,6 +822,8 @@ Never auto-split, auto-merge, or generate across an unapproved boundary.
 After approval, each child unit receives an independently executable prompt. Shared continuity context remains consistent across child units.
 
 If the director explicitly keeps a risky single unit, preserve the decision and make the prompt generation-friendly without deleting a committed dramatic step. Keep residual-risk notes assistant-facing only.
+
+Before recommending any deletion, merge, or generation-unit split, run Structural Subtraction Safety. State what story, relationship, theme, viewer-knowledge, or continuity function the affected beat currently carries; identify where that function would move; and disclose any intentional loss. A shorter or easier unit is not automatically better. Material deletion, merging, splitting, or accepted loss always stops for director approval, including in SCREENWRITER MODE.
 
 ### 8.9.1 Editing and Semantic Timing
 
@@ -752,11 +848,32 @@ In AUTEUR MODE, preserve explicit cuts. In APPRENTICE MODE, ask before changing 
 
 ### 8.11 Performance Vitality
 
-Translate internal state or held stillness into one to three subtle, state-specific, non-looping physical carriers appropriate to shot scale and duration.
+Translate every material abstract performance intent into observable evidence. Emotion adjectives such as fear, fatigue, restraint, longing, confusion, or coldness cannot stand alone when they materially affect the scene; carry them through visible or audible changes in gaze, breath, body path, contact, resistance, timing, release, aftermath, scale relationship, or listener response.
+
+When a performance beat is material, derive it inside the existing `performance_progression` field:
+
+```yaml
+performance_beat:
+  beat_id:
+  trigger:
+  baseline:
+  onset:
+  physical_carriers:
+  dialogue_delivery:
+  listener_response:
+  release_or_aftermath:
+  shot_scale:
+```
+
+This is an internal shape, not a new default artifact or parallel contract. Select only one to three strongest, state-specific, non-looping carriers for the beat. Prefer a useful combination across face or gaze, body or hand or breath, and timing or release or aftermath; do not mechanically fill every category.
+
+For material dialogue, reason through `trigger and preparation -> delivery control -> sentence ending -> residual aftermath -> listener reception`. Serialize only the parts needed to make the approved performance executable. Adverbs such as `sadly`, `coldly`, or `emotionally` are not sufficient by themselves.
+
+Match each carrier to shot scale and duration. Wide shots rely on posture, weight, path, spacing, and recovery; close shots may use eyelids, mouth tension, swallowing, or small breath changes. Do not instruct a detail the current image scale cannot read.
 
 Examples include a change in breath depth, delayed blink, gaze that stops tracking, hand tension, a swallow, weight shift, settling fabric, or bodily aftermath.
 
-Do not compile `blank`, `numb`, `frozen`, or `stunned` into total bodily freeze unless absolute stillness is explicit.
+Do not compile `blank`, `numb`, `frozen`, or `stunned` into total bodily freeze unless absolute stillness is explicit. Do not use muscle IDs, contraction percentages, pseudo-clinical physiology, or repetitive micro-action lists. During compression, preserve the chosen carrier and the rationale it protects rather than replacing it with an abstract adjective.
 
 ### 8.12 Default Generated Diegetic Sound
 
@@ -773,6 +890,22 @@ Do not use sound categories to change director mode, scene grammar, active stage
 Never infer music from romance, action, suspense, montage rhythm, emotional intensity, or dramatic payoff.
 
 Do not invent dialogue, narration, singing, or vocal performance. Preserve director-supplied dialogue or explicitly requested vocal content as locked content.
+
+When the director explicitly enables dialogue or vocal control, extend the existing `sound_contract` rather than creating another audio system:
+
+```yaml
+vocal_events:
+  - event_id:
+    speaker:
+    exact_text:
+    language:
+    delivery_authority:
+    beat:
+    allowed_count:
+silent_reaction_beats:
+```
+
+Each approved vocal event has one speaker, exact text, language, beat, and allowed count. A silent reaction remains nonverbal and receives only its approved performance carriers; it must not acquire a whisper, repeated name, extra line, subtitle, or vocalization. This structure stays inactive when the user has not requested dialogue or vocal control, and it never changes the default ambience, synchronized SFX, or no-music policy.
 
 State the environmental bed once in `AUDIO`. Place action-synchronized sound cues inside the beat they control. Preserve both during compression.
 
@@ -840,6 +973,14 @@ Rules:
 - Storyboard never controls final color, lighting, material, texture, face, wardrobe finish, linework, labels, or sheet layout.
 - A keyframe becomes active at runtime only after explicit admission.
 - Offscreen characters remain internal continuity unless visible or audible.
+
+### Reference Conditioning Risk Gate
+
+After material authority is resolved but before runtime admission, decide whether each candidate runtime material should actually be attached, cropped, limited to a beat, reduced to text extraction, or withheld. Evaluate whether the task truly needs visual conditioning and whether the source composition, pose, multi-view layout, style, lighting, or framing could control properties outside its allowed authority.
+
+Prefer the narrowest admission strategy that preserves the required function. Record the practical loss of withholding the material and any safer alternative, such as a single-subject crop, selected panel crop, local beat binding, or text lock. This gate changes admission strategy only; it does not create a new Material Registry or silently change the material's role.
+
+If the director explicitly requests a runtime material, do not remove, replace, crop, downgrade, or withhold it silently. Explain the material risk and recommend one narrower strategy or request a decision. Even in SCREENWRITER MODE, material admission remains subject to this disclosed decision boundary. Do not remove all references merely because conditioning risk exists.
 
 ### Runtime Attachments
 
@@ -1034,9 +1175,12 @@ Every video prompt must:
 - include active runtime references only;
 - state final visual style through executable carriers;
 - preserve start state, end state, and continuity;
+- preserve relevant operator body path, lens target, and cross-unit motion-state handoff without forcing embodied-camera detail into stable shots;
+- preserve production-critical physical causality and intermediate topology without expanding ordinary actions;
 - preserve the committed Shot Spine's editorial function, attention progression, and camera logic;
 - use visible, directional motion language;
 - protect reaction timing, breath, eye-line, and holds when performance matters;
+- preserve exact approved vocal-event ownership and silent reaction beats when dialogue control is active;
 - include environmental ambience and synchronized diegetic/action effects;
 - exclude music unless explicitly requested;
 - use semantic timing and the resolved transition policy;
@@ -1223,6 +1367,7 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Generation-unit boundaries are declared or approved.
 - The Production Spine is current and frozen.
 - The Intent Ledger is nested in that Spine; its material entries have one owner, materially important decisions preserve rationale, and every derived question, assumption, trace, delta, or revision-conflict view agrees with it.
+- When a state trigger is active, `framewright_state.yaml` matches the latest explicit decision, current active artifacts, approved generation units, selected takes, and material roles; exactly one revision is active per artifact identity and every replaced revision remains superseded rather than active.
 - Material causal state and blocking readiness were resolved before the Committed Shot / Phase Spine froze; no parallel world, blocking, capture-logic, or viewer-relationship registry exists.
 - Every compiler-inferred shot passes the Capture Necessity Test without creating a shot quota or altering AUTEUR locks.
 - Each prompt block starts with the required mode line.
@@ -1251,11 +1396,18 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Video prompts use semantic relative timing unless numeric timing was explicitly requested or required for an approved synchronization technique.
 - Edited sequences use a stated hard-cut transition policy unless overridden; continuous takes have one uninterrupted camera path with no hidden reset.
 - Production-critical camera moves state start, path, landing, direction, visible movement evidence, and motivation in the relevant beat.
+- When embodied camera is relevant, operator body path and lens target remain distinct; permitted error, recovery, viewer attachment, and cross-unit motion state are explicit without contaminating stable shots.
 - Relevant scale, object-state, reaction-target, threshold-crossing, Style Survival, and Surface Fidelity locks are present without unnecessary generic blocks.
+- Production-critical physical actions preserve trigger, force, resistance, contact, release or lock, settling, and aftermath; mechanical transformations preserve required part provenance and load-bearing state without over-describing ordinary motion.
+- Runtime material admission passed the Reference Conditioning Risk Gate; an explicitly requested material was not silently removed, cropped, downgraded, or withheld.
 - Compression preserves action flow, geography, object state, camera coverage, transition policy, reference authority, and critical negatives.
+- Every material abstract intent has a shot-legible visible, audible, or temporal carrier; material dialogue has executable onset, delivery, aftermath, or listener-response causality without micro-action overload.
+- Generation-unit feasibility separately explains relevant dialogue, blocking, camera-attention, world-response, transformation, object-state, silence, and reference loads; no ceiling, score, or quota substitutes for the explanation.
+- Any proposed structural subtraction identifies the function being transferred and stops for approval before material deletion, merge, split, or intentional loss.
 - Video prompts request environmental ambience and synchronized effects.
 - Video prompts exclude music unless explicitly overridden.
 - No invented dialogue, narration, singing, or vocal performance appears.
+- When explicit vocal control is active, every event has one speaker, exact text, language, beat, and count; silent reactions contain no added vocal event or visible-text instruction.
 - Character limits include handles and line breaks.
 - Split-unit files are independently executable.
 - Generated files contain no assistant-facing workflow language.
@@ -1282,9 +1434,13 @@ semantic_trace:
 Semantic Trace is not a second editable source and is not saved by default. Run these compact meta-tests:
 
 - `Intent Coverage Test`: every active material director lock has an appropriate carrier, and its rationale still holds through structure and execution.
+- `Observable Intent Test`: every material abstract intent is translated into visible, audible, spatial, or temporal evidence rather than left as an orphan adjective.
+- `Embodied Dialogue Test`: material dialogue has at least one executable causal carrier in preparation, delivery, ending, aftermath, or listener response.
+- `Shot-Scale Legibility Test`: every selected performance carrier is readable at the committed shot scale.
+- `Performance Overdirection Test`: each material beat keeps only the strongest necessary carriers and avoids repetitive micro-action choreography.
 - `Instruction Provenance Test`: every material compiler-added instruction comes from an approved decision, safe inference, active material authority, or target requirement.
 - `Intentional Freedom Preservation Test`: deliberately open areas were not over-specified or reported as unresolved defects.
-- `Rationale Conflict Test`: a revision did not preserve surface action while breaking the approved reason; if it did, report and request a decision.
+- `Rationale Conflict Test`: a revision or proposed structural subtraction did not preserve surface action while breaking the approved reason, theme carrier, relationship function, viewer knowledge, or continuity function; if it did, report and request a decision.
 - `Silent Invention Test`: unauthorized emotion, relationship, camera premise, world state, dialogue, or reference authority did not enter the artifact.
 - `Compression Survival Test`: compression preserved every active material intent carrier and its trace mapping.
 - `Cross-Stage Consistency Test`: Storyboard, Keyframes, and Video Prompt read the same approved scope without rewriting decision state or each other's authority.

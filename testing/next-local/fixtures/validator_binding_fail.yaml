@@ -1,0 +1,10 @@
+kind: prompt
+expected: fail
+expected_errors:
+  - native_mention_unmapped
+  - native_binding_unused
+  - handle_outside_refs
+prompt: |-
+  [MODE: APPRENTICE]
+  @Image 1 crosses the room while HERO={{HANDLE}} waits.
+native_bindings: ["@Image 2"]

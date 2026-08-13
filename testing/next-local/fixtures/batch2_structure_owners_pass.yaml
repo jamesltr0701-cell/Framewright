@@ -1,0 +1,16 @@
+kind: compile_trace
+expected: pass
+prompt: |-
+  [MODE: APPRENTICE]
+  AUDIO: room tone and synchronized action effects, no music.
+  GU02 opens from the approved settled doorway state and completes the exit.
+serialization_owners: [seedance_omni_reference]
+active_stages: [video_prompt]
+director_modes: [apprentice]
+production_spines: [current_approved_spine]
+material_registries: [project_material_registry]
+split_units:
+  - unit_label: GU02
+    start_state: character holds the open doorway after GU01
+    end_state: character has exited and the door remains open
+    independently_executable: true

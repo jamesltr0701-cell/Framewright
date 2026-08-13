@@ -1,0 +1,25 @@
+kind: compile_trace
+expected: pass
+case: duojiao_fish_head
+prompt: |-
+  [MODE: AUTEUR]
+  AUDIO: kitchen room tone, knife contact, ceramic placement, no music.
+  Preserve the approved cooking order. The knife drops under its own weight, contacts the board once, then remains settled before the plate moves.
+material_intents:
+  - intent: fast precise procedure
+    carriers: [clean action order, single contact, settled tool before next action]
+performance_beats:
+  - beat_id: precise_cut
+    onset: wrist aligns over the board
+    physical_carriers: [compact elbow path, immediate grip release after contact]
+    release_or_aftermath: hand clears the settled blade
+    shot_scale: medium_close
+    carrier_legible: true
+feasibility:
+  systems:
+    blocking: {risk: low, reason: one cook and one work surface}
+    object_state: {risk: medium, reason: the knife must contact and settle before the plate moves}
+    active_reference: {risk: low, reason: the kitchen reference supplies geography only}
+  weakest_beat: knife contact and settle
+  competing_objectives: [procedural order, prop physics]
+  experience_priority_stack: [procedural order, prop physics, kitchen continuity]

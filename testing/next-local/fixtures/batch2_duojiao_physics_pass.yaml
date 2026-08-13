@@ -1,0 +1,22 @@
+kind: compile_trace
+expected: pass
+case: duojiao_physics
+prompt: |-
+  [MODE: AUTEUR]
+  AUDIO: blade contact and settled kitchen room tone, no music.
+  Gravity accelerates the knife downward; the edge contacts the board once, the handle rebounds slightly, then the blade lies flat and remains settled before the plate moves.
+material_intents:
+  - intent: credible precise procedure
+    carriers: [downward acceleration, single contact, visible settling]
+physical_causality:
+  - object_or_system: kitchen knife
+    production_critical: true
+    mechanical_transformation: false
+    initial_state: held above the cutting board
+    trigger: grip releases
+    force_or_acceleration: gravity accelerates it downward
+    resistance: air resistance is negligible
+    contact: edge meets the board once
+    release_or_lock: hand stays clear after release
+    rebound_or_settling: handle rebounds slightly and blade lies flat
+    aftermath: knife remains still before the plate moves

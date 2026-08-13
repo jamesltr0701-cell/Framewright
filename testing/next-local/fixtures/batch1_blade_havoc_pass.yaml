@@ -1,0 +1,35 @@
+kind: compile_trace
+expected: pass
+case: blade_havoc
+prompt: |-
+  [MODE: APPRENTICE]
+  AUDIO: hydraulic locks, metal load, two exact spoken lines, no extra speech, no music.
+  The first transformation completes before the second begins. Blade says the first locked line once; Havoc answers once after the load-bearing leg locks.
+material_intents:
+  - intent: mechanical weight
+    carriers: [visible load transfer, delayed lock, chassis rebound]
+performance_beats:
+  - beat_id: call
+    onset: sees the lock engage
+    physical_carriers: [head snaps toward the mechanism]
+    exact_dialogue: "Blade!"
+    dialogue_delivery: one urgent call
+    listener_response: Havoc turns only after the lock
+    shot_scale: medium
+    carrier_legible: true
+  - beat_id: answer
+    onset: the chassis settles
+    physical_carriers: [jaw releases after the impact]
+    exact_dialogue: "Havoc..."
+    dialogue_delivery: one strained answer
+    release_or_aftermath: breath trails under the hydraulic settle
+    shot_scale: close
+    carrier_legible: true
+feasibility:
+  systems:
+    dialogue: {risk: medium, reason: two vocal events must remain unique}
+    transformation: {risk: high, reason: two mechanical processes compete for readable intermediate states}
+    object_state: {risk: high, reason: load transfer and part provenance must remain ordered}
+  weakest_beat: handoff between the two transformations
+  competing_objectives: [mechanical causality, dialogue clarity, identity continuity]
+  experience_priority_stack: [mechanical causality, identity continuity, dialogue clarity]

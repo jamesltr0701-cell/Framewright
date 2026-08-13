@@ -1,0 +1,15 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - requested_reference_changed_silently
+prompt: |-
+  [MODE: APPRENTICE]
+  The character crosses the room.
+reference_admission:
+  - material_key: hero_board
+    director_requested: true
+    requested_strategy: attach
+    strategy: withhold
+    conditioning_risk: multi-view layout may duplicate the character
+    practical_loss_if_withheld: identity consistency weakens
+    user_approved: false

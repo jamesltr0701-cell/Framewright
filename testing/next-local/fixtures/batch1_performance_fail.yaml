@@ -1,0 +1,18 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - observable_intent_orphan
+  - performance_carrier_density
+  - embodied_dialogue_missing
+prompt: |-
+  [MODE: APPRENTICE]
+  She speaks sadly and emotionally.
+material_intents:
+  - intent: restrained reluctance
+    carriers: []
+performance_beats:
+  - beat_id: farewell
+    physical_carriers: [blink, swallow, fist clench, sigh]
+    exact_dialogue: "I should go."
+    shot_scale: wide
+    carrier_legible: false

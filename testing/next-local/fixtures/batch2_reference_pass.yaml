@@ -1,0 +1,17 @@
+kind: compile_trace
+expected: pass
+case: reference_admission
+prompt: |-
+  [MODE: APPRENTICE]
+  MATERIAL ROLES
+  @Image 1: subject identity only; use the selected single-character crop, not the multi-view layout.
+  @Image 1 crosses the room without inheriting the source pose or composition.
+native_bindings: ["@Image 1"]
+reference_admission:
+  - material_key: hero_board
+    director_requested: true
+    requested_strategy: attach
+    strategy: crop
+    conditioning_risk: the multi-view sheet could duplicate the character and impose its layout
+    practical_loss_if_withheld: identity consistency would weaken
+    user_approved: true

@@ -1,0 +1,21 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - serialization_owner_count
+  - active_stage_count
+  - production_spine_count
+  - split_state_missing
+  - split_unit_not_executable
+prompt: |-
+  [MODE: APPRENTICE]
+  GU02 continues somehow.
+serialization_owners: [core_fallback, seedance_omni_reference]
+active_stages: [storyboard, video_prompt]
+director_modes: [apprentice]
+production_spines: [old_spine, new_spine]
+material_registries: [project_material_registry]
+split_units:
+  - unit_label: GU02
+    start_state: ""
+    end_state: ""
+    independently_executable: false

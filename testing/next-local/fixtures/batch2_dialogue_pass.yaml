@@ -1,0 +1,26 @@
+kind: compile_trace
+expected: pass
+case: dialogue_events
+prompt: |-
+  [MODE: APPRENTICE]
+  AUDIO: machinery, room tone, no music. Blade says "Blade!" once. After the chassis settles, Havoc answers "Havoc..." once. No other speech; the final reaction is silent and has no subtitle.
+vocal_events:
+  - event_id: call_blade
+    speaker: Blade
+    exact_text: "Blade!"
+    language: English
+    delivery_authority: locked urgent call
+    beat: first lock engages
+    allowed_count: 1
+  - event_id: answer_havoc
+    speaker: Havoc
+    exact_text: "Havoc..."
+    language: English
+    delivery_authority: locked strained answer
+    beat: chassis settles
+    allowed_count: 1
+silent_reaction_beats:
+  - beat_id: final_reaction
+    performance_carriers: [jaw remains loose, breath trails]
+    speech: ""
+    subtitle_or_visible_text: ""

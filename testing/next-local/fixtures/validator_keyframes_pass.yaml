@@ -1,0 +1,10 @@
+kind: prompt
+expected: pass
+prompt: |-
+  KEYFRAME_01
+  [MODE: APPRENTICE]
+  Frozen doorway hesitation with final-image lighting and material finish.
+
+  KEYFRAME_02
+  [MODE: APPRENTICE]
+  Frozen aftermath after the character exits; the open door preserves continuity.

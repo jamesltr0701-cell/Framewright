@@ -1,0 +1,22 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - physical_chain_incomplete
+  - transformation_topology_missing
+prompt: |-
+  [MODE: APPRENTICE]
+  The leg instantly morphs into a launcher and throws the vehicle.
+physical_causality:
+  - object_or_system: launcher leg
+    production_critical: true
+    mechanical_transformation: true
+    initial_state: normal leg
+    trigger: transformation starts
+    force_or_acceleration: instant force
+    resistance: none
+    contact: ""
+    release_or_lock: ""
+    rebound_or_settling: ""
+    aftermath: vehicle is airborne
+    part_provenance: ""
+    load_bearing_state: ""

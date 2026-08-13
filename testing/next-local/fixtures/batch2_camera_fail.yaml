@@ -1,0 +1,24 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - camera_path_conflated
+  - unselected_take_as_truth
+  - opening_constraint_persisted
+prompt: |-
+  [MODE: SCREENWRITER]
+  Dynamic camera follows everything.
+camera_agency:
+  required: true
+  operator_goal: escape while watching the threat
+  body_path: toward threat
+  lens_target: toward threat
+  opposed_paths: true
+  viewer_attachment: fleeing witness
+motion_state_handoff:
+  camera_velocity_and_direction: forward
+  subject_and_world_motion: backward
+  opening_only_constraints: [temporary blur]
+  persistent_constraints: [temporary blur]
+  must_not_persist: [temporary blur]
+  selected_take_source: take_02
+  director_selected_take: false

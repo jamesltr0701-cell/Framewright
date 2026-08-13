@@ -1,0 +1,35 @@
+kind: compile_trace
+expected: pass
+case: idol
+prompt: |-
+  [MODE: APPRENTICE]
+  AUDIO: quiet corridor room tone and synchronized footsteps; no music.
+  In a medium close shot, she pauses before the doorway. Her fingers release the handle slowly; she finishes the line without looking back, then holds the unfinished reach as the listener remains silent.
+material_intents:
+  - intent: restrained reluctance
+    carriers: [slow finger release, unfinished reach, delayed exit]
+performance_beats:
+  - beat_id: farewell
+    onset: pauses before the doorway
+    physical_carriers: [slow finger release, unfinished reach]
+    exact_dialogue: "I should go."
+    dialogue_delivery: finishes without looking back
+    listener_response: remains silent
+    release_or_aftermath: holds the unfinished reach
+    shot_scale: medium_close
+    carrier_legible: true
+feasibility:
+  systems:
+    dialogue: {risk: low, reason: one short vocal turn}
+    blocking: {risk: low, reason: one doorway action}
+    camera_attention: {risk: low, reason: one held composition}
+    silence: {risk: medium, reason: the listener reaction needs protected hold time}
+  weakest_beat: listener reaction hold
+  competing_objectives: [departure action, listener reaction]
+  experience_priority_stack: [restrained farewell, listener reception, doorway continuity]
+structural_changes:
+  - type: proposed_delete
+    applied: false
+    function_before: preserves the unfinished emotional gesture
+    function_transfer: none; therefore keep it
+    user_approved: false

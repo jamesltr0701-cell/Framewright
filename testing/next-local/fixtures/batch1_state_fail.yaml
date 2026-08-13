@@ -1,0 +1,38 @@
+kind: state
+expected: fail
+expected_errors:
+  - duplicate_active_revision
+  - take_not_director_selected
+document:
+  framewright_state:
+    schema_version: "1.0"
+    core_version: "3.5.1"
+    project_slug: synthetic_bad_state
+    current_scope: sequence_01
+    active_stage: video_prompt
+    director_mode: apprentice
+    approved_generation_units: [GU01]
+    active_artifacts:
+      - artifact_id: video_prompt
+        stage: video_prompt
+        generation_unit: GU01
+        revision: 1
+        locator: GU01/prompt_video.txt
+        change_class: compiler_inference
+      - artifact_id: video_prompt
+        stage: video_prompt
+        generation_unit: GU01
+        revision: 2
+        locator: GU01/prompt_video_v2.txt
+        change_class: director_refinement
+    superseded_artifacts: []
+    active_intent_entries: []
+    intentional_freedom: []
+    unresolved_material_decisions: []
+    active_material_roles: []
+    cross_gu_continuity: {}
+    selected_generated_takes:
+      - take_id: GU01_take_01
+        director_selected: false
+    last_approved_revision: 2
+    last_updated: "2026-08-13T12:00:00+08:00"

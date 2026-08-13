@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.1.0"
+profile_version: "1.2.0"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -93,6 +93,20 @@ Rules:
 - Authority may be local to one shot, phase, or beat.
 - Inactive, withheld, planning-only, rejected, and text-extraction-only materials obey core Silent Reference Exclusion.
 - Native references are surface bindings for the current run; they do not replace stable core material identity.
+
+Before admission, serialize the result of the core Reference Conditioning Risk Gate as an assistant-facing strategy, not as a second registry:
+
+```yaml
+reference_admission_strategy:
+  material_key:
+  strategy: attach | crop | beat_limited | text_extraction_only | withhold
+  active_scope:
+  conditioning_risk:
+  practical_loss_if_withheld:
+  director_decision_required:
+```
+
+The adapter may recommend the narrowest strategy, but it must not silently remove, replace, crop, downgrade, or withhold a director-requested runtime material. Ask for a decision when the recommended strategy changes that explicit request. Keep the risk and operator decision in the Run Card; serialize only the resulting active material role and scope into the clean prompt.
 
 ### 4.1 Native Material Mention Serialization
 
@@ -240,7 +254,9 @@ Serialize in this order:
 2. emit `MATERIAL ROLES` only when active references need model-facing role or authority limits;
 3. emit exactly one selected task schema;
 4. use native mentions directly inside the action, edit, endpoint, continuation, dialogue, or sound clauses they control;
-5. run core Compactness, Compression Safety, Silent Reference Exclusion, Runtime Cleanliness, and character-limit validation.
+5. serialize relevant operator body path separately from lens target, and carry only the approved opening or persistent motion-state constraints needed by this unit;
+6. serialize production-critical physical causality through the shortest visible trigger-to-aftermath chain that preserves topology and load state;
+7. run core Compactness, Compression Safety, Silent Reference Exclusion, Runtime Cleanliness, and character-limit validation.
 
 Do not print UI setup, upload order, chip-selection instructions, Run Card fields, rejected materials, or operator reminders in the prompt. The Run Card owns file-to-mention mapping; the clean prompt owns only model-facing semantics.
 
@@ -300,12 +316,23 @@ seedance_audio_policy:
   music: no_music | preserve | generate_explicit_request | replace | remove
   audio_reference_authority:
   subtitle_or_visible_text: none | preserve | generate_locked_text | replace | remove
+  vocal_events:
+    - event_id:
+      speaker:
+      exact_text:
+      language:
+      delivery_authority:
+      beat:
+      allowed_count:
+  silent_reaction_beats:
 ```
 
 Rules:
 
 - Do not activate this policy merely because audio material is attached; the user's requested scope controls it.
 - Keep dialogue text, speaker, language, and any locked delivery exact. Timbre authority does not grant new wording, emotion, accent, or pacing.
+- Give every approved vocal event one speaker, exact text, language, beat, and allowed count. Use a native mention as speaker only when its identity is unambiguous and actively bound.
+- Serialize a silent reaction as nonverbal performance only. Do not add a whisper, repeated name, extra speech, subtitle, or visible text to fill silence.
 - Map an admitted audio reference with `@Audio n` only to its allowed properties and active beats.
 - In Smart Edit, source-video audio remains part of the sole editing master unless the explicit edit scope says preserve, remove, or replace a named component.
 - State the environmental bed once. Keep synchronized action SFX in the beat that visibly causes them.
@@ -335,7 +362,9 @@ Before serialization, verify route prerequisites and target-surface support:
 - First and Last Frames has explicit endpoint assignments and compatible requested aspect / composition logic.
 - Extend has an admitted source video and a recoverable actual ending boundary.
 - Storyboard control has explicit runtime admission and limited structural authority.
+- Every admitted reference passed the core conditioning-risk gate; any strategy that changes a director-requested attachment has explicit approval.
 - Audio, dialogue, and subtitle control has an explicit requested scope.
+- Explicit vocal control has unique event ownership and silent-reaction boundaries.
 
 If a required material or assignment is missing, ask one compact Intake question. Do not switch routes silently. If the route is valid but execution remains dense, return to the core Generation-Unit Feasibility Gate; never auto-split or auto-merge.
 
@@ -394,9 +423,14 @@ Before saving, verify:
 - first-frame, last-frame, both-endpoint, and Extend assignments are explicit;
 - storyboard material is absent unless explicitly admitted for Video Prompt runtime;
 - continuous-take phases remain phases, not cuts;
+- relevant operator body path remains distinct from lens target, and opening-only motion constraints are not incorrectly made persistent;
+- cross-unit motion continuity inherits only approved Spine state or a director-selected take;
+- production-critical physical chains preserve required contact, settling, part provenance, and load state without generic topology blocks;
 - inactive materials and UI instructions do not enter the prompt;
+- reference conditioning strategy is disclosed assistant-facing, and no director-requested runtime material is silently removed, replaced, cropped, downgraded, or withheld;
 - unspecified sound inherits ambience plus synchronized diegetic/action SFX and no music;
 - explicit dialogue, audio, music, SFX, and subtitle policies affect only their requested scope;
+- each approved vocal event appears only for its speaker, text, beat, and allowed count; silent reactions do not acquire extra speech or visible text;
 - the Run Card remains assistant-facing and the clean prompt is saved;
 - generation evidence is recorded only after separately authorized generation and does not promote one result into a global rule;
 - core timing, sound, continuity, performance, compression, and character-limit checks pass.

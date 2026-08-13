@@ -1,0 +1,24 @@
+kind: compile_trace
+expected: pass
+case: blade_topology
+prompt: |-
+  [MODE: APPRENTICE]
+  AUDIO: connected metal slides, hydraulic compression, chassis impact, no music.
+  Existing calf panels rotate on visible hinges into a braced leg; the locked leg accepts the chassis load before the hydraulic assembly compresses and releases it upward.
+material_intents:
+  - intent: mechanical causality
+    carriers: [visible hinges, load transfer, compressed release]
+physical_causality:
+  - object_or_system: transforming support leg
+    production_critical: true
+    mechanical_transformation: true
+    initial_state: calf panels connected to the lower leg
+    trigger: hinge motors engage
+    force_or_acceleration: panels rotate outward under motor force
+    resistance: joints slow as alignment pins meet
+    contact: foot assembly plants under the chassis
+    release_or_lock: pins lock before load transfer
+    rebound_or_settling: hydraulic assembly compresses under weight
+    aftermath: stored force releases and lifts the chassis
+    part_provenance: every support part unfolds from the visible calf panels and remains connected
+    load_bearing_state: the planted locked leg bears the chassis before release

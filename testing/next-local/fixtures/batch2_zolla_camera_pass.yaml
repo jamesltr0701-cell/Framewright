@@ -1,0 +1,32 @@
+kind: compile_trace
+expected: pass
+case: zolla_camera
+prompt: |-
+  [MODE: SCREENWRITER]
+  AUDIO: retreating footfalls, hard breath, trailing rubble, no music.
+  The operator runs away from the threat while the lens keeps looking backward; the horizon lags with each step and recovers late without a cut.
+material_intents:
+  - intent: embodied survival witness
+    carriers: [retreating body path, backward lens target, late horizon recovery]
+camera_agency:
+  required: true
+  operator_goal: stay with the escaping subject
+  body_path: retreats west
+  lens_target: looks east toward the threat
+  opposed_paths: true
+  distance_change: threat recedes while subject remains near
+  orientation_or_horizon: step-driven lag
+  framing_error_behavior: brief edge loss is permitted
+  recovery_behavior: corrects late after each impact
+  viewer_attachment: attached to the fleeing operator
+motion_state_handoff:
+  camera_velocity_and_direction: retreating west at running speed
+  horizon_and_body_inertia: rightward roll is still recovering
+  focal_focus_exposure_state: focus remains on the near subject; exposure carries dust flicker
+  subject_and_world_motion: subject and camera move west; dust continues east to west
+  sound_continuity: breath and rubble tail continue
+  opening_only_constraints: [rightward horizon roll]
+  persistent_constraints: [westward retreat, trailing rubble]
+  must_not_persist: [rightward horizon roll]
+  selected_take_source: GU01_take_03
+  director_selected_take: true

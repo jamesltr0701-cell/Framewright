@@ -1,0 +1,25 @@
+kind: compile_trace
+expected: pass
+case: zolla
+prompt: |-
+  [MODE: SCREENWRITER]
+  AUDIO: footfalls, strained breath, distant impacts, no music.
+  One continuous take follows the runner moving away from the threat while the lens looks back over her shoulder; the horizon lags with her body inertia and recovers without a cut.
+material_intents:
+  - intent: survival panic
+    carriers: [forward body flight, broken breath, late horizon recovery]
+performance_beats:
+  - beat_id: flee
+    onset: hears the impact behind her
+    physical_carriers: [forward body flight, broken breath]
+    release_or_aftermath: does not recover fully before recommitting
+    shot_scale: medium_wide
+    carrier_legible: true
+feasibility:
+  systems:
+    blocking: {risk: medium, reason: the body path and lens target oppose one another}
+    camera_attention: {risk: high, reason: the lens must look backward while the operator keeps retreating}
+    world_response: {risk: low, reason: only one distant impact remains active}
+  weakest_beat: backward attention transfer during forward escape
+  competing_objectives: [survival behavior, POV credibility, threat legibility]
+  experience_priority_stack: [survival behavior, POV credibility, spatial scale, threat legibility]

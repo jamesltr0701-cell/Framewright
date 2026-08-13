@@ -1,0 +1,24 @@
+kind: compile_trace
+expected: pass
+case: freefall
+prompt: |-
+  [MODE: SCREENWRITER]
+  AUDIO: rushing air, clothing flutter, distant city wash, no music.
+  One uninterrupted fall. The camera holds the same body relationship as the subject stops fighting the air and the final look remains deliberately open.
+material_intents:
+  - intent: quiet surrender
+    carriers: [limbs stop correcting, breath releases, gaze stops searching]
+performance_beats:
+  - beat_id: surrender
+    onset: the last correction fails
+    physical_carriers: [limbs stop correcting, breath releases, gaze stops searching]
+    release_or_aftermath: body remains carried by the fall
+    shot_scale: medium
+    carrier_legible: true
+feasibility:
+  systems:
+    camera_attention: {risk: low, reason: one uninterrupted camera relationship}
+    performance: {risk: low, reason: one material transition with three legible carriers}
+  weakest_beat: final release
+  competing_objectives: []
+  experience_priority_stack: []

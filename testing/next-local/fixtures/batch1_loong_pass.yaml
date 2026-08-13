@@ -1,0 +1,18 @@
+kind: compile_trace
+expected: pass
+case: loong
+prompt: |-
+  [MODE: AUTEUR]
+  AUDIO: river impact and settling water, no music.
+  Preserve the locked bridge geography. The dragon enters head first; after the body disappears, the water closes over it and the creature never reappears.
+material_intents:
+  - intent: irreversible disappearance
+    carriers: [head-first entry, closing water, no reappearance]
+performance_beats: []
+feasibility:
+  systems:
+    object_state: {risk: medium, reason: entry order and terminal absence must survive compression}
+    world_response: {risk: low, reason: only the water aftermath persists}
+  weakest_beat: terminal water closure
+  competing_objectives: [entry readability, terminal absence]
+  experience_priority_stack: [terminal disappearance, entry order, water aftermath]

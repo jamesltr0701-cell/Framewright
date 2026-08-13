@@ -1,0 +1,19 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - structural_function_unaccounted
+  - structural_change_unapproved
+prompt: |-
+  [MODE: SCREENWRITER]
+  AUDIO: room tone, no music.
+  The reaction beat has been removed automatically.
+material_intents:
+  - intent: emotional clarity
+    carriers: [speaker pause]
+performance_beats: []
+structural_changes:
+  - type: delete_reaction
+    applied: true
+    function_before: ""
+    function_transfer: ""
+    user_approved: false

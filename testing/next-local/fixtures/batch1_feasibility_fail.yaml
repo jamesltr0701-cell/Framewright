@@ -1,0 +1,19 @@
+kind: compile_trace
+expected: fail
+expected_errors:
+  - feasibility_assessment_invalid
+  - weakest_beat_missing
+  - priority_stack_missing
+prompt: |-
+  [MODE: SCREENWRITER]
+  AUDIO: room tone and action effects, no music.
+  Cover every event in one dense take.
+material_intents:
+  - intent: overwhelming pressure
+    carriers: [rapid blocking handoffs]
+performance_beats: []
+feasibility:
+  systems:
+    dialogue: {risk: high, reason: six vocal turns overlap physical action}
+    camera_attention: {risk: 87, reason: fake combined precision}
+  competing_objectives: [dialogue, blocking, transformation]
