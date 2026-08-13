@@ -1,0 +1,14 @@
+kind: compile_trace
+expected: pass
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "Preserve approved structure, blocking, motion, and camera; re-render identity, materials, and final style."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 12}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    blockout_fine:
+      allowed_authority: [structure, blocking, motion, camera]
+      denied_authority: [identity, temporary_material, final_style]

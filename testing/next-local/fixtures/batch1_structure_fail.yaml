@@ -1,10 +1,11 @@
 kind: compile_trace
+director_modes: [screenwriter]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - structural_function_unaccounted
   - structural_change_unapproved
 prompt: |-
-  [MODE: SCREENWRITER]
   AUDIO: room tone, no music.
   The reaction beat has been removed automatically.
 material_intents:

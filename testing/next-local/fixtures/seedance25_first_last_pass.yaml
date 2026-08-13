@@ -1,0 +1,15 @@
+kind: compile_trace
+expected: pass
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Begin at the assigned first frame, resolve the middle turn, and arrive at the assigned last frame; no music."
+seedance25:
+  route: first_last_frames
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: locked_to_first_image, resolved_value: first_image_ratio, surface_value: adaptive}
+  endpoint_aspect_compatible: true
+  endpoints:
+    first_frame: "@Image 1 composition and state"
+    last_frame: "@Image 2 composition and state"
+    middle_motion_and_state_change: subject turns and sits

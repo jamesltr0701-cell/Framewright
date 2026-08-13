@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [screenwriter]
+conversation_mode_declared: true
 expected: pass
 case: zolla
 prompt: |-
-  [MODE: SCREENWRITER]
   AUDIO: footfalls, strained breath, distant impacts, no music.
   One continuous take follows the runner moving away from the threat while the lens looks back over her shoulder; the horizon lags with her body inertia and recovers without a cut.
 material_intents:

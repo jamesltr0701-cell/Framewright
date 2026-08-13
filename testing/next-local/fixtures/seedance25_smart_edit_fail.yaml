@@ -1,0 +1,12 @@
+kind: compile_trace
+expected: fail
+expected_errors: [smart_edit_duration_lock_invalid, source_aspect_lock_invalid, smart_edit_contract_incomplete]
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Change the video."
+seedance25:
+  route: smart_edit
+  parameter_contract:
+    duration: {provenance: platform_locked, resolved_value: 12, surface_value: 12}
+    aspect_ratio: {provenance: locked_to_source_video, resolved_value: "16:9", surface_value: "16:9"}
+  smart_edit: {sole_source_master: false, edit_scope: "", content_to_preserve: ""}

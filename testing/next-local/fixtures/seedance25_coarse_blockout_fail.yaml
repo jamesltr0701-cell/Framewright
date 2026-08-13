@@ -1,0 +1,15 @@
+kind: compile_trace
+expected: fail
+expected_errors: [coarse_blockout_authority_invalid]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "Copy everything from the rough blockout."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 10}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    blockout_coarse:
+      allowed_authority: [identity, final_style]
+      denied_authority: []

@@ -5,6 +5,5 @@ expected_errors:
   - native_binding_unused
   - handle_outside_refs
 prompt: |-
-  [MODE: APPRENTICE]
   @Image 1 crosses the room while HERO={{HANDLE}} waits.
 native_bindings: ["@Image 2"]

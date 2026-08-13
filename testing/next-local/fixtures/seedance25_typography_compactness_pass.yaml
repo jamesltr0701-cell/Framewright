@@ -1,0 +1,21 @@
+kind: compile_trace
+expected: pass
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "The prepared sign asset remains centered and readable; preserve identity, boundary state, camera causality, room tone, action SFX, and no music."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 6}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  typography_or_frame_accuracy:
+    critical: true
+    assistant_limitation_present: true
+    recommended_route: prepared_asset
+  compactness:
+    character_count: 144
+    active_material_count: 1
+    stage_count: 1
+    semantic_anchors: [identity, boundary_state, camera_causality, no_music]
+    assistant_facing_leakage: false
+    inactive_blocks: []

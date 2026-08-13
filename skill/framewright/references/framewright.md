@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "3.5.1"
+version: "3.5.2-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -300,15 +300,7 @@ Advisor behavior is a named, scope-limited decision-authority grant, not a fourt
 
 A safe execution inference must not change story meaning, relationship, emotional outcome, generation-unit boundary, stage, reference authority, director-locked structure, or another high-impact creative decision. It must be necessary for execution, easy to reverse, and recorded as `compiler_inference` rather than presented as a director lock.
 
-Every generated prompt file or independently executable prompt block starts with exactly one of:
-
-```text
-[MODE: AUTEUR]
-[MODE: APPRENTICE]
-[MODE: SCREENWRITER]
-```
-
-In a multi-keyframe file, repeat the selected mode line at the start of each `KEYFRAME_##` block.
+Every compilation scope resolves exactly one Director Mode, stores it in internal state, and declares it explicitly to the user before compilation or delivery. Director Mode continues to control authority and creative decisions, but its literal compiler label is assistant-facing metadata and never enters a clean model-facing Prompt. A multi-keyframe file inherits the same internal mode for every block without repeating a mode label.
 
 ## 6. Scene Grammar Routing
 
@@ -986,7 +978,7 @@ If the director explicitly requests a runtime material, do not remove, replace, 
 
 The Material Registry's `material_key` is stable semantic identity inside Framewright. A platform filename, index, chip label, or API asset ID is only a current-run binding and must not define the material's role or authority.
 
-When a generic downstream platform needs unresolved inline handles, use the compact fallback immediately after the mode line:
+When a generic downstream platform needs unresolved inline handles, use the compact fallback at the start of the clean Prompt:
 
 ```text
 REFS:
@@ -1071,7 +1063,6 @@ One approved generation unit receives one prompt and one initial board image. Sa
 Required opening and layout declaration:
 
 ```text
-[MODE: ...]
 Create a 16:9 production-safe line-only blocking storyboard sheet. Treat every panel as a monochrome line drawing for shot planning, not as a final cinematic image.
 
 LAYOUT CONTRACT:
@@ -1132,7 +1123,6 @@ Each block begins:
 
 ```text
 KEYFRAME_01
-[MODE: ...]
 ```
 
 Each keyframe:
@@ -1171,7 +1161,7 @@ Use `compact_runtime` by default. Use a fuller execution contract only when expl
 
 Every video prompt must:
 
-- begin with exactly one mode line;
+- exclude literal Director Mode labels and other compiler metadata;
 - include active runtime references only;
 - state final visual style through executable carriers;
 - preserve start state, end state, and continuity;
@@ -1192,7 +1182,6 @@ Default character limit: 10,000 characters including spaces, line breaks, aliase
 Preferred compact headings:
 
 ```text
-[MODE: ...]
 REFS
 VISUAL STYLE
 AUDIO
@@ -1232,7 +1221,7 @@ Do not also create `prompt_video.txt` unless the user explicitly requests a sepa
 Each unit file must:
 
 - be independently executable;
-- begin with one mode line;
+- exclude literal Director Mode labels and other compiler metadata;
 - contain its own local start and end state;
 - preserve shared visual, identity, environment, geography, object, and sound context;
 - carry only active references needed for that unit.
@@ -1262,9 +1251,6 @@ No generated file may contain unresolved instructional placeholders. For the gen
 Allowed runtime headings include:
 
 ```text
-[MODE: AUTEUR]
-[MODE: APPRENTICE]
-[MODE: SCREENWRITER]
 [REFERENCE REGISTRY]
 [MATERIAL ROLES]
 [FINAL LOOK CONTRACT]
@@ -1370,7 +1356,7 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - When a state trigger is active, `framewright_state.yaml` matches the latest explicit decision, current active artifacts, approved generation units, selected takes, and material roles; exactly one revision is active per artifact identity and every replaced revision remains superseded rather than active.
 - Material causal state and blocking readiness were resolved before the Committed Shot / Phase Spine froze; no parallel world, blocking, capture-logic, or viewer-relationship registry exists.
 - Every compiler-inferred shot passes the Capture Necessity Test without creating a shot quota or altering AUTEUR locks.
-- Each prompt block starts with the required mode line.
+- Exactly one Director Mode is resolved internally and declared to the user; no clean Prompt contains its literal label.
 - Internal entity IDs do not leak.
 - No unresolved instructional placeholders remain.
 - Only active runtime references appear.

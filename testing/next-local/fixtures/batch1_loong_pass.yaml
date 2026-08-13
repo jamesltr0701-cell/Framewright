@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [auteur]
+conversation_mode_declared: true
 expected: pass
 case: loong
 prompt: |-
-  [MODE: AUTEUR]
   AUDIO: river impact and settling water, no music.
   Preserve the locked bridge geography. The dragon enters head first; after the body disappears, the water closes over it and the creature never reappears.
 material_intents:

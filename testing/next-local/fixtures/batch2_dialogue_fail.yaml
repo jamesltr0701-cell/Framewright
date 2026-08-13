@@ -1,10 +1,11 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - vocal_event_count_mismatch
   - silence_ownership_violation
 prompt: |-
-  [MODE: APPRENTICE]
   Blade shouts "Blade! Blade!" and the silent listener whispers a reply.
 vocal_events:
   - event_id: call_blade

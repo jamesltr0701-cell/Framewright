@@ -1,0 +1,20 @@
+kind: compile_trace
+expected: fail
+expected_errors: [material_hard_limit_exceeded, stable_range_warning_missing]
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "Use every supplied material."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 10}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  materials:
+    image_count: 31
+    video_count: 11
+    video_combined_seconds: 35
+    audio_count: 11
+    audio_combined_seconds: 35
+    subject_image_count: 13
+  active_subset_mapped: true
+  stable_range_warning_present: false

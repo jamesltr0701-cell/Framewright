@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: pass
 case: blade_havoc
 prompt: |-
-  [MODE: APPRENTICE]
   AUDIO: hydraulic locks, metal load, two exact spoken lines, no extra speech, no music.
   The first transformation completes before the second begins. Blade says the first locked line once; Havoc answers once after the load-bearing leg locks.
 material_intents:

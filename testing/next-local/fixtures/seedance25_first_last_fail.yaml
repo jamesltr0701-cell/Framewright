@@ -1,0 +1,13 @@
+kind: compile_trace
+expected: fail
+expected_errors: [source_aspect_lock_invalid, endpoint_aspect_mismatch, endpoint_authority_incomplete]
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Use both endpoint images."
+seedance25:
+  route: first_last_frames
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: locked_to_first_image, resolved_value: first_image_ratio, surface_value: "16:9"}
+  endpoint_aspect_compatible: false
+  endpoints: {first_frame: "@Image 1", last_frame: "@Image 2", middle_motion_and_state_change: ""}

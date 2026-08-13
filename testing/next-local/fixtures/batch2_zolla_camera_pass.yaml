@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [screenwriter]
+conversation_mode_declared: true
 expected: pass
 case: zolla_camera
 prompt: |-
-  [MODE: SCREENWRITER]
   AUDIO: retreating footfalls, hard breath, trailing rubble, no music.
   The operator runs away from the threat while the lens keeps looking backward; the horizon lags with each step and recovers late without a cut.
 material_intents:

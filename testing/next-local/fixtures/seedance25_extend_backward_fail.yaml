@@ -1,0 +1,12 @@
+kind: compile_trace
+expected: fail
+expected_errors: [extension_boundary_invalid, extension_trigger_missing]
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "Show something before the video."
+seedance25:
+  route: extend
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 5}
+    aspect_ratio: {provenance: locked_to_source_video, resolved_value: source_ratio, surface_value: adaptive}
+  extension: {direction: backward, boundary_owner: source_end, trigger: before}

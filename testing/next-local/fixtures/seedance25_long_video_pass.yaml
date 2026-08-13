@@ -1,0 +1,22 @@
+kind: compile_trace
+expected: pass
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "The florist arranges, wraps, and hands off one bouquet in three continuous stages; no music."
+seedance25:
+  route: long_video
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 20}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  stages:
+    - {entry_state: loose stems on bench, principal_change: bouquet arranged, end_state: bouquet centered}
+    - {entry_state: bouquet centered, principal_change: bouquet wrapped, end_state: wrap tied}
+    - {entry_state: florist holds bouquet, principal_change: assistant receives it, end_state: assistant holds bouquet}
+  numeric_timing:
+    active: true
+    trigger_reason: long_video
+    resolved_duration: 20
+    ranges:
+      - {start: 0, end: 6, critical: false}
+      - {start: 6, end: 14, critical: true, trigger: wrapping begins, state_must_continue: true, continued_state: florist owns bouquet}
+      - {start: 14, end: 20, critical: true, trigger: handoff begins, state_must_continue: true, continued_state: assistant owns bouquet}

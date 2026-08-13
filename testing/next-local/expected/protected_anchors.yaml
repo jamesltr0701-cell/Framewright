@@ -1,4 +1,4 @@
-candidate_version: "3.5.1"
+candidate_version: "3.5.2-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -22,3 +22,9 @@ protected_anchors:
   - "Keyframes and Video Prompt remain prompt-only by default."
   - "UI display text and asset order never become semantic authority."
   - "Generated prompt files contain only executable model-facing content."
+  - "Every compilation scope resolves exactly one Director Mode"
+  - "never enters a clean model-facing Prompt"
+  - "one-click video` remains an example label, never a route"
+  - "Semantic timing remains the default."
+  - "Music remains `no_music` unless the user explicitly requests music"
+  - "The storyboard recommendation does not override core one-generation-unit / one-board authority"

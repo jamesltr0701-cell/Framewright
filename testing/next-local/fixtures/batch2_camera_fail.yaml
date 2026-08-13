@@ -1,11 +1,12 @@
 kind: compile_trace
+director_modes: [screenwriter]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - camera_path_conflated
   - unselected_take_as_truth
   - opening_constraint_persisted
 prompt: |-
-  [MODE: SCREENWRITER]
   Dynamic camera follows everything.
 camera_agency:
   required: true

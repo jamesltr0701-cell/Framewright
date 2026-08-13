@@ -1,0 +1,20 @@
+kind: compile_trace
+expected: fail
+expected_errors: [typography_limitation_missing, compactness_count_mismatch, compactness_anchors_missing, compactness_not_qualified]
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Guarantee perfect typography on the exact frame."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 6}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  typography_or_frame_accuracy:
+    critical: true
+    assistant_limitation_present: false
+    recommended_route: prompt_only
+  compactness:
+    character_count: 1
+    semantic_anchors: []
+    assistant_facing_leakage: true
+    inactive_blocks: [unused_audio]

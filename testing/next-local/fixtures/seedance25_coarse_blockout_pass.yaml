@@ -1,0 +1,14 @@
+kind: compile_trace
+expected: pass
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "Use the blockout for paths, blocking, and camera only; render final identity and materials from admitted references."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 10}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    blockout_coarse:
+      allowed_authority: [action_paths, blocking, camera_path, cut_structure, lighting_progression, sound_timing]
+      denied_authority: [identity, costume, final_surface, texture, final_style]

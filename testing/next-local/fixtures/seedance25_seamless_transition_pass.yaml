@@ -1,0 +1,21 @@
+kind: compile_trace
+expected: pass
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Bridge @Video 1 into @Video 2 when the camera rises; buildings replace the tiles as the camera dives, arriving at the second clip's opening with a continuous wind bridge."
+native_bindings: ["@Video 1", "@Video 2"]
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 5}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    seamless_transition:
+      before_material: "@Video 1"
+      after_material: "@Video 2"
+      trigger: camera rises
+      camera_path: rise, turn, then dive
+      transformation_or_transition: tiles become buildings
+      arrival_state: source 2 opening composition
+      audio_bridge: continuous rising wind
+      pixel_identical_preservation_promised: false

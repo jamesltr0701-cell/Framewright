@@ -1,9 +1,10 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - requested_reference_changed_silently
 prompt: |-
-  [MODE: APPRENTICE]
   The character crosses the room.
 reference_admission:
   - material_key: hero_board

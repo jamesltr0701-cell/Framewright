@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [auteur]
+conversation_mode_declared: true
 expected: pass
 case: duojiao_fish_head
 prompt: |-
-  [MODE: AUTEUR]
   AUDIO: kitchen room tone, knife contact, ceramic placement, no music.
   Preserve the approved cooking order. The knife drops under its own weight, contacts the board once, then remains settled before the plate moves.
 material_intents:

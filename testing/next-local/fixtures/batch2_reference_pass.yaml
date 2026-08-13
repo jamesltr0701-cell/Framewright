@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: pass
 case: reference_admission
 prompt: |-
-  [MODE: APPRENTICE]
   MATERIAL ROLES
   @Image 1: subject identity only; use the selected single-character crop, not the multi-view layout.
   @Image 1 crosses the room without inheriting the source pose or composition.

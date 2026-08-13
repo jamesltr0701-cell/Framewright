@@ -1,0 +1,15 @@
+kind: compile_trace
+expected: fail
+expected_errors: [keyframe_order_or_state_missing, keyframe_cut_inferred]
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Use the keyframes as separate cuts."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    multi_keyframe:
+      ordered_anchors: [{native_ref: "@Image 1", state: ""}]
+      cuts_implied: true

@@ -1,0 +1,8 @@
+kind: compile_trace
+expected: fail
+expected_errors: [mode_metadata_leak, director_mode_undeclared]
+director_modes: [apprentice]
+conversation_mode_declared: false
+prompt: |-
+  [MODE: APPRENTICE]
+  A woman crosses the room.

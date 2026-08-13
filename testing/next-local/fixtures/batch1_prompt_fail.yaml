@@ -1,7 +1,6 @@
 kind: prompt
 expected: fail
 expected_errors:
-  - mode_line_missing
   - workflow_language_in_prompt
   - unresolved_placeholder
 prompt: |-

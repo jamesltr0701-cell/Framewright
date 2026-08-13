@@ -1,0 +1,19 @@
+kind: compile_trace
+expected: fail
+expected_errors: [long_video_stage_contract_incomplete, numeric_timing_range_invalid, critical_timing_trigger_missing]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "Many actions happen at exact times."
+seedance25:
+  route: long_video
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 20}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  stages: [{entry_state: start, principal_change: "", end_state: ""}]
+  numeric_timing:
+    active: true
+    trigger_reason: long_video
+    resolved_duration: 20
+    ranges:
+      - {start: 0, end: 8, critical: true, trigger: ""}
+      - {start: 7, end: 21, critical: false}

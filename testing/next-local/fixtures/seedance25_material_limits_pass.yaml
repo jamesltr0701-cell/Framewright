@@ -1,0 +1,20 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "Use only the mapped active references for this scene; environmental ambience and action SFX, no music."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 10}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  materials:
+    image_count: 12
+    video_count: 2
+    video_combined_seconds: 18
+    audio_count: 1
+    audio_combined_seconds: 6
+    subject_image_count: 9
+    storyboard_panel_count: 20
+  active_subset_mapped: true
+  stable_range_warning_present: true

@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: pass
 case: idol
 prompt: |-
-  [MODE: APPRENTICE]
   AUDIO: quiet corridor room tone and synchronized footsteps; no music.
   In a medium close shot, she pauses before the doorway. Her fingers release the handle slowly; she finishes the line without looking back, then holds the unfinished reach as the listener remains silent.
 material_intents:

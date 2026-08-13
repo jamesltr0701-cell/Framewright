@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [screenwriter]
+conversation_mode_declared: true
 expected: pass
 case: freefall
 prompt: |-
-  [MODE: SCREENWRITER]
   AUDIO: rushing air, clothing flutter, distant city wash, no music.
   One uninterrupted fall. The camera holds the same body relationship as the subject stops fighting the air and the final look remains deliberately open.
 material_intents:

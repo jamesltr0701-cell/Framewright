@@ -1,0 +1,17 @@
+kind: compile_trace
+expected: fail
+expected_errors: [unrequested_music, unrequested_dialogue_syntax, unrequested_visible_text_syntax]
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "She says {extra dialogue}. ■■UNREQUESTED SUBTITLE■■ appears while (upbeat music) plays."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  audio:
+    music_requested: false
+    music: generate_explicit_request
+    dialogue_requested: false
+    visible_text_requested: false
+    syntax_evidence_grade: snapshot_qualified

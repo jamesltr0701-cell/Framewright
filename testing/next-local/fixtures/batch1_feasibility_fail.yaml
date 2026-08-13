@@ -1,11 +1,12 @@
 kind: compile_trace
+director_modes: [screenwriter]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - feasibility_assessment_invalid
   - weakest_beat_missing
   - priority_stack_missing
 prompt: |-
-  [MODE: SCREENWRITER]
   AUDIO: room tone and action effects, no music.
   Cover every event in one dense take.
 material_intents:

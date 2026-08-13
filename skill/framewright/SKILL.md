@@ -25,13 +25,14 @@ Preserve the exact version suffix. When the reference reports a local experiment
 
 1. Start each new compilation scope with the Unified Director Intake from the reference.
 2. Present a compact understanding and production reading, classify material gaps, and schedule questions by dependency: ask only the highest-impact question when its answer can change later questions; combine only genuinely independent questions, with five retained as the maximum batch size.
-3. After each dependent answer, update the Production Spine's nested Intent Ledger and recalculate the question queue. Protect intentional freedom, omit low-impact decoration, and stop when remaining gaps cannot materially change a downstream contract.
-4. When the reference's conditional state trigger is active, read or update the project-local `framewright_state.yaml` before compilation. Reconcile it with the latest explicit user decision and active artifacts; never treat it as a second Production Spine or target-model input.
-5. Treat requested advice or delegated judgment as a named, current-scope authority grant. Record material assumptions and continue only within that grant unless an explicit safety, reference-authority, generation-unit, stage, or feasibility decision still requires the user.
-6. Run exactly one selected stage: Storyboard, Keyframes, or Video Prompt.
-7. Save the completed artifact as the required `.txt` file, run the bundled deterministic validator and Semantic Preflight, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
-8. Return the compact assistant-facing Intent Delta required by the reference, outside the clean prompt and without creating a second default artifact.
-9. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
+3. Select exactly one Director Mode and state it explicitly to the user before compilation. Keep that mode in internal compile state, but never serialize its literal label into a clean model-facing Prompt.
+4. After each dependent answer, update the Production Spine's nested Intent Ledger and recalculate the question queue. Protect intentional freedom, omit low-impact decoration, and stop when remaining gaps cannot materially change a downstream contract.
+5. When the reference's conditional state trigger is active, read or update the project-local `framewright_state.yaml` before compilation. Reconcile it with the latest explicit user decision and active artifacts; never treat it as a second Production Spine or target-model input.
+6. Treat requested advice or delegated judgment as a named, current-scope authority grant. Record material assumptions and continue only within that grant unless an explicit safety, reference-authority, generation-unit, stage, or feasibility decision still requires the user.
+7. Run exactly one selected stage: Storyboard, Keyframes, or Video Prompt.
+8. Save the completed artifact as the required `.txt` file, run the bundled deterministic validator and Semantic Preflight, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
+9. Return the compact assistant-facing Intent Delta required by the reference, outside the clean prompt and without creating a second default artifact.
+10. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
 
 ## Tool boundary
 

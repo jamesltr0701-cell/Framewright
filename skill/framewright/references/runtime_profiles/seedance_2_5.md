@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.2.0"
+profile_version: "1.3.0"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -67,6 +67,29 @@ Never infer that:
 
 Use the core gate to assess practical action load, cut resets, state progression, performance, reference complexity, dialogue, sound, and continuity. Any split or merge still requires a natural boundary and explicit director approval.
 
+### 3.1 Parameter Provenance and Route Locks
+
+Resolve target-surface parameters in the Run Card, not in the clean Prompt unless a value is itself executable story or framing intent:
+
+```yaml
+parameter_contract:
+  duration:
+    provenance: user_settable | inherited_from_source | platform_locked
+    resolved_value:
+  aspect_ratio:
+    provenance: user_settable | locked_to_source_video | locked_to_first_image
+    resolved_value:
+```
+
+Route contracts:
+
+- `omni_reference` and `long_video`: duration and aspect ratio are user-settable within verified surface support; duration may not exceed 30 seconds.
+- `smart_edit`: aspect ratio is locked to the source video and the surface ratio setting is `adaptive`; duration is platform-locked to the source and the surface duration setting is `-1`. A non-Seedance source may differ by up to about 0.3 seconds because transition frames are compressed; this tolerance is not an editing target.
+- `first_last_frames`: aspect ratio is locked to the first-frame image and the surface ratio setting is `adaptive`; first and last images must use the same aspect ratio; duration is user-settable.
+- `extend`: aspect ratio is locked to the source video and the surface ratio setting is `adaptive`; extension duration is independently user-settable. MOV input and output are recommended for audio-visual continuity.
+
+Never present a locked field as freely editable. A source-derived value remains a Run Card fact even when it is omitted from the model-facing Prompt.
+
 ## 4. Material Registry Bridge
 
 Use the core unified Material Registry as the only source of truth. Each active runtime material resolves:
@@ -131,7 +154,7 @@ Rules:
 - With multiple possible subjects, add only a compact disambiguator: `the woman in @Image 1`, `the red vehicle in @Image 2`, or equivalent.
 - Avoid padded forms such as `The character from @Image 1` when the mention is already unambiguous.
 
-When active materials need explicit authority, place one compact model-facing block after the Framewright mode line:
+When active materials need explicit authority, place one compact model-facing block at the start of the clean Prompt:
 
 ```text
 MATERIAL ROLES
@@ -141,6 +164,25 @@ MATERIAL ROLES
 ```
 
 Include only active runtime materials. Every listed mention must be used, every used mention must be listed or unambiguously bound by its task schema, and all text surrogates count against the character limit.
+
+### 4.2 Target-Surface Material Admission
+
+The current surface accepts at most 50 total reference assets per request, subject to these per-media hard limits:
+
+- images: at most 30, each no larger than 4K;
+- videos: at most 10, combined duration no more than 30 seconds;
+- audio: at most 10 clips, combined duration no more than 30 seconds.
+
+Exceeding a hard limit is a validation failure. The following are stability recommendations and produce an assistant-facing warning rather than an automatic rejection:
+
+- subject-image references: 1-8 subjects generally work better; 9-12 may require more attempts;
+- subject audio/video references: 1-5 subjects generally work better; 6-10 may require more attempts;
+- motion or style reference video: 5-10 seconds generally works better;
+- Smart Edit source: under 20 seconds generally works better;
+- Smart Edit reference images: 1-5 generally work better; 6-8 may require more attempts;
+- storyboard grid: 15 panels or fewer generally works better.
+
+The storyboard recommendation does not override core one-generation-unit / one-board authority, silently split a unit, or prohibit an approved board with more than 15 necessary panels. Report the stability risk and preserve the director-approved boundary.
 
 ## 5. Task Router
 
@@ -170,9 +212,13 @@ Endpoint authority controls the assigned boundary only. Resolve the middle motio
 
 ### 5.5 Extend
 
-Use when an existing source video should continue from its actual ending boundary.
+Use when an existing source video should continue forward from its actual ending boundary or backward into its actual opening boundary. Resolve `extension_direction: forward | backward` before serialization.
 
-Recover the source ending's composition, identity and pose, object and damage state, motion direction and momentum, camera-subject relationship, lighting and environment, room tone, reverb, noise floor, and action-sound continuity. Extend begins at that boundary and does not treat a merely similar still image as the source ending.
+For `forward`, recover the source ending's composition, identity and pose, object and damage state, motion direction and momentum, camera-subject relationship, lighting and environment, room tone, reverb, noise floor, and action-sound continuity. The new segment's first frame continues from that truth.
+
+For `backward`, recover the source opening with the same properties. Describe the preceding action so the new segment's final frame reaches that source first-frame truth. Do not mechanically reverse the forward schema or refer to the source ending.
+
+Both directions require an explicit extension trigger in the clean Prompt, such as `extend forward`, `extend backward`, `continue`, or an equivalent unambiguous instruction. Additional references may supply only admitted attributes and never override the active boundary.
 
 ### 5.6 Distinct Boundary Contracts
 
@@ -235,8 +281,9 @@ NEGATIVE
 ### Extend
 
 ```text
-SOURCE END BOUNDARY
-CONTINUATION ACTION
+EXTENSION DIRECTION + TRIGGER
+SOURCE END BOUNDARY (forward) OR SOURCE START BOUNDARY (backward)
+CONTINUATION OR PRECEDING ACTION
 CAMERA + MOTION CONTINUITY
 OBJECT + ENVIRONMENT CONTINUITY
 AUDIO CONTINUITY
@@ -246,11 +293,51 @@ NEGATIVE
 
 Omit a heading when it adds no executable value, except Smart Edit must retain explicit edit scope and content-to-preserve language.
 
-### 6.1 Serialization Procedure
+### 6.1 Existing Advanced Control Schemas
+
+Use these only when the corresponding already-declared control profile is active.
+
+`multi_keyframe`:
+
+```yaml
+multi_keyframe_contract:
+  ordered_anchors:
+    - native_ref:
+      state:
+      active_stage_or_beat:
+      allowed_authority:
+      denied_authority:
+  progression:
+  cuts_implied: false
+```
+
+Every anchor is an independent image in declared order and owns only its named major state. An anchor never creates a cut by itself and never authorizes automatic keyframe-image generation.
+
+`blockout_coarse` may own approved action paths, blocking, camera path, cut structure, lighting progression, and sound timing. It denies identity, costume, final surface, texture, and visual-style authority; map every geometric stand-in to its final subject or prop.
+
+`blockout_fine` may preserve approved structure, blocking, motion, and camera treatment. Final identity, materials, color, costume, environment finish, and style remain controlled by the Material Registry and director locks; temporary blockout geometry is not identity truth.
+
+`seamless_transition` resolves:
+
+```yaml
+seamless_transition_contract:
+  before_material:
+  after_material:
+  trigger:
+  camera_path:
+  transformation_or_transition:
+  arrival_state:
+  audio_bridge:
+  pixel_identical_preservation_promised: false
+```
+
+The clean Prompt carries the executable bridge; the Run Card states that seamless continuity does not promise pixel-identical preservation of both supplied clips. `one-click video` remains an example label, never a route, mode, control profile, or fixture family.
+
+### 6.2 Serialization Procedure
 
 Serialize in this order:
 
-1. emit exactly one Framewright mode line;
+1. exclude the literal Framewright Director Mode label; the Run Card and compile trace retain the one conversation-visible mode;
 2. emit `MATERIAL ROLES` only when active references need model-facing role or authority limits;
 3. emit exactly one selected task schema;
 4. use native mentions directly inside the action, edit, endpoint, continuation, dialogue, or sound clauses they control;
@@ -284,6 +371,7 @@ MODE: [Framewright director mode]
 TASK / UI MODE: [resolved Seedance route]
 CONTROL PROFILES: [active profiles]
 DURATION / ASPECT RATIO: [resolved values]
+PARAMETER PROVENANCE: [locked, derived, or user-settable]
 MATERIALS TO UPLOAD: [active runtime materials]
 REFERENCE MAPPING: [material role and limited authority]
 GENERATION STRATEGY: [concise operator plan]
@@ -352,6 +440,32 @@ SUBTITLE / VISIBLE TEXT:
 
 Omit inactive markers. Never add an empty `MUSIC` block to a default no-music prompt when one compact no-music instruction is sufficient.
 
+When explicitly requested, Seedance-specific serialization uses the current guide's compact syntax: music in `(...)`, a discrete SFX event in `<...>`, spoken dialogue in `{...}`, and deliberately requested visible subtitle text in `■■...■■`. For non-Chinese dialogue, also state speaker, language, accent when material, and delivery. These marks serialize an already approved sound or text scope; they never create one. Negative controls such as `no BGM`, `no subtitles`, or removal of a named audio component remain valid when requested.
+
+The exact special-glyph mapping is snapshot-qualified from the reconciled Prompt Guide because the current Lark page confirmed the special-syntax section but did not provide a fresh native export. Preserve this evidence grade assistant-facing; never substitute invented punctuation.
+
+### 9.1 Conditional Numeric Timing
+
+Semantic timing remains the default. Use integer-second timestamps only for a Long Video pacing plan, a user-requested critical exact moment, required dialogue/audio/edit/action synchronization, or another selected technique that needs numeric ranges.
+
+When numeric timing is active:
+
+- ranges are consecutive, non-overlapping, and within resolved duration;
+- each critical point has a visible or audible trigger;
+- each production-critical camera event states the camera instruction;
+- any state that must continue after the event is explicitly preserved;
+- impossible action density becomes a feasibility risk, not a fabricated exact guarantee.
+
+Do not rewrite an ordinary scene into second-by-second timing automatically. Timestamps allocate pacing and are not frame-accurate edit guarantees.
+
+### 9.2 Typography and Frame Accuracy
+
+When critical typography, formulas, signage, subtitle layout, or frame-accurate timing matters, the Run Card or handoff states the Prompt-only reliability boundary and recommends a prepared asset, locked reference, or post-production route. The user may still ask the model to attempt it. Keep this limitation assistant-facing unless a concrete visible constraint is executable in the Prompt.
+
+### 9.3 Compactness Qualification
+
+Retain the 10,000-character hard ceiling. Passing it is necessary, not sufficient: record character count, active-material count, stage count, and preserved semantic anchors for representative routes; reject duplicated instructions, inactive blocks, assistant-facing leakage, and low-value headings. Compression must preserve identity, state, boundary, reference authority, camera causality, dialogue ownership, and explicit negatives.
+
 ## 10. Advanced Task Feasibility
 
 Before serialization, verify route prerequisites and target-surface support:
@@ -360,7 +474,10 @@ Before serialization, verify route prerequisites and target-surface support:
 - Smart Edit has exactly one admitted source-video editing master and a bounded edit scope.
 - Long Video remains within the declared 30-second ceiling and its stages do not conceal overloaded cuts, references, dialogue, or state changes.
 - First and Last Frames has explicit endpoint assignments and compatible requested aspect / composition logic.
-- Extend has an admitted source video and a recoverable actual ending boundary.
+- Extend has an admitted source video, explicit direction, and the correct recoverable ending boundary for forward or opening boundary for backward.
+- Multi-keyframe anchors have an explicit order and state mapping without implied cuts.
+- Coarse and fine blockouts stay within their distinct authority boundaries.
+- Seamless transition has a trigger, camera path, arrival state, and audio bridge.
 - Storyboard control has explicit runtime admission and limited structural authority.
 - Every admitted reference passed the core conditioning-risk gate; any strategy that changes a director-requested attachment has explicit approval.
 - Audio, dialogue, and subtitle control has an explicit requested scope.
@@ -368,7 +485,7 @@ Before serialization, verify route prerequisites and target-surface support:
 
 If a required material or assignment is missing, ask one compact Intake question. Do not switch routes silently. If the route is valid but execution remains dense, return to the core Generation-Unit Feasibility Gate; never auto-split or auto-merge.
 
-Count the final plain-text prompt, including mode line, material-role declarations, native mention surrogates, dialogue, audio cues, negatives, spaces, and line breaks. UI chip rendering does not excuse an over-limit `.txt` artifact.
+Count the final plain-text prompt, including material-role declarations, native mention surrogates, dialogue, audio cues, negatives, spaces, and line breaks. UI chip rendering does not excuse an over-limit `.txt` artifact.
 
 ## 11. Generation Evidence and Repair
 
@@ -415,12 +532,15 @@ Before saving, verify:
 - director mode, scene grammar, stage, and generation-unit boundaries are unchanged;
 - the 30-second ceiling was not used as default duration or feasibility proof;
 - the director's route override was honored when valid;
+- parameter provenance matches the selected route and no locked value is presented as user-settable;
+- hard material limits pass; stable-range excess is disclosed as a warning rather than a false platform rejection;
 - each active material has limited allowed and denied authority;
 - every text surrogate maps to the intended file and stable Material Registry role; UI labels and upload order do not define authority;
 - every listed native mention is used and every used mention is mapped;
 - unambiguous single-subject mentions are not padded, while ambiguous multi-subject mentions are compactly qualified;
 - Smart Edit has exactly one source-video editing master and preserves all unedited content;
 - first-frame, last-frame, both-endpoint, and Extend assignments are explicit;
+- forward and backward Extend use the correct source boundary and an unambiguous trigger;
 - storyboard material is absent unless explicitly admitted for Video Prompt runtime;
 - continuous-take phases remain phases, not cuts;
 - relevant operator body path remains distinct from lens target, and opening-only motion constraints are not incorrectly made persistent;

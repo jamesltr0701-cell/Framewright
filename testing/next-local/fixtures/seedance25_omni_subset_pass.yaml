@@ -1,0 +1,16 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+native_bindings: ["@Image 1"]
+prompt: |-
+  MATERIAL ROLES
+  @Image 1: subject identity only; do not inherit pose, crop, or composition.
+  @Image 1 crosses the room. Environmental ambience and footsteps; no music.
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  materials: {image_count: 1}
+  active_subset_mapped: true

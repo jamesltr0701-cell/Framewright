@@ -1,0 +1,21 @@
+kind: compile_trace
+expected: fail
+expected_errors: [seamless_transition_incomplete, pixel_identical_promise]
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Join the clips with perfect pixel identity."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 5}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    seamless_transition:
+      before_material: video 1
+      after_material: video 2
+      trigger: ""
+      camera_path: ""
+      transformation_or_transition: dissolve
+      arrival_state: ""
+      audio_bridge: ""
+      pixel_identical_preservation_promised: true

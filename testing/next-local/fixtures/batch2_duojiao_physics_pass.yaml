@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [auteur]
+conversation_mode_declared: true
 expected: pass
 case: duojiao_physics
 prompt: |-
-  [MODE: AUTEUR]
   AUDIO: blade contact and settled kitchen room tone, no music.
   Gravity accelerates the knife downward; the edge contacts the board once, the handle rebounds slightly, then the blade lies flat and remains settled before the plate moves.
 material_intents:

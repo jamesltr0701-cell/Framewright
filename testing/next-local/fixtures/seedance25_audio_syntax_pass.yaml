@@ -1,0 +1,16 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "At the doorway, she says {I should go.} in English with restrained delivery; <the latch clicks>. ■■LEAVING■■ appears only on the requested sign. No BGM."
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  audio:
+    music_requested: false
+    music: no_music
+    dialogue_requested: true
+    visible_text_requested: true
+    syntax_evidence_grade: snapshot_qualified

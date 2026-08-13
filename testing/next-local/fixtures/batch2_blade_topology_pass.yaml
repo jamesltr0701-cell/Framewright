@@ -1,8 +1,9 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: pass
 case: blade_topology
 prompt: |-
-  [MODE: APPRENTICE]
   AUDIO: connected metal slides, hydraulic compression, chassis impact, no music.
   Existing calf panels rotate on visible hinges into a braced leg; the locked leg accepts the chassis load before the hydraulic assembly compresses and releases it upward.
 material_intents:

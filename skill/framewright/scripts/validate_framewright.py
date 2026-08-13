@@ -69,6 +69,8 @@ CHANGE_CLASSES = {
     "model_workaround",
 }
 RISKS = {"low", "medium", "high"}
+SEEDANCE_ROUTES = {"omni_reference", "smart_edit", "long_video", "first_last_frames", "extend"}
+SEEDANCE_CONTROLS = {"multi_keyframe", "blockout_coarse", "blockout_fine", "seamless_transition"}
 
 
 def issue(code: str, message: str, **context: Any) -> dict[str, Any]:
@@ -101,22 +103,15 @@ def validate_prompt_text(
 ) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     lines = text.splitlines()
-    nonempty = [line.strip() for line in lines if line.strip()]
     mode_lines = [line.strip() for line in lines if MODE_RE.fullmatch(line.strip())]
-
-    keyframe_headers = [index for index, line in enumerate(lines) if re.fullmatch(r"KEYFRAME_\d+", line.strip())]
-    if keyframe_headers:
-        for index in keyframe_headers:
-            next_line = lines[index + 1].strip() if index + 1 < len(lines) else ""
-            if not MODE_RE.fullmatch(next_line):
-                errors.append(issue("mode_line_missing", "Every keyframe block must place one exact mode line after its header."))
-        if len(mode_lines) != len(keyframe_headers):
-            errors.append(issue("mode_line_count", "Every keyframe block must own exactly one mode line.", count=len(mode_lines)))
-    else:
-        if not nonempty or not MODE_RE.fullmatch(nonempty[0]):
-            errors.append(issue("mode_line_missing", "Prompt must begin with one exact mode line."))
-        if len(mode_lines) != 1:
-            errors.append(issue("mode_line_count", "Prompt must contain exactly one mode line.", count=len(mode_lines)))
+    if mode_lines:
+        errors.append(
+            issue(
+                "mode_metadata_leak",
+                "Director Mode is conversation-visible internal metadata and must not enter a clean Prompt.",
+                values=mode_lines,
+            )
+        )
     if len(text) > character_limit:
         errors.append(
             issue(
@@ -222,6 +217,180 @@ def validate_state_data(
     return errors
 
 
+def validate_seedance25(data: Any, prompt: str) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(data, dict):
+        return [issue("seedance_contract_invalid", "Seedance 2.5 qualification data must be a mapping.")]
+
+    route = data.get("route")
+    if route not in SEEDANCE_ROUTES:
+        errors.append(issue("seedance_route_invalid", "Seedance 2.5 route is missing or unsupported.", route=route))
+
+    parameters = data.get("parameter_contract")
+    if route in SEEDANCE_ROUTES and not isinstance(parameters, dict):
+        errors.append(issue("parameter_contract_missing", "Seedance 2.5 route qualification requires parameter provenance."))
+    if isinstance(parameters, dict) and route in SEEDANCE_ROUTES:
+        duration = parameters.get("duration", {})
+        aspect = parameters.get("aspect_ratio", {})
+        expected: dict[str, tuple[set[str], set[str]]] = {
+            "omni_reference": ({"user_settable"}, {"user_settable"}),
+            "long_video": ({"user_settable"}, {"user_settable"}),
+            "smart_edit": ({"platform_locked", "inherited_from_source"}, {"locked_to_source_video"}),
+            "first_last_frames": ({"user_settable"}, {"locked_to_first_image"}),
+            "extend": ({"user_settable"}, {"locked_to_source_video"}),
+        }
+        duration_allowed, aspect_allowed = expected[route]
+        if not isinstance(duration, dict) or duration.get("provenance") not in duration_allowed:
+            errors.append(issue("duration_provenance_invalid", "Duration provenance does not match the selected route.", route=route))
+        if not isinstance(aspect, dict) or aspect.get("provenance") not in aspect_allowed:
+            errors.append(issue("aspect_provenance_invalid", "Aspect-ratio provenance does not match the selected route.", route=route))
+        if route == "smart_edit":
+            if duration.get("surface_value") != -1:
+                errors.append(issue("smart_edit_duration_lock_invalid", "Smart Edit surface duration must be locked with -1."))
+            if aspect.get("surface_value") != "adaptive":
+                errors.append(issue("source_aspect_lock_invalid", "Smart Edit aspect ratio must be locked to the source with adaptive."))
+        if route in {"first_last_frames", "extend"} and aspect.get("surface_value") != "adaptive":
+            errors.append(issue("source_aspect_lock_invalid", "The selected locked-aspect route requires adaptive."))
+        if route == "first_last_frames" and data.get("endpoint_aspect_compatible") is not True:
+            errors.append(issue("endpoint_aspect_mismatch", "First and last frame images must use the same aspect ratio."))
+
+    materials = data.get("materials")
+    if isinstance(materials, dict):
+        images = int(materials.get("image_count", 0) or 0)
+        videos = int(materials.get("video_count", 0) or 0)
+        audio = int(materials.get("audio_count", 0) or 0)
+        video_seconds = float(materials.get("video_combined_seconds", 0) or 0)
+        audio_seconds = float(materials.get("audio_combined_seconds", 0) or 0)
+        if images + videos + audio > 50 or images > 30 or videos > 10 or audio > 10 or video_seconds > 30 or audio_seconds > 30:
+            errors.append(issue("material_hard_limit_exceeded", "Seedance 2.5 material count or combined duration exceeds a platform hard limit."))
+        stable_exceeded = any(
+            (
+                int(materials.get("subject_image_count", 0) or 0) > 8,
+                int(materials.get("subject_av_count", 0) or 0) > 5,
+                float(materials.get("motion_reference_seconds", 0) or 0) > 10,
+                float(materials.get("edit_source_seconds", 0) or 0) > 20,
+                int(materials.get("edit_reference_image_count", 0) or 0) > 5,
+                int(materials.get("storyboard_panel_count", 0) or 0) > 15,
+            )
+        )
+        if stable_exceeded and data.get("stable_range_warning_present") is not True:
+            errors.append(issue("stable_range_warning_missing", "A recommendation was exceeded without an assistant-facing stability warning."))
+        if images + videos + audio > 0 and data.get("active_subset_mapped") is not True:
+            errors.append(issue("active_subset_mapping_missing", "Admitted materials require an explicit active-subset mapping."))
+
+    if route == "smart_edit":
+        smart_edit = data.get("smart_edit")
+        if not isinstance(smart_edit, dict) or smart_edit.get("sole_source_master") is not True or not smart_edit.get("edit_scope") or not smart_edit.get("content_to_preserve"):
+            errors.append(issue("smart_edit_contract_incomplete", "Smart Edit requires one source master, bounded scope, and preservation contract."))
+    if route == "long_video":
+        stages = data.get("stages")
+        if not isinstance(stages, list) or not stages or any(
+            not isinstance(stage, dict) or not stage.get("entry_state") or not stage.get("end_state") or not stage.get("principal_change")
+            for stage in stages
+        ):
+            errors.append(issue("long_video_stage_contract_incomplete", "Every Long Video stage requires entry state, one principal change, and end state."))
+    if route == "first_last_frames":
+        endpoints = data.get("endpoints")
+        if not isinstance(endpoints, dict) or not endpoints.get("first_frame") or (
+            endpoints.get("last_frame") and not endpoints.get("middle_motion_and_state_change")
+        ):
+            errors.append(issue("endpoint_authority_incomplete", "First/last route requires explicit endpoint authority and middle motion when both endpoints exist."))
+    if route == "extend" and not isinstance(data.get("extension"), dict):
+        errors.append(issue("extension_contract_missing", "Extend route requires direction, boundary owner, and trigger."))
+
+    extension = data.get("extension")
+    if isinstance(extension, dict):
+        direction = extension.get("direction")
+        if direction not in {"forward", "backward"}:
+            errors.append(issue("extension_direction_invalid", "Extend requires forward or backward direction."))
+        expected_boundary = "source_end" if direction == "forward" else "source_start"
+        if extension.get("boundary_owner") != expected_boundary:
+            errors.append(issue("extension_boundary_invalid", "Extension direction uses the wrong source boundary.", direction=direction))
+        trigger = str(extension.get("trigger", "")).lower()
+        if not any(token in trigger for token in ("extend", "continue")):
+            errors.append(issue("extension_trigger_missing", "Extend requires an explicit extension trigger."))
+
+    controls = data.get("controls", {})
+    if isinstance(controls, dict):
+        keyframes = controls.get("multi_keyframe")
+        if isinstance(keyframes, dict):
+            anchors = keyframes.get("ordered_anchors", [])
+            if not isinstance(anchors, list) or len(anchors) < 2 or any(
+                not isinstance(anchor, dict) or not anchor.get("native_ref") or not anchor.get("state") for anchor in anchors
+            ):
+                errors.append(issue("keyframe_order_or_state_missing", "Multi-keyframe control requires ordered anchors with state mappings."))
+            if keyframes.get("cuts_implied") is not False:
+                errors.append(issue("keyframe_cut_inferred", "Keyframe order must not imply cuts automatically."))
+        coarse = controls.get("blockout_coarse")
+        if isinstance(coarse, dict):
+            allowed = set(coarse.get("allowed_authority", []) or [])
+            denied = set(coarse.get("denied_authority", []) or [])
+            if not {"action_paths", "blocking", "camera_path"}.issubset(allowed) or not {"identity", "final_surface", "final_style"}.issubset(denied):
+                errors.append(issue("coarse_blockout_authority_invalid", "Coarse blockout authority is incomplete or leaks final appearance."))
+        fine = controls.get("blockout_fine")
+        if isinstance(fine, dict):
+            allowed = set(fine.get("allowed_authority", []) or [])
+            denied = set(fine.get("denied_authority", []) or [])
+            if not {"structure", "blocking", "motion", "camera"}.issubset(allowed) or not {"identity", "temporary_material", "final_style"}.issubset(denied):
+                errors.append(issue("fine_blockout_authority_invalid", "Fine blockout authority is incomplete or leaks temporary appearance."))
+        transition = controls.get("seamless_transition")
+        if isinstance(transition, dict):
+            for key in ("before_material", "after_material", "trigger", "camera_path", "transformation_or_transition", "arrival_state", "audio_bridge"):
+                if not transition.get(key):
+                    errors.append(issue("seamless_transition_incomplete", "Seamless transition is missing an execution field.", key=key))
+            if transition.get("pixel_identical_preservation_promised") is not False:
+                errors.append(issue("pixel_identical_promise", "Seamless transition must not promise pixel-identical preservation."))
+
+    timing = data.get("numeric_timing")
+    if isinstance(timing, dict) and timing.get("active") is True:
+        if timing.get("trigger_reason") not in {"long_video", "critical_moment", "synchronization", "technique_required"}:
+            errors.append(issue("numeric_timing_unqualified", "Numeric timing lacks an approved trigger condition."))
+        duration = float(timing.get("resolved_duration", 0) or 0)
+        ranges = timing.get("ranges", [])
+        previous_end = 0.0
+        for index, item in enumerate(ranges if isinstance(ranges, list) else []):
+            start = float(item.get("start", -1)) if isinstance(item, dict) else -1
+            end = float(item.get("end", -1)) if isinstance(item, dict) else -1
+            if start != previous_end or end <= start or end > duration:
+                errors.append(issue("numeric_timing_range_invalid", "Numeric timing ranges must be consecutive, non-overlapping, and within duration.", index=index))
+                break
+            if item.get("critical") is True and not item.get("trigger"):
+                errors.append(issue("critical_timing_trigger_missing", "A critical timed event requires a trigger.", index=index))
+            if item.get("camera_critical") is True and not item.get("camera_instruction"):
+                errors.append(issue("critical_camera_instruction_missing", "A production-critical timed camera event requires camera instruction.", index=index))
+            if item.get("state_must_continue") is True and not item.get("continued_state"):
+                errors.append(issue("continued_state_missing", "A timed event fails to preserve the state that must continue.", index=index))
+            previous_end = end
+        if previous_end != duration:
+            errors.append(issue("numeric_timing_range_invalid", "Numeric timing ranges do not cover the resolved duration."))
+
+    audio = data.get("audio")
+    if isinstance(audio, dict):
+        if audio.get("music_requested") is not True and audio.get("music") not in {None, "no_music", "preserve", "remove"}:
+            errors.append(issue("unrequested_music", "Seedance syntax activated music without an explicit request."))
+        if audio.get("dialogue_requested") is not True and re.search(r"\{[^{}]+\}", prompt):
+            errors.append(issue("unrequested_dialogue_syntax", "Dialogue syntax appeared without an approved dialogue scope."))
+        if audio.get("visible_text_requested") is not True and "■■" in prompt:
+            errors.append(issue("unrequested_visible_text_syntax", "Visible-text syntax appeared without an approved scope."))
+        if audio.get("syntax_evidence_grade") not in {None, "current_online", "snapshot_qualified"}:
+            errors.append(issue("audio_syntax_evidence_invalid", "Special syntax has no valid evidence grade."))
+
+    typography = data.get("typography_or_frame_accuracy")
+    if isinstance(typography, dict) and typography.get("critical") is True:
+        if typography.get("assistant_limitation_present") is not True or typography.get("recommended_route") not in {"prepared_asset", "locked_reference", "post_production"}:
+            errors.append(issue("typography_limitation_missing", "Critical text or frame accuracy needs an assistant-facing limitation and reliable route."))
+
+    compactness = data.get("compactness")
+    if isinstance(compactness, dict):
+        if compactness.get("character_count") != len(prompt):
+            errors.append(issue("compactness_count_mismatch", "Recorded character count does not match the clean Prompt."))
+        if not compactness.get("semantic_anchors"):
+            errors.append(issue("compactness_anchors_missing", "Compactness qualification must preserve semantic anchors."))
+        if compactness.get("assistant_facing_leakage") is True or compactness.get("inactive_blocks"):
+            errors.append(issue("compactness_not_qualified", "Compactness qualification found leakage or inactive blocks."))
+    return errors
+
+
 def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     prompt = data.get("prompt")
@@ -246,6 +415,15 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         values = data.get(field)
         if values is not None and (not isinstance(values, list) or len(values) != 1):
             errors.append(issue(code, f"{field} must contain exactly one active owner."))
+    director_modes = data.get("director_modes")
+    if not isinstance(director_modes, list) or len(director_modes) != 1:
+        errors.append(issue("director_mode_count", "Exactly one internal Director Mode must be resolved."))
+    if data.get("conversation_mode_declared") is not True:
+        errors.append(issue("director_mode_undeclared", "The resolved Director Mode must be declared to the user outside the clean Prompt."))
+
+    seedance = data.get("seedance25")
+    if seedance is not None:
+        errors.extend(validate_seedance25(seedance, prompt if isinstance(prompt, str) else ""))
 
     for unit in data.get("split_units", []) or []:
         if not isinstance(unit, dict) or not unit.get("unit_label"):
@@ -407,8 +585,8 @@ def validate_core(core: Path, skill: Path, profile: Path, manifest: Path) -> lis
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.1":
-        errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.1.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.2-local":
+        errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.2-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     if not profile_meta.get("profile_version"):

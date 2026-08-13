@@ -1,0 +1,16 @@
+kind: compile_trace
+expected: pass
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: |-
+  EDIT GOAL
+  Replace only the yellow lamp. Preserve composition, actions, camera, occlusion, event order, room tone, and every other object.
+seedance25:
+  route: smart_edit
+  parameter_contract:
+    duration: {provenance: platform_locked, resolved_value: source_duration, surface_value: -1}
+    aspect_ratio: {provenance: locked_to_source_video, resolved_value: source_ratio, surface_value: adaptive}
+  smart_edit:
+    sole_source_master: true
+    edit_scope: yellow lamp only
+    content_to_preserve: all non-target content

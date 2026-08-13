@@ -1,11 +1,12 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - observable_intent_orphan
   - performance_carrier_density
   - embodied_dialogue_missing
 prompt: |-
-  [MODE: APPRENTICE]
   She speaks sadly and emotionally.
 material_intents:
   - intent: restrained reluctance

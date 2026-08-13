@@ -1,4 +1,6 @@
 kind: compile_trace
+director_modes: [apprentice]
+conversation_mode_declared: true
 expected: fail
 expected_errors:
   - serialization_owner_count
@@ -7,11 +9,9 @@ expected_errors:
   - split_state_missing
   - split_unit_not_executable
 prompt: |-
-  [MODE: APPRENTICE]
   GU02 continues somehow.
 serialization_owners: [core_fallback, seedance_omni_reference]
 active_stages: [storyboard, video_prompt]
-director_modes: [apprentice]
 production_spines: [old_spine, new_spine]
 material_registries: [project_material_registry]
 split_units:

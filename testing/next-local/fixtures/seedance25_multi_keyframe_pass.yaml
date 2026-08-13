@@ -1,0 +1,17 @@
+kind: compile_trace
+expected: pass
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "Use @Image 1 then @Image 2 as ordered key states; they do not imply cuts."
+native_bindings: ["@Image 1", "@Image 2"]
+seedance25:
+  route: omni_reference
+  parameter_contract:
+    duration: {provenance: user_settable, resolved_value: 8}
+    aspect_ratio: {provenance: user_settable, resolved_value: "16:9"}
+  controls:
+    multi_keyframe:
+      ordered_anchors:
+        - {native_ref: "@Image 1", state: standing at door}
+        - {native_ref: "@Image 2", state: seated by window}
+      cuts_implied: false
