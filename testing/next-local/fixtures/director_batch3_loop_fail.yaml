@@ -1,0 +1,10 @@
+kind: compile_trace
+expected: fail
+expected_errors: [loop_seam_unmatched]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "The pendulum ends at the opposite phase and the room tone cuts off; no music."
+endpoint_contract:
+  purpose: loop_seam
+  observable_end_state: pendulum opposite the opening phase with silent audio tail
+  seam_matches: []

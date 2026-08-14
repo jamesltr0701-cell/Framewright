@@ -119,6 +119,14 @@ DRAMATIC_LENSES = {
     "power_or_information_change",
 }
 INSTRUMENT_RELATIONSHIPS = {"support", "counterpoint", "neutral"}
+ENDPOINT_PURPOSES = {
+    "resolve",
+    "extension_anchor",
+    "loop_seam",
+    "hero_hold",
+    "edit_point",
+    "reveal_or_payoff",
+}
 DEFAULT_REGISTRY = (
     Path(__file__).resolve().parent.parent
     / "references"
@@ -441,6 +449,8 @@ def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
         errors.append(issue("prompt_ir_unresolved_material", "Approved Prompt IR cannot contain unresolved material decisions."))
     if not prompt_ir.get("generation_unit"):
         errors.append(issue("prompt_ir_generation_unit_missing", "Prompt IR requires one active generation unit."))
+    if prompt_ir.get("endpoint_purpose") not in ENDPOINT_PURPOSES:
+        errors.append(issue("endpoint_purpose_invalid", "Prompt IR requires one supported endpoint purpose."))
 
     scopes: dict[str, set[Any]] = {}
     for key in ("completed_beats", "current_beats", "reserved_future_beats"):
@@ -1029,6 +1039,23 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
                 if deviation.get("future_beat_leak") is True:
                     errors.append(issue("expressive_arc_future_leak", "Global expressive planning may not leak future beats into a local compile."))
 
+    endpoint = data.get("endpoint_contract")
+    if endpoint is not None:
+        if not isinstance(endpoint, dict) or endpoint.get("purpose") not in ENDPOINT_PURPOSES or not endpoint.get("observable_end_state"):
+            errors.append(issue("endpoint_contract_invalid", "Endpoint contract requires one supported purpose and observable end state."))
+        else:
+            purpose = endpoint["purpose"]
+            if purpose == "extension_anchor" and not endpoint.get("open_carriers"):
+                errors.append(issue("extension_anchor_closed", "Extension anchor requires at least one controlled open carrier."))
+            if purpose == "loop_seam" and not endpoint.get("seam_matches"):
+                errors.append(issue("loop_seam_unmatched", "Loop seam requires explicit visual or audio phase matches."))
+            if purpose == "hero_hold" and endpoint.get("settled_readable") is not True:
+                errors.append(issue("hero_hold_unreadable", "Hero hold must settle into a stable readable state."))
+            if purpose == "edit_point" and endpoint.get("clean_visual_audio_boundary") is not True:
+                errors.append(issue("edit_point_unclean", "Edit point requires a clean visual and audio boundary."))
+            if purpose == "reveal_or_payoff" and endpoint.get("readability_hold") is not True:
+                errors.append(issue("payoff_hold_missing", "Reveal or payoff endpoint requires a readability hold."))
+
     for beat in data.get("performance_beats", []) or []:
         if not isinstance(beat, dict):
             errors.append(issue("performance_beat_invalid", "Performance beat must be a mapping."))
@@ -1247,8 +1274,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.6-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.6-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.7-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.7-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):

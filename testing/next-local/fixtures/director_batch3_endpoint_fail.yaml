@@ -1,0 +1,10 @@
+kind: compile_trace
+expected: fail
+expected_errors: [hero_hold_unreadable]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "The product spins rapidly through the final frame. Motor hum; no music."
+endpoint_contract:
+  purpose: hero_hold
+  observable_end_state: product still spinning and motion-blurred
+  settled_readable: false

@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.6-local"
+version: "3.5.4-merge.7-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -487,6 +487,7 @@ production_spine:
   visible_entities:
   start_state:
   end_state:
+  endpoint_purpose:
   shot_or_phase_plan:
   committed_shot_spine:
   storyboard_structure_counts:
@@ -547,6 +548,19 @@ The spine must preserve:
 - environmental sound and synchronized action cues.
 - editorial, attention, and camera function for every compiler-inferred or improved shot;
 - transition policy and relative rhythm shape.
+
+### 7.1 Endpoint Purpose Contract
+
+Every Video Prompt generation unit resolves one `endpoint_purpose` in addition to its observable `end_state`:
+
+- `resolve`: complete the active action and establish the resulting state;
+- `extension_anchor`: leave controlled motion, gaze, camera, environment, or sound energy available for a seamless successor;
+- `loop_seam`: land on a state designed to reconnect to the opening without a visible or audible seam;
+- `hero_hold`: settle into a stable, readable product, character, tableau, or identity hold;
+- `edit_point`: create a deliberate picture-and-sound boundary for an editorial cut;
+- `reveal_or_payoff`: land a reveal, consequence, or peak and protect enough hold for comprehension.
+
+Endpoint purpose explains what the boundary must do; end state records what is actually visible and audible there. Core selects or approves both and reconciles them with transition policy, continuation type, rhythm, payoff hold, and any selected-take canon. An adapter may express target-specific endpoint mechanics but may not change the purpose. `extension_anchor` does not itself authorize another generation unit, and `loop_seam` does not imply that every action should loop.
 
 ## 8. Shared Craft Operators
 
@@ -1458,6 +1472,7 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Active camera, blocking, light, performance, sound, rhythm, and cut choices pass the Instrument Coherence Test by supporting, purposefully counterpointing, or remaining neutral to the directing intention.
 - Any directorial voice is expressed through functional camera, instability, light, color, rhythm, performance, or sound tendencies rather than an empty preset label or named living-director imitation.
 - Cross-generation expressive arcs coordinate tendencies without leaking future beats; every purposeful deviation follows an established pattern and has a story, information, relationship, or viewer-experience function.
+- Every Video Prompt generation unit has one endpoint purpose consistent with its observable end state, transition policy, continuation contract, and required payoff hold; adapters preserve rather than choose it.
 - `camera_logic` is derived from the approved Visual Strategy and does not rewrite it.
 - Applicable Scene-Level Camera Premise, Default Coverage Substitution, Repetition and Rupture, Visual Sentence, Function-Label Laundering, and Reference Pose Contamination tests pass without angle or movement quotas.
 - Explicit user structure is preserved.

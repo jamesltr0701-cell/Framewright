@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-merge.6-local"
+candidate_version: "3.5.4-merge.7-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -35,6 +35,7 @@ protected_anchors:
   - "Never reject an AUTEUR-locked conventional choice merely because it is conventional."
   - "A pattern break is valid only after the pattern is perceptibly established"
   - "Do not imitate a named living director"
+  - "Endpoint purpose explains what the boundary must do"
   - "The target model selects the dialect"
   - "A Video Prompt cannot pass by claiming multiple owners"
   - "Intake Presentation Layer"

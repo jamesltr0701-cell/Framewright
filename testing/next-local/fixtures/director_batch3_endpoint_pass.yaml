@@ -1,0 +1,10 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "She turns toward the moving train as the camera continues drifting right; wheel rhythm and station air remain open, no music."
+endpoint_contract:
+  purpose: extension_anchor
+  observable_end_state: her gaze, the train, camera drift, and wheel rhythm continue rightward
+  open_carriers: [subject gaze, train motion, camera drift, wheel rhythm]
+  continuation_type: seamless_extension
