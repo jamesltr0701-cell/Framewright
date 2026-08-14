@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "3.5.3-local"
+version: "3.5.4-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -154,6 +154,35 @@ Use dependency-sensitive scheduling:
 - If several important details share one causal source but do not justify separate decisions, present one coherent `WORLD-RESPONSE PROPOSAL` for approval, partial revision, rejection, or intentional freedom instead of fragmenting it into many questions.
 
 A World-Response Proposal remains assistant-facing review and is not a director lock until approved. After approval, record its material parts as the appropriate Intent Ledger entries; do not turn the proposal into a new workflow tier or let crowd texture obscure the principal action.
+
+### 3.1 Intake Presentation Layer
+
+Use one Framewright-owned `Intake Presentation Layer` to adapt how the Unified Director Intake is expressed. This layer may change language, density, whether a provisional proposal comes before a question, and how materially distinct options are described. It does not choose the question queue, Director Mode, inference authority, generation-unit boundary, reference authority, active stage, target model, serialization owner, or compiler instruction sources. It creates no second intake, memory, state record, or prompt artifact.
+
+Classify only the current expression condition, and recalculate it when the user's input changes:
+
+- `blank-slate`: the user has not supplied a workable creative direction. Offer two or three concrete, visibly different directions or one compact provisional production proposal that gives the user something to react to. Mark it as a proposal, preserve an easy reject or revise path, and ask only the highest-impact choice needed next. Do not fill high-impact story, authority, stage, or reference decisions by default.
+- `rough-idea`: the user has a recognizable intention but material gaps remain. Preserve the user's distinctive wording, restate the visible core, and use plain, imageable options only where the options would produce different downstream contracts. Keep dependency-sensitive scheduling; do not turn the exchange into a technical questionnaire.
+- `production-fluent`: the user supplies professional terminology, production constraints, or detailed direction. Preserve professional instructions verbatim as source evidence, respond at the same production altitude, and ask only about contradictions or material gaps. Do not normalize precise direction into generic cinematic language.
+
+Expression proficiency does not select Director Mode. Director Mode continues to derive only from the supplied shot or panel structure and the approved inference-authority scope. A plain-language user with complete ordered shot structure can be AUTEUR; a production-fluent user who supplies dramatic action without explicit shot structure can still require SCREENWRITER inference authorization.
+
+When distinctive wording carries creative intent, retain it in the `UNDERSTANDING` and, when material, in the relevant Intent Ledger entry with its user-decision provenance. A feeling-to-film translation remains a reviewable Framewright proposal until approved; do not silently replace the user's wording or record the translation as a director lock.
+
+The presentation profile is ephemeral assistant-facing context. Do not serialize `blank-slate`, `rough-idea`, `production-fluent`, `Intake Presentation Layer`, or any presentation-profile label into the Production Spine, `framewright_state.yaml`, a Run Card, or a clean model-facing Prompt.
+
+### 3.2 Content Review Lenses
+
+After the visible intent is understood, apply only the content review lens relevant to the task. A review lens may expose a material gap or propose an observable carrier, but it is not a route, Director Mode, scene grammar, fixed questionnaire, Director's Read record, or parallel canonical state. The Intent Ledger remains nested in the one current Production Spine, and only approved decisions or authorized inferences may update it.
+
+For narrative or performance-led work, selectively review:
+
+- `visible suppressed behavior`: when a character is restraining an emotion, intention, or reaction, prefer one or two shot-legible visible or audible actions over an abstract emotion label. The approved behavior must have a visible, audible, spatial, or temporal carrier, remain compatible with shot scale, and pass the Performance Overdirection Test.
+- `non-transferable detail`: preserve a concrete detail whose replacement would weaken this specific scene, identity, relationship, place, procedure, or source material. Record its source provenance as an explicit user decision, active material evidence, approved inference, or intentional freedom. Never present a Framewright invention as though it came from the user or a supplied asset.
+
+For utility-led product, process, environment, texture, motion-study, or functional demonstration work, apply `NON-NARRATIVE REFUSAL`: preserve the utility intent and do not invent character wants, conflict, power shifts, subtext, or dramatic turns merely to make the task appear cinematic. If a performer is present and narrative intent would materially change blocking, performance, capture logic, or the final result, ask one plain-language dependent question; otherwise keep the work non-narrative.
+
+These lenses refine existing Performance Vitality, Material Registry, Intent Ledger, provenance, and Semantic Preflight checks. They must not duplicate those systems, create mandatory ten-field completion, import an external Skill vocabulary into the clean prompt, or block a task merely because a lens is inapplicable.
 
 For a later dependent turn, use:
 

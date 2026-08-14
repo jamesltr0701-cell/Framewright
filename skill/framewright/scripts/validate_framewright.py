@@ -964,8 +964,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.3-local":
-        errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.3-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-local":
+        errors.append(issue("candidate_version_mismatch", "Core candidate must identify as 3.5.4-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):

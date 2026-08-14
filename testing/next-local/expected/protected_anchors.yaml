@@ -1,4 +1,4 @@
-candidate_version: "3.5.3-local"
+candidate_version: "3.5.4-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -32,3 +32,12 @@ protected_anchors:
   - "Core Native currently targets Seedance 2.0"
   - "The target model selects the dialect"
   - "A Video Prompt cannot pass by claiming multiple owners"
+  - "Intake Presentation Layer"
+  - "Expression proficiency does not select Director Mode."
+  - "Preserve the user's distinctive wording"
+  - "Preserve professional instructions verbatim"
+  - "NON-NARRATIVE REFUSAL"
+  - "visible suppressed behavior"
+  - "non-transferable detail"
+  - "source provenance"
+  - "not a route, Director Mode, scene grammar, fixed questionnaire, Director's Read record, or parallel canonical state"
