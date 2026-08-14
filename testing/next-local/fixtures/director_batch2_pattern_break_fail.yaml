@@ -1,0 +1,15 @@
+kind: compile_trace
+expected: fail
+expected_errors: [pattern_break_unmotivated, expressive_arc_future_leak]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "The first unit remains locked and does not reveal future action. Quiet room tone; no music."
+cross_generation_expressive_arc:
+  generation_units:
+    - {unit: GU01, movement: fixed}
+    - {unit: GU02, movement: handheld}
+  pattern_breaks:
+    - unit: GU01
+      pattern_established: false
+      function: null
+      future_beat_leak: true

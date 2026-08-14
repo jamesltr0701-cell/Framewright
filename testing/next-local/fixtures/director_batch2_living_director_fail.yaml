@@ -1,0 +1,11 @@
+kind: compile_trace
+expected: fail
+expected_errors: [living_director_imitation_forbidden]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "A functional low camera follows the subject through the corridor. Footsteps and ventilation; no music."
+directorial_voice_contract:
+  functional_dimensions:
+    camera_relationship: low following distance with restricted viewer knowledge
+  preset_label_is_authority: false
+  named_living_director_imitation: true

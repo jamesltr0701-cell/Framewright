@@ -1,0 +1,23 @@
+kind: compile_trace
+expected: pass
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: "The third unit closes viewer distance only after the earlier fixed observations. Room tone falls away at the decision; no music."
+directorial_voice_contract:
+  functional_dimensions:
+    camera_relationship: observe from thresholds before earned proximity
+    rhythm_and_cut_behavior: long holds interrupted only by irreversible decisions
+    sound_density_and_silence: ordinary room density drops into silence at commitment
+  preset_label: restrained intimacy
+  preset_label_is_authority: false
+  named_living_director_imitation: false
+cross_generation_expressive_arc:
+  generation_units:
+    - {unit: GU01, viewer_distance: far, movement: fixed}
+    - {unit: GU02, viewer_distance: medium, movement: fixed}
+    - {unit: GU03, viewer_distance: near, movement: slow approach}
+  pattern_breaks:
+    - unit: GU03
+      pattern_established: true
+      function: viewer proximity marks the irreversible decision
+      future_beat_leak: false

@@ -1,0 +1,11 @@
+kind: compile_trace
+expected: fail
+expected_errors: [directorial_voice_empty, directorial_voice_preset_authority]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "A restrained scene unfolds. Quiet room tone; no music."
+directorial_voice_contract:
+  functional_dimensions: {}
+  preset_label: intimate minimalist
+  preset_label_is_authority: true
+  named_living_director_imitation: false

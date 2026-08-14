@@ -1002,6 +1002,33 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         if review.get("director_locked") is True and review.get("rejected") is True:
             errors.append(issue("auteur_locked_default_rejected", "A director-locked conventional choice may not be rejected merely as a default."))
 
+    voice = data.get("directorial_voice_contract")
+    if voice is not None:
+        if not isinstance(voice, dict):
+            errors.append(issue("directorial_voice_invalid", "Directorial voice must be a functional mapping."))
+        else:
+            dimensions = voice.get("functional_dimensions")
+            if not isinstance(dimensions, dict) or not any(dimensions.values()):
+                errors.append(issue("directorial_voice_empty", "Directorial voice requires at least one functional decision tendency."))
+            if voice.get("preset_label_is_authority") is True:
+                errors.append(issue("directorial_voice_preset_authority", "A descriptive preset label cannot own directorial voice."))
+            if voice.get("named_living_director_imitation") is True:
+                errors.append(issue("living_director_imitation_forbidden", "Directorial voice may not imitate a named living director."))
+
+    expressive_arc = data.get("cross_generation_expressive_arc")
+    if expressive_arc is not None:
+        if not isinstance(expressive_arc, dict) or not isinstance(expressive_arc.get("generation_units"), list):
+            errors.append(issue("expressive_arc_invalid", "Cross-generation expressive arc requires an ordered generation-unit list."))
+        else:
+            for deviation in expressive_arc.get("pattern_breaks", []) or []:
+                if not isinstance(deviation, dict):
+                    errors.append(issue("pattern_break_invalid", "Pattern break must be a mapping."))
+                    continue
+                if deviation.get("pattern_established") is not True or not deviation.get("function"):
+                    errors.append(issue("pattern_break_unmotivated", "A pattern break requires an established pattern and material function."))
+                if deviation.get("future_beat_leak") is True:
+                    errors.append(issue("expressive_arc_future_leak", "Global expressive planning may not leak future beats into a local compile."))
+
     for beat in data.get("performance_beats", []) or []:
         if not isinstance(beat, dict):
             errors.append(issue("performance_beat_invalid", "Performance beat must be a mapping."))
@@ -1220,8 +1247,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.5-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.5-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.6-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.6-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):

@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-merge.5-local"
+candidate_version: "3.5.4-merge.6-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -33,6 +33,8 @@ protected_anchors:
   - "Every registered target, including Seedance 2.0, uses one formal subordinate adapter."
   - "Instrument Coherence Test"
   - "Never reject an AUTEUR-locked conventional choice merely because it is conventional."
+  - "A pattern break is valid only after the pattern is perceptibly established"
+  - "Do not imitate a named living director"
   - "The target model selects the dialect"
   - "A Video Prompt cannot pass by claiming multiple owners"
   - "Intake Presentation Layer"

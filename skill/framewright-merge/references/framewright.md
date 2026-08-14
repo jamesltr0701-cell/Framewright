@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.5-local"
+version: "3.5.4-merge.6-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -374,6 +374,7 @@ After resolving director mode and scene grammar, establish one internal scene-le
 ```yaml
 visual_strategy:
   directing_intention:
+  directorial_voice:
   dramatic_alignment:
   viewer_knowledge:
   spatial_pressure:
@@ -386,6 +387,7 @@ visual_strategy:
   dramatic_lenses:
   default_solution_review:
   instrument_coherence:
+  cross_generation_expressive_arc:
 ```
 
 Visual Strategy owns the scene-level camera premise, dominant rule, progression, and any motivated rupture. It remains internal unless translated into concrete composition, viewpoint, action, blocking, or camera carriers. The Production Spine's `camera_logic` is a derived executable summary and must not rewrite the approved Visual Strategy.
@@ -415,6 +417,27 @@ Reject a default only for a scene-specific reason and only when the replacement 
 
 Then run the `Instrument Coherence Test` across the instruments actually in play: camera, blocking, light, performance, sound, rhythm, and cut. Each active instrument must support the directing intention, deliberately counterpoint it for a stated function, or remain neutral so another instrument can carry the work. Coherence is not sameness: a motivated counterpoint may be the strongest choice. Do not invent work for an otherwise irrelevant instrument.
 
+For multi-generation-unit work, or when the director explicitly asks for a recognizable directing voice, define an optional functional `directorial_voice`. It is a small set of repeatable decision tendencies, not a taste label:
+
+```yaml
+directorial_voice:
+  camera_relationship:
+  visibility_and_instability_tolerance:
+  light_motivation_and_contrast:
+  color_discipline:
+  rhythm_and_cut_behavior:
+  performance_register:
+  sound_density_and_silence:
+  established_rule:
+  purposeful_deviation_policy:
+```
+
+Fill only dimensions that change downstream choices. Descriptive shorthand such as `intimate minimalist` may summarize an already-defined contract but cannot serve as authority by itself. Do not imitate a named living director; translate any requested influence into user-approved functional traits without claiming identity or authorship.
+
+When more than one generation unit shares a scene, sequence, or campaign, plan a `cross_generation_expressive_arc` over scale, movement, light, sound, rhythm, and viewer distance. Each unit still compiles from its actual accepted start state and only its current beats. The arc coordinates tendencies; it does not leak future events, dialogue, reveals, or object states into a local prompt.
+
+A pattern break is valid only after the pattern is perceptibly established and only when the deviation has a specific story, information, relationship, or viewer-experience function. Novelty alone is not motivation. A planned future break remains global planning metadata until its own generation unit becomes current.
+
 Mode authority:
 
 - In AUTEUR MODE, use Visual Strategy only to understand, validate, and detect execution drift. Do not change director-locked shot order, count, framing, movement, rhythm, or panel structure.
@@ -428,6 +451,8 @@ For inferred or improved structure, run these compact pre-save tests:
 - `Repetition and Rupture Test`: repetition is motivated, and any exception has a specific dramatic or informational job.
 - `Directing Intention Test`: the scene has one functional viewer-experience aim, and every material inferred choice either supports it, deliberately counterpoints it, or stays neutral.
 - `Anti-Default Test`: any rejected familiar solution has a scene-specific weakness and an executable positive replacement; director-locked convention remains protected.
+- `Directorial Voice Test`: any claimed voice resolves into functional choices rather than a preset label or named-director imitation.
+- `Expressive Arc Test`: cross-unit tendencies develop legibly, and every pattern break follows an established pattern and performs a material function without future-beat leakage.
 - `Visual Sentence Test`: adjacent unlocked shots develop knowledge, pressure, space, action, or performance rather than merely vary angle.
 - `Function-Label Laundering Test`: a function label cannot justify a shot whose actual framing and visible content do not perform that function.
 - `Reference Pose Contamination Test`: identity or style references do not silently dictate pose, camera, crop, or composition.
@@ -456,6 +481,7 @@ production_spine:
   director_mode:
   scene_grammar:
   visual_strategy:
+  directorial_voice:
   active_stage:
   generation_unit:
   visible_entities:
@@ -471,6 +497,7 @@ production_spine:
   attention_flow:
   transition_policy:
   rhythm_shape:
+  cross_generation_expressive_arc:
   object_state_progression:
   spatial_geography:
   continuity_locks:
@@ -1429,6 +1456,8 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Directing intention is functional rather than decorative; selective dramatic lenses are used only when they change execution, and non-narrative work is not forced into psychological story logic.
 - Any Default Solution Review protects AUTEUR locks, identifies a scene-specific weakness, and sends only an executable positive replacement into the artifact.
 - Active camera, blocking, light, performance, sound, rhythm, and cut choices pass the Instrument Coherence Test by supporting, purposefully counterpointing, or remaining neutral to the directing intention.
+- Any directorial voice is expressed through functional camera, instability, light, color, rhythm, performance, or sound tendencies rather than an empty preset label or named living-director imitation.
+- Cross-generation expressive arcs coordinate tendencies without leaking future beats; every purposeful deviation follows an established pattern and has a story, information, relationship, or viewer-experience function.
 - `camera_logic` is derived from the approved Visual Strategy and does not rewrite it.
 - Applicable Scene-Level Camera Premise, Default Coverage Substitution, Repetition and Rupture, Visual Sentence, Function-Label Laundering, and Reference Pose Contamination tests pass without angle or movement quotas.
 - Explicit user structure is preserved.
