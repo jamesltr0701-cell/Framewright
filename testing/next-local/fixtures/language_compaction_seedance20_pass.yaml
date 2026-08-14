@@ -1,0 +1,30 @@
+kind: compile_trace
+expected: pass
+director_modes: [screenwriter]
+conversation_mode_declared: true
+artifact_stage: video_prompt
+target_model: seedance_2_0
+serialization_owner: framewright_merge_adapter_seedance_2_0
+adapter_id: seedance_2_0
+adapter_profile_contract: seedance_2_0
+compiler_instruction_sources: [skill/framewright-merge/SKILL.md, skill/framewright-merge/references/framewright.md, skill/framewright-merge/references/runtime_profiles/seedance_2_0.md]
+character_limit: 10000
+native_bindings: ["@Image 1"]
+prompt: "@Image 1沿湿冷走廊向前奔跑，镜头低位后退；她在门前急停，雨声与脚步同步延续，无音乐。"
+language_compaction:
+  source_language: en
+  output_language: zh
+  strategy: lossless_zh_payload
+  target_adapter: seedance_2_0
+  adapter_support_declared: true
+  active_character_limit: 10000
+  source_character_count: 10420
+  output_character_count: 46
+  content_deletion_applied: false
+  semantic_anchor_ids_before: [run_forward, low_retreat, stop_at_door, rain_and_steps]
+  semantic_anchor_ids_after: [run_forward, low_retreat, stop_at_door, rain_and_steps]
+  protected_literals_before: ["@Image 1"]
+  protected_literals_after: ["@Image 1"]
+  schema_literals_preserved: true
+  exact_locked_text_preserved: true
+  translated_scope: natural_language_payload

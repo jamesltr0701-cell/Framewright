@@ -1,9 +1,10 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.3.0"
+profile_version: "1.4.0"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
+overflow_language_strategy: "lossless_zh_payload"
 ---
 
 # Seedance 2.5 Runtime Profile
@@ -465,6 +466,8 @@ When critical typography, formulas, signage, subtitle layout, or frame-accurate 
 ### 9.3 Compactness Qualification
 
 Retain the 10,000-character hard ceiling. Passing it is necessary, not sufficient: record character count, active-material count, stage count, and preserved semantic anchors for representative routes; reject duplicated instructions, inactive blocks, assistant-facing leakage, and low-value headings. Compression must preserve identity, state, boundary, reference authority, camera causality, dialogue ownership, and explicit negatives.
+
+When a complete clean English candidate still exceeds the ceiling, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Re-express every natural-language schema value in concise Chinese from the approved Prompt IR. Preserve task headings, `@Image N` / `@Video N` / `@Audio N`, special audio or subtitle symbols, proper names marked exact, exact approved dialogue or visible text, numbers, and route literals byte-for-byte. Use the Chinese candidate only when semantic anchors and protected literals match and the complete prompt fits. If it still exceeds the ceiling, resume Core Compression Safety without silently changing structure or reference authority.
 
 ## 10. Advanced Task Feasibility
 

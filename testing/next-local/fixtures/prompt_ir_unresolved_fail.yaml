@@ -25,5 +25,7 @@ document:
     reserved_future_beats: []
     hard_constraints: []
     intentional_freedom: []
+    semantic_anchor_ids: [object_covered, cloth_lifts, object_visible]
+    protected_literals: []
     unresolved_material_decisions: [which product variant is under the cloth]
     adapter_input_status: approved

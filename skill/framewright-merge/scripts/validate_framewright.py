@@ -22,6 +22,7 @@ except ImportError as exc:  # pragma: no cover - explicit runtime diagnostic
 MODE_RE = re.compile(r"^\[MODE: (AUTEUR|APPRENTICE|SCREENWRITER)\]$")
 NATIVE_MENTION_RE = re.compile(r"@(Image|Video|Audio)\s+\d+")
 H3_LABEL_RE = re.compile(r"<(Subject|Picture|Video|Audio)\s+\d+>")
+CJK_RE = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
 UNRESOLVED_RE = re.compile(
     r"\[(?:resolved|required|insert|todo|tbd)[^\]\n]*\]", re.IGNORECASE
 )
@@ -91,6 +92,8 @@ PROMPT_IR_REQUIRED = (
     "reserved_future_beats",
     "hard_constraints",
     "intentional_freedom",
+    "semantic_anchor_ids",
+    "protected_literals",
     "unresolved_material_decisions",
     "adapter_input_status",
 )
@@ -127,6 +130,7 @@ ENDPOINT_PURPOSES = {
     "edit_point",
     "reveal_or_payoff",
 }
+NATIVE_BINDING_ADAPTERS = {"seedance_2_0", "seedance_2_5", "minimax_h3"}
 DEFAULT_REGISTRY = (
     Path(__file__).resolve().parent.parent
     / "references"
@@ -205,6 +209,8 @@ def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str,
             owners.append(owner)
         adapter_id = record.get("adapter_id")
         profile = record.get("profile")
+        if record.get("overflow_language_strategy") != "lossless_zh_payload":
+            errors.append(issue("adapter_overflow_language_strategy_missing", "Every registered adapter must declare lossless Chinese payload re-serialization.", target_model=target_model))
         if "core_native_profile" in record:
             errors.append(issue("legacy_core_native_profile_forbidden", "Every target must use a formal adapter; Core Native profile records are forbidden.", target_model=target_model))
         if not isinstance(adapter_id, str) or not adapter_id:
@@ -316,6 +322,8 @@ def validate_serialization_ownership(
         errors.append(issue("adapter_id_missing", "Every target serialization requires the registered adapter ID.", expected=expected_adapter))
     elif actual_adapter != expected_adapter:
         errors.append(issue("adapter_id_mismatch", "Adapter ID does not match the registered target and owner.", expected=expected_adapter, actual=actual_adapter))
+    if expected_adapter in NATIVE_BINDING_ADAPTERS and "{{HANDLE}}" in prompt:
+        errors.append(issue("generic_handle_forbidden", "The selected adapter requires native material mentions or labels instead of {{HANDLE}}."))
     matching_contract = (
         isinstance(data.get("seedance25"), dict)
         if expected_adapter == "seedance_2_5"
@@ -471,6 +479,54 @@ def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
     for forbidden_key in ("serialization_owner", "adapter_id", "native_ref", "ui_mode", "route", "prompt_headings"):
         if forbidden_key in prompt_ir:
             errors.append(issue("adapter_dialect_in_prompt_ir", "Model-neutral Prompt IR contains an adapter-owned field.", key=forbidden_key))
+    return errors
+
+
+def validate_language_compaction(
+    data: Any,
+    prompt: str,
+    resolved_adapter: Any = None,
+) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(data, dict):
+        return [issue("language_compaction_invalid", "Language compaction contract must be a mapping.")]
+
+    limit = data.get("active_character_limit")
+    source_count = data.get("source_character_count")
+    if not isinstance(limit, int) or limit <= 0 or not isinstance(source_count, int):
+        errors.append(issue("language_compaction_count_invalid", "Language compaction requires integer source count and active limit."))
+    elif source_count <= limit:
+        errors.append(issue("language_compaction_unnecessary", "Chinese overflow re-serialization activates only after the clean English candidate exceeds the active limit."))
+    if data.get("source_language") != "en" or data.get("output_language") != "zh":
+        errors.append(issue("language_compaction_route_invalid", "Overflow language route must re-serialize an English candidate as Chinese."))
+    if data.get("strategy") != "lossless_zh_payload" or data.get("adapter_support_declared") is not True:
+        errors.append(issue("language_compaction_strategy_invalid", "Selected adapter must declare the lossless Chinese payload strategy."))
+    target_adapter = data.get("target_adapter")
+    if target_adapter not in NATIVE_BINDING_ADAPTERS or (
+        resolved_adapter is not None and target_adapter != resolved_adapter
+    ):
+        errors.append(issue("language_compaction_adapter_mismatch", "Language compaction target must match the one resolved adapter."))
+    if not CJK_RE.search(prompt):
+        errors.append(issue("language_compaction_chinese_missing", "A Chinese overflow candidate must contain Chinese natural-language payload."))
+    if isinstance(limit, int) and len(prompt) > limit:
+        errors.append(issue("language_compaction_still_over_limit", "Chinese overflow candidate still exceeds the active character limit.", actual=len(prompt), limit=limit))
+    if data.get("output_character_count") != len(prompt):
+        errors.append(issue("language_compaction_recount_mismatch", "Recorded Chinese candidate count does not match the final prompt.", actual=len(prompt), recorded=data.get("output_character_count")))
+    if data.get("content_deletion_applied") is not False:
+        errors.append(issue("language_compaction_content_deleted", "Lossless Chinese re-serialization may not delete active content."))
+
+    before_anchors = data.get("semantic_anchor_ids_before")
+    after_anchors = data.get("semantic_anchor_ids_after")
+    if not isinstance(before_anchors, list) or not before_anchors or before_anchors != after_anchors:
+        errors.append(issue("language_compaction_anchor_mismatch", "Semantic anchors must remain identical and ordered across language re-serialization."))
+    before_literals = data.get("protected_literals_before")
+    after_literals = data.get("protected_literals_after")
+    if not isinstance(before_literals, list) or before_literals != after_literals:
+        errors.append(issue("language_compaction_literal_mismatch", "Protected schema, binding, timing, name, and exact-text literals must remain byte-identical."))
+    if data.get("schema_literals_preserved") is not True or data.get("exact_locked_text_preserved") is not True:
+        errors.append(issue("language_compaction_protection_unverified", "Schema literals and exact locked text require explicit preservation checks."))
+    if data.get("target_adapter") == "minimax_h3" and data.get("translated_scope") != "natural_language_values_only":
+        errors.append(issue("h3_language_compaction_scope_invalid", "H3 Chinese compaction may translate natural-language values only."))
     return errors
 
 
@@ -1004,6 +1060,16 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     if minimax_h3 is not None:
         errors.extend(validate_minimax_h3(minimax_h3, prompt if isinstance(prompt, str) else ""))
 
+    language_compaction = data.get("language_compaction")
+    if language_compaction is not None:
+        errors.extend(
+            validate_language_compaction(
+                language_compaction,
+                prompt if isinstance(prompt, str) else "",
+                data.get("adapter_id"),
+            )
+        )
+
     for unit in data.get("split_units", []) or []:
         if not isinstance(unit, dict) or not unit.get("unit_label"):
             errors.append(issue("split_unit_invalid", "Split unit record must be a labeled mapping."))
@@ -1310,13 +1376,15 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.8-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.8-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.9-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.9-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
         if not profile_meta.get("profile_version") or profile_meta.get("profile_role") != "subordinate_video_prompt_adapter":
             errors.append(issue("profile_frontmatter_invalid", "Runtime profile version or role is missing.", profile=str(profile)))
+        if profile_meta.get("overflow_language_strategy") != "lossless_zh_payload":
+            errors.append(issue("profile_overflow_language_strategy_missing", "Runtime profile must declare lossless Chinese payload re-serialization.", profile=str(profile)))
 
     documents = [("core", core_text), ("skill", skill_text)] + [
         (f"profile:{profile.name}", profile_text)

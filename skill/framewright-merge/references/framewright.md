@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.8-local"
+version: "3.5.4-merge.9-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -886,6 +886,21 @@ Never remove:
 
 After compression, reread the prompt and repair any broken action flow, prop pickup/held/dropped/broken/returned continuity, screen direction, camera or panel mismatch, missing setup, impossible logic jump, lost camera coverage, or missing transition policy.
 
+#### Lossless Chinese Overflow Re-serialization
+
+Normal compactness removes only repetition, hollow wording, inactive material, and duplicated explanation; it must not delete active meaning merely to make an English candidate fit.
+
+When a clean English Video Prompt candidate still exceeds the active character limit, and the selected adapter declares `lossless_zh_payload` support, use this order before any content-bearing subtraction:
+
+1. preserve the approved Prompt IR unchanged;
+2. re-serialize the complete natural-language payload in concise Chinese from that same IR rather than loosely translating the finished prose;
+3. preserve every semantic anchor, active reference role, start and end state, endpoint purpose, current beat, camera and continuity contract, sound event, critical negative, and intentional freedom;
+4. preserve byte-for-byte every adapter schema key, native reference token, H3 label, timestamp, proper name marked exact, model/API literal, and exact approved dialogue, lyric, narration, subtitle, or visible text in its original language;
+5. recount all characters, spaces, line breaks, labels, and bindings;
+6. use the complete Chinese candidate when it fits and semantic-parity validation passes.
+
+This is a language re-serialization, not permission to summarize, merge beats, simplify action, translate locked speech, or change director intent. For mixed-language schemas, translate only adapter-approved natural-language values and keep required structural literals unchanged. If the complete Chinese candidate still exceeds the limit, resume the existing Compression Safety order and disclose any proposed material loss or boundary change under the applicable Director Mode.
+
 ### 8.8 Stale-Negative Pass
 
 Every negative instruction must prevent a realistic current risk.
@@ -1095,7 +1110,7 @@ If the director explicitly requests a runtime material, do not remove, replace, 
 
 The Material Registry's `material_key` is stable semantic identity inside Framewright. A platform filename, index, chip label, or API asset ID is only a current-run binding and must not define the material's role or authority.
 
-When a generic downstream platform needs unresolved inline handles, use the compact fallback at the start of the clean Prompt:
+Only a future adapter that explicitly declares generic unresolved inline handles may use the compact fallback below. No currently registered merge adapter uses it:
 
 ```text
 REFS:
@@ -1114,9 +1129,9 @@ Rules:
 
 ### Surface-Specific Material Mentions
 
-When a loaded runtime profile supports native material mentions, that profile owns the binding syntax and the generic `REFS` fallback is omitted.
+When a loaded runtime profile supports native material mentions or labels, that profile owns the binding syntax and the generic `REFS` fallback is omitted.
 
-For Seedance 2.5, `@` is a structured asset-mention operation, not a permanent lexical handle:
+For Seedance 2.0 and Seedance 2.5, `@` is a structured asset-mention operation, not a permanent lexical handle:
 
 - In the UI, the operator invokes `@` and selects the intended uploaded material; the surface may display a thumbnail, filename, chip, or index.
 - In a saved `.txt` prompt, use the profile's plain-text surrogate such as `@Image 1`, `@Video 1`, or `@Audio 1`; a text file cannot preserve an interactive chip.
@@ -1126,6 +1141,8 @@ For Seedance 2.5, `@` is a structured asset-mention operation, not a permanent l
 - When more than one subject or role could be confused, add the shortest useful qualifier, for example `the woman in @Image 1` or `the red vehicle in @Image 2`.
 
 Every native mention must map to one active runtime material, and every mapped active material must be used. Count plain-text surrogates against the character limit. Do not include upload instructions in the clean prompt.
+
+For MiniMax H3, use only its registered `<Subject N>`, `<Picture N>`, `<Video N>`, and `<Audio N>` labels. Generic `{{HANDLE}}` aliases are not valid H3 serialization.
 
 For MiniMax H3, the loaded profile owns its semantic label system (`<Subject N>`, `<Picture N>`, `<Video N>`, and `<Audio N>`). These labels describe prompt-local subject and source relationships; they are not upload-order handles, API asset IDs, or replacements for stable Material Registry identity. Use them only after the director explicitly selects H3 and map each label to the intended active material in the Run Card.
 
@@ -1297,6 +1314,8 @@ video_prompt_ir:
   reserved_future_beats:
   hard_constraints:
   intentional_freedom:
+  semantic_anchor_ids:
+  protected_literals:
   unresolved_material_decisions:
   adapter_input_status: approved
 ```
@@ -1347,7 +1366,9 @@ Every video prompt must:
 - remain independently executable;
 - stay within the active character limit.
 
-Default character limit: 10,000 characters including spaces, line breaks, aliases, native material mentions, and pasted handles.
+Default character limit: 10,000 characters including spaces, line breaks, aliases, native material mentions, and any future adapter-authorized handles.
+
+When the selected adapter declares a lower limit, that adapter limit wins. If a clean English candidate exceeds the active limit, apply Lossless Chinese Overflow Re-serialization before removing active content. A complete Chinese candidate must pass the same runtime-cleanliness, reference, semantic-anchor, continuity, sound, and ownership validation as the English candidate.
 
 When camera execution is production-critical, the IR records it in the beat that needs it: start frame, path, landing frame, direction, visible movement evidence, and motivation. An adapter must preserve this local execution instead of replacing it with a global rhythm summary.
 
@@ -1528,6 +1549,7 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Production-critical physical actions preserve trigger, force, resistance, contact, release or lock, settling, and aftermath; mechanical transformations preserve required part provenance and load-bearing state without over-describing ordinary motion.
 - Runtime material admission passed the Reference Conditioning Risk Gate; an explicitly requested material was not silently removed, cropped, downgraded, or withheld.
 - Compression preserves action flow, geography, object state, camera coverage, transition policy, reference authority, and critical negatives.
+- When an English candidate exceeded the active character limit, an adapter-declared complete Chinese payload was attempted before content-bearing subtraction; schema literals, native bindings, exact speech or visible text, and semantic anchors remained unchanged.
 - Every material abstract intent has a shot-legible visible, audible, or temporal carrier; material dialogue has executable onset, delivery, aftermath, or listener-response causality without micro-action overload.
 - Generation-unit feasibility separately explains relevant dialogue, blocking, camera-attention, world-response, transformation, object-state, silence, and reference loads; no ceiling, score, or quota substitutes for the explanation.
 - Any proposed structural subtraction identifies the function being transferred and stops for approval before material deletion, merge, split, or intentional loss.

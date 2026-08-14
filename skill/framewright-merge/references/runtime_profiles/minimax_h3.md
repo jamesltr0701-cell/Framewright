@@ -1,10 +1,11 @@
 ---
 profile_name: "Framewright MiniMax H3 Runtime Profile"
-profile_version: "0.1.0-local"
+profile_version: "0.2.0-local"
 target_model: "MiniMax H3"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 15
 prompt_character_limit: 7000
+overflow_language_strategy: "lossless_zh_payload"
 ---
 
 # MiniMax H3 Runtime Profile
@@ -163,7 +164,7 @@ An ordinary reference video does not automatically activate its audio. Audio reu
 
 ## 6. H3 Serialization Schemas
 
-Use exactly one schema as the clean-prompt serialization owner. Write H3 rewrite fields in English while preserving approved dialogue, lyrics, and visible text in their original language.
+Use exactly one schema as the clean-prompt serialization owner. Keep H3 field names, relationship markers, labels, shot markers, timestamp syntax, and required literals in English. Natural-language field values normally follow the working prompt language; preserve approved dialogue, lyrics, and visible text in their original language.
 
 ### 6.1 Base Modes: T2VA, I2VA, FL2VA, L2VA
 
@@ -208,7 +209,7 @@ For H3 multi-shot serialization:
 - `[Shot 1]` has no timestamp.
 - Each later shot begins with a strictly increasing cut point inside the resolved duration: `[Shot 2] At 00:03.500, the camera cuts to...`.
 - A cut must introduce new subject, spatial, state, viewpoint, or temporal information. Prefer camera movement when only distance or a slight angle changes.
-- Write camera motion as natural English inside the shot. Distinguish camera-body movement from lens-only movement and add amplitude or speed only when material.
+- Write camera motion as precise natural language inside the shot. Distinguish camera-body movement from lens-only movement and add amplitude or speed only when material.
 - Keep shot numbering consecutive and make all cut times consistent with the approved rhythm and end state.
 
 These cut points are H3 serialization required by the selected runtime technique. They do not create, delete, or reorder Core shots. If more than one materially different timing allocation is plausible, ask the director rather than silently choosing one. Exact timestamps guide H3 pacing and are not a promise of frame-accurate editing or beat adherence.
@@ -240,6 +241,12 @@ When an audio asset is active, distinguish:
 - synchronized source-video audio from an ordinary video attachment.
 
 Put shot-local dialogue and synchronized sound inside the current shot. Put the overall ambience and physical sound summary in `overall_soundscape`. Put only audience-only music in `non_diegetic_music`; use `N/A` when absent.
+
+### 8.1 Lossless Chinese Overflow Payload
+
+When a complete clean English H3 candidate exceeds the 7,000-character profile limit, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Keep all schema field names, `<Subject N>` / `<Picture N>` / `<Video N>` / `<Audio N>` labels, relationship markers, `[Shot N]`, timestamps, speaker IDs, `<d>[Language]...</d>` wrappers, `N/A`, proper names marked exact, and exact approved speech or visible text byte-for-byte. Re-serialize only natural-language field values in concise Chinese from the same approved Prompt IR.
+
+Use the hybrid Chinese candidate only when every semantic anchor and protected literal matches the English candidate and the complete prompt fits. Do not translate H3 structure, alter cut timing, or summarize a shot. If the hybrid candidate remains over limit, resume Core Compression Safety and preserve H3's required fields.
 
 ## 9. Context-IR Boundary
 

@@ -1,9 +1,10 @@
 ---
 profile_name: "Framewright Merge Seedance 2.0 Runtime Profile"
-profile_version: "2.1.0"
+profile_version: "2.2.0"
 profile_role: "subordinate_video_prompt_adapter"
 target_model: "seedance_2_0"
 evidence_scope: "model_execution_heuristics_not_platform_guarantees"
+overflow_language_strategy: "lossless_zh_payload"
 ---
 
 # Seedance 2.0 Runtime Profile
@@ -40,6 +41,18 @@ For first/last-frame work, let the first frame define the opening and the last f
 For R2V, bind video separately to approved motion, camera, timing, composition, or edit behavior. Deny performer identity, wardrobe, location, and sound unless explicitly authorized.
 
 An artistic source-look lock comes from Core's approved final-look and source-authority contract. This adapter may explain target stability risk but may not invent, weaken, or broaden that artistic authority.
+
+### 4.1 Native Material Mentions
+
+Use Seedance-native plain-text surrogates in the saved prompt:
+
+```text
+@Image 1
+@Video 1
+@Audio 1
+```
+
+Map every surrogate assistant-facing to one stable Material Registry record and its limited authority. Use the selected native mention directly in the action, identity, endpoint, motion, or sound clause it controls. Never emit `{{HANDLE}}`, a generic alias assignment, an upload instruction, or an unverified platform chip label. If the active surface cannot preserve the required native binding, report that execution conflict instead of silently substituting a generic handle.
 
 ## 5. Seedance Execution Grammar
 
@@ -121,3 +134,5 @@ Use only one schema. Native material surrogates such as `@Image 1`, `@Video 1`, 
 Remove hollow boosters, repeated adjectives, duplicated authority, repeated camera explanation, repeated continuity, then secondary atmosphere. Preserve identity and count, active source roles, actual opening state, current action, camera causality, dialogue ownership, sound cues, terminal state, endpoint execution, continuity, completed-beat exclusions, and reserved-future exclusions.
 
 The final clean prompt contains executable direction only and stays within the active character limit. Put capability uncertainty, surface setup, evidence labels, fidelity allocation, overload warnings, reference map, and residual risk in the Run Card.
+
+When a complete clean English candidate exceeds that limit, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Seedance 2.0 permits the complete natural-language payload to be re-expressed in concise Chinese. Preserve `@Image N`, `@Video N`, `@Audio N`, proper names marked exact, exact approved speech or visible text, symbols, numbers, and material-role boundaries byte-for-byte. Do not mix the language of one dialogue event except for approved proper nouns. Use the Chinese candidate only after semantic anchors and all native bindings match the English candidate and the recount passes.

@@ -25,5 +25,7 @@ document:
     reserved_future_beats: [letter_opened]
     hard_constraints: [do not open the letter]
     intentional_freedom: [minor breathing rhythm]
+    semantic_anchor_ids: [start_letter_closed, hand_withdrawal, end_letter_closed]
+    protected_literals: []
     unresolved_material_decisions: []
     adapter_input_status: approved

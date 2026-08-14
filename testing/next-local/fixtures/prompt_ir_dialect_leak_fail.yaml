@@ -25,6 +25,8 @@ document:
     reserved_future_beats: []
     hard_constraints: []
     intentional_freedom: []
+    semantic_anchor_ids: [door_closed, door_opens, door_open]
+    protected_literals: []
     unresolved_material_decisions: []
     adapter_input_status: approved
     prompt_headings: [REFS, BEATS]

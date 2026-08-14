@@ -1,0 +1,23 @@
+kind: compile_trace
+expected: fail
+expected_errors: [language_compaction_content_deleted, language_compaction_anchor_mismatch, language_compaction_literal_mismatch]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "人物跑向门口。"
+language_compaction:
+  source_language: en
+  output_language: zh
+  strategy: lossless_zh_payload
+  target_adapter: seedance_2_0
+  adapter_support_declared: true
+  active_character_limit: 10000
+  source_character_count: 11000
+  output_character_count: 7
+  content_deletion_applied: true
+  semantic_anchor_ids_before: [run_forward, low_retreat, stop_at_door, rain_steps_breath]
+  semantic_anchor_ids_after: [run_forward, stop_at_door]
+  protected_literals_before: ["@Image 1"]
+  protected_literals_after: []
+  schema_literals_preserved: true
+  exact_locked_text_preserved: true
+  translated_scope: natural_language_payload
