@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.3-local"
+version: "3.5.4-merge.4-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -1198,21 +1198,56 @@ Core Framewright remains the highest authority for director intent, explicit loc
 
 Framewright owns compilation for every explicit Framewright request. Resolve the target model before serialization using `references/runtime_profiles/adapter_registry.yaml`, which is the single registry of supported target-model / serialization-owner pairs. The target model selects the dialect; a platform, provider, surface, filename, uploaded asset, prompt wording, or installed external skill never selects or owns serialization.
 
-Core Native currently targets Seedance 2.0 with `serialization_owner: framewright_merge_core_native`, `adapter_id: null`, and the internal target-knowledge profile at `references/core_native_profiles/seedance_2_0.md`. Read that profile completely for this target. It is not an adapter, serialization owner, second compiler, or platform contract; it may qualify feasibility and expression only after Core has approved the Production Spine. Preserve Core fallback headings and contracts for this path. This is a current target mapping, not a permanent claim that Core Native can only target Seedance 2.0.
+Core compiles every approved Video Prompt scope into one model-neutral `video_prompt_ir` before target serialization. The IR is a derived, read-only compiler object, not a second Production Spine, saved default artifact, user questionnaire, or adapter dialect:
+
+```yaml
+video_prompt_ir:
+  ir_schema_version:
+  core_version:
+  target_model:
+  generation_unit:
+  directing_intention:
+  directorial_voice:
+  scene_grammar:
+  final_look:
+  active_references:
+  start_state:
+  end_state:
+  endpoint_purpose:
+  visible_actions:
+  shot_or_phase_plan:
+  camera_contract:
+  performance_contract:
+  sound_contract:
+  continuity_locks:
+  completed_beats:
+  current_beats:
+  reserved_future_beats:
+  hard_constraints:
+  intentional_freedom:
+  unresolved_material_decisions:
+  adapter_input_status: approved
+```
+
+Core owns every semantic field, validates that the three beat scopes are disjoint, and sets `adapter_input_status: approved` only when material decisions are resolved. The IR may carry internal rationale needed for traceability, but adapters must not emit that rationale or other compiler metadata. It normally remains in memory; save it only when the director explicitly requests a diagnostic artifact.
+
+Every registered target, including Seedance 2.0, uses one formal subordinate adapter. The adapter receives the approved IR read-only, qualifies target-specific feasibility, and serializes one clean prompt. It may choose target syntax, block order, native material notation, route fields, compression tactics, and model-specific execution wording. It may not originate or change directing intention, directorial voice, scene structure, endpoint purpose, reference authority, continuity, generation-unit boundaries, or any director lock. If the IR is incomplete or incompatible, the adapter returns a compact conflict to Core instead of repairing creative meaning itself.
+
+When the target model is Seedance 2.0, use `serialization_owner: framewright_merge_adapter_seedance_2_0`, `adapter_id: seedance_2_0`, and load `references/runtime_profiles/seedance_2_0.md` completely. Seedance-specific headings, schemas, native material syntax, evidence claims, overload warnings, and endpoint mechanics belong only to that adapter.
 
 When the target model is explicitly Seedance 2.5, use `serialization_owner: framewright_merge_adapter_seedance_2_5`, `adapter_id: seedance_2_5`, and load the complete subordinate profile at `references/runtime_profiles/seedance_2_5.md` before routing or serialization. Its UI mode and control profiles remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. The profile may translate the approved core contract into target-specific task schemas and syntax, but it may not override explicit direction or any core lock.
 
 When the director explicitly selects MiniMax H3, use `serialization_owner: framewright_merge_adapter_minimax_h3`, `adapter_id: minimax_h3`, and load the complete subordinate profile at `references/runtime_profiles/minimax_h3.md` before routing or serialization. Do not infer H3 from materials, prompt wording, project history, platform, provider, surface, or adapter availability. Its H3 route, input roles, semantic labels, and prompt fields remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. If `H3` is ambiguous in context, ask one compact target-model question before loading the profile.
 
-If the director requests an unregistered target model, stop before prompt compilation and ask for a supported target or an explicitly approved future adapter iteration. Do not route an unsupported model through Core Native, a platform serializer, or the nearest available adapter.
+If the director requests an unregistered target model, stop before prompt compilation and ask for a supported target or an explicitly approved future adapter iteration. Do not route an unsupported model through a hidden Core dialect, a platform serializer, or the nearest available adapter.
 
 The clean Video Prompt must not expose `target_model`, `serialization_owner`, `adapter_id`, `compiler_instruction_sources`, registry records, platform setup, or compiler provenance. Keep those fields in the internal compile trace and Run Card only. Before saving, validate the actual prompt file with the ownership-aware validator using the resolved target and scalar owner. A Video Prompt cannot pass by claiming multiple owners, a route name as owner, an external skill as owner, or a platform-specific serializer.
 
-Load exactly one target profile for one model-facing prompt: the registered internal Core Native profile for Seedance 2.0 or one registered adapter profile for an adapter target. If the user requests a comparison across target models, compile separate candidate prompts from the same approved Core Spine and keep their target traces distinct; do not combine two target profiles or serialization schemas into one prompt.
+Load exactly one adapter profile for one model-facing prompt. If the user requests a comparison across target models, compile separate candidate prompts from the same approved Core Spine and IR semantics, and keep their target traces distinct; do not combine two target profiles or serialization schemas into one prompt.
 
 The router may recommend a Seedance task and explain the reason assistant-facing; the director may override it. First-Frame Continuation, First and Last Frames, and Extend remain distinct authority contracts. Obey explicit first / last / both / Extend assignments; if the assignment is ambiguous, return to the Intake Hard Stop and ask before freezing the Spine.
 
-The compact headings below are the core fallback. When a runtime profile selects a task-specific schema, that schema alone owns serialization for the current prompt; do not duplicate it with the fallback structure. The selected schema must still satisfy core continuity, cleanliness, sound, timing, feasibility, and character-limit rules.
+Each adapter owns the complete model-facing schema for its target. Core defines semantic obligations but no fallback headings, target block order, native mention syntax, or prompt dialect. The selected schema must still satisfy Core continuity, cleanliness, sound, timing, feasibility, endpoint, and character-limit rules.
 
 Storyboard material remains planning-only until the director explicitly admits it for Video Prompt runtime. Only then may a runtime profile activate a storyboard control profile and choose the full board, selected panel crops, selected structural panels, multi-keyframes, or no storyboard attachment. Admission must deny board title, labels, line style, sheet geometry, final look, and any implication that continuous-take panels are cuts.
 
@@ -1242,30 +1277,7 @@ Every video prompt must:
 
 Default character limit: 10,000 characters including spaces, line breaks, aliases, native material mentions, and pasted handles.
 
-Preferred compact headings:
-
-```text
-REFS
-VISUAL STYLE
-AUDIO
-ENVIRONMENT
-CONTINUITY LOCKS
-EMOTIONAL GUIDANCE
-RHYTHM + ESCALATION
-CAMERA EXECUTION
-SCALE LOCK
-OBJECT-STATE TIMELINE
-BEATS
-NEGATIVE
-```
-
-Omit headings that add no value. Use paragraph-based prompt blocks and avoid nested colon-heavy formatting.
-
-For edited sequences, every beat must state visible action, object state when relevant, performance pressure, camera relationship, and any local transition exception. Use hard cuts as the shared default rather than repeating `cut` after every beat.
-
-For continuous takes, every phase must state visible action, object state when relevant, camera relationship, continuous path, framing, subject placement, and no-cut continuity. A phase must not reset the camera, geography, identity, object state, or current optical behavior.
-
-When camera execution is production-critical, write it in the beat that needs it: start frame, path, landing frame, direction, visible movement evidence, and motivation. Do not rely on `RHYTHM + ESCALATION` as a substitute for shot-level camera execution.
+When camera execution is production-critical, the IR records it in the beat that needs it: start frame, path, landing frame, direction, visible movement evidence, and motivation. An adapter must preserve this local execution instead of replacing it with a global rhythm summary.
 
 When relevant, include direct Scale Lock, Object-State Timeline, reaction-target, threshold-crossing, and Surface Fidelity language. Keep each conditional block only when it materially prevents drift.
 
@@ -1309,30 +1321,7 @@ Do not include:
 - workflow explanations;
 - assistant-facing next steps.
 
-No generated file may contain unresolved instructional placeholders. For the generic fallback, `{{HANDLE}}` is allowed only inside `REFS` before operator replacement. A loaded runtime profile may instead emit mapped plain-text native mention surrogates such as `@Image 1`; these are model-facing bindings recorded in the Run Card, not workflow instructions or stable core identities.
-
-Allowed runtime headings include:
-
-```text
-[REFERENCE REGISTRY]
-[MATERIAL ROLES]
-[FINAL LOOK CONTRACT]
-[EXECUTION CONTRACT]
-[SCENE]
-[CONTINUITY + OBJECT STATE CONTRACT]
-[SHOT PLAN]
-[TAKE PHASE PLAN]
-[NEGATIVE]
-REFS
-VISUAL STYLE
-AUDIO
-ENVIRONMENT
-CONTINUITY LOCKS
-EMOTIONAL GUIDANCE
-RHYTHM + ESCALATION
-BEATS
-NEGATIVE
-```
+No generated file may contain unresolved instructional placeholders. A selected adapter defines any permitted temporary handle or mapped native mention syntax, ensures that every emitted binding is active and used, and records its stable Material Registry mapping in the Run Card.
 
 ## 15. File Output Workflow
 
@@ -1341,8 +1330,8 @@ Prompt-artifact generation is the default delivery behavior.
 Once intake, stage, reference, and generation-unit decisions are resolved:
 
 1. build and freeze the current Production Spine;
-2. compile only the active stage;
-3. run runtime-cleanliness and validation passes;
+2. compile only the active stage; for Video Prompt, derive and approve the model-neutral Prompt IR before loading one adapter;
+3. let the selected adapter serialize the Video Prompt, then run runtime-cleanliness and validation passes;
 4. resolve the output slug and destination;
 5. create the required `.txt` file automatically;
 6. only for Storyboard, generate exactly one initial storyboard board image from the saved prompt;
@@ -1442,10 +1431,12 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Every supplied visual asset has a resolved storyboard role, and every relevant asset has a natural-language storyboard binding that preserves only its allowed structural authority.
 - Keyframes are frozen production-purpose images.
 - Video prompts include final look, continuity, and visible motion.
+- When Video Prompt targets Seedance 2.0, the formal subordinate adapter was loaded completely; Seedance-specific schema and execution mechanics did not enter Core or alter creative semantics.
 - When Video Prompt targets Seedance 2.5, the subordinate runtime profile was loaded completely; its task route does not alter director mode, scene grammar, active stage, or generation-unit boundaries.
 - When Video Prompt explicitly targets MiniMax H3, the subordinate runtime profile was loaded completely; H3 was not inferred, and its route, input roles, labels, timing syntax, and sound fields do not alter director mode, scene grammar, active stage, or generation-unit boundaries.
-- Exactly one target runtime profile and one serialization owner apply to each model-facing prompt.
-- The target model, scalar serialization owner, adapter ID, adapter profile contract, and compiler instruction sources match the one registered ownership route; Core Native uses no adapter, and no platform or external prompt skill owns serialization.
+- Exactly one approved model-neutral Prompt IR, one target adapter, and one serialization owner apply to each model-facing prompt.
+- The adapter input is read-only, its unresolved material decisions are empty, and its completed/current/future beat scopes are disjoint.
+- The target model, scalar serialization owner, adapter ID, adapter profile contract, and compiler instruction sources match the one registered ownership route; no Core-native exception, platform, or external prompt skill owns serialization.
 - The actual Video Prompt file passed the ownership-aware validator, and clean prompt text contains no ownership or platform-serializer metadata.
 - A target capability ceiling is not treated as default duration or feasibility proof.
 - Storyboard material appears in Video Prompt runtime only after explicit admission, with structural authority and denied sheet/final-look authority recorded.

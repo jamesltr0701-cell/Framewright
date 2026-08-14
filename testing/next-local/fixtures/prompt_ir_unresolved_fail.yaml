@@ -1,0 +1,29 @@
+kind: prompt_ir
+expected: fail
+expected_errors: [prompt_ir_unresolved_material]
+document:
+  video_prompt_ir:
+    ir_schema_version: "1.0"
+    core_version: "3.5.4-merge.4-local"
+    target_model: seedance_2_0
+    generation_unit: GU01
+    directing_intention: reveal the object clearly
+    scene_grammar: observational_scene
+    final_look: soft daylight
+    active_references: []
+    start_state: object covered
+    end_state: object visible
+    endpoint_purpose: reveal_or_payoff
+    visible_actions: [cloth lifts]
+    shot_or_phase_plan: [one reveal]
+    camera_contract: locked close view
+    performance_contract: controlled hand movement
+    sound_contract: cloth movement, no music
+    continuity_locks: []
+    completed_beats: []
+    current_beats: [reveal]
+    reserved_future_beats: []
+    hard_constraints: []
+    intentional_freedom: []
+    unresolved_material_decisions: [which product variant is under the cloth]
+    adapter_input_status: approved

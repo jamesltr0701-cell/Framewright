@@ -10,16 +10,19 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
 "$PYTHON_BIN" "$VALIDATOR" core \
   --core "$REPO_ROOT/skill/framewright-merge/references/framewright.md" \
   --skill "$REPO_ROOT/skill/framewright-merge/SKILL.md" \
+  --profile "$REPO_ROOT/skill/framewright-merge/references/runtime_profiles/seedance_2_0.md" \
   --profile "$REPO_ROOT/skill/framewright-merge/references/runtime_profiles/seedance_2_5.md" \
   --profile "$REPO_ROOT/skill/framewright-merge/references/runtime_profiles/minimax_h3.md" \
   --registry "$REPO_ROOT/skill/framewright-merge/references/runtime_profiles/adapter_registry.yaml" \
   --manifest "$SCRIPT_DIR/expected/protected_anchors.yaml"
 "$PYTHON_BIN" "$VALIDATOR" regression "$SCRIPT_DIR/fixtures"
 
-PROMPT_PATH=$(mktemp /private/tmp/framewright-v353-core-native.XXXXXX)
+PROMPT_PATH=$(mktemp /private/tmp/framewright-merge-seedance20-adapter.XXXXXX)
 trap 'rm -f -- "$PROMPT_PATH"' EXIT HUP INT TERM
 printf '%s\n' 'A woman crosses the room. Quiet ventilation and synchronized footsteps; no music.' > "$PROMPT_PATH"
 "$PYTHON_BIN" "$VALIDATOR" video-prompt "$PROMPT_PATH" \
   --target-model seedance_2_0 \
-  --serialization-owner framewright_merge_core_native \
+  --serialization-owner framewright_merge_adapter_seedance_2_0 \
+  --adapter-id seedance_2_0 \
+  --profile-contract seedance_2_0 \
   --registry "$REPO_ROOT/skill/framewright-merge/references/runtime_profiles/adapter_registry.yaml"

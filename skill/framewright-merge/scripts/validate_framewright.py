@@ -68,6 +68,32 @@ ARTIFACT_REQUIRED = (
     "locator",
     "change_class",
 )
+PROMPT_IR_REQUIRED = (
+    "ir_schema_version",
+    "core_version",
+    "target_model",
+    "generation_unit",
+    "directing_intention",
+    "scene_grammar",
+    "final_look",
+    "active_references",
+    "start_state",
+    "end_state",
+    "endpoint_purpose",
+    "visible_actions",
+    "shot_or_phase_plan",
+    "camera_contract",
+    "performance_contract",
+    "sound_contract",
+    "continuity_locks",
+    "completed_beats",
+    "current_beats",
+    "reserved_future_beats",
+    "hard_constraints",
+    "intentional_freedom",
+    "unresolved_material_decisions",
+    "adapter_input_status",
+)
 CHANGE_CLASSES = {
     "director_refinement",
     "compiler_inference",
@@ -97,7 +123,7 @@ OWNERSHIP_PROMPT_TERMS = (
     "serialization_owner",
     "adapter_id",
     "compiler_instruction_sources",
-    "framewright_merge_core_native",
+    "framewright_merge_adapter_seedance_2_0",
     "framewright_merge_adapter_seedance_2_5",
     "framewright_merge_adapter_minimax_h3",
 )
@@ -164,29 +190,18 @@ def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str,
             owners.append(owner)
         adapter_id = record.get("adapter_id")
         profile = record.get("profile")
-        core_native_profile = record.get("core_native_profile")
-        if (adapter_id is None) != (profile is None):
-            errors.append(issue("adapter_registry_profile_pair_invalid", "Adapter ID and profile must both be null or both be scalar values.", target_model=target_model))
-        if adapter_id is None:
-            if not isinstance(core_native_profile, str) or not core_native_profile:
-                errors.append(issue("core_native_profile_missing", "Core Native target requires one registered internal knowledge profile.", target_model=target_model))
-            else:
-                resolved_native = (repository_root / core_native_profile).resolve()
-                if (resolved_native != package_root and package_root not in resolved_native.parents) or not resolved_native.is_file():
-                    errors.append(issue("core_native_profile_path_invalid", "Registered Core Native profile is missing or outside the Framewright Merge package.", target_model=target_model, profile=core_native_profile))
-        elif core_native_profile is not None:
-            errors.append(issue("adapter_core_native_profile_forbidden", "Adapter targets may not load a Core Native profile.", target_model=target_model))
-        if adapter_id is not None:
-            if not isinstance(adapter_id, str) or not adapter_id:
-                errors.append(issue("adapter_registry_id_invalid", "Adapter ID must be a non-empty scalar.", target_model=target_model))
-            else:
-                adapter_ids.append(adapter_id)
-            if not isinstance(profile, str) or not profile:
-                errors.append(issue("adapter_registry_profile_invalid", "Adapter profile must be a non-empty scalar path.", target_model=target_model))
-            else:
-                resolved = (registry_path.parent / profile).resolve()
-                if package_root not in resolved.parents or not resolved.is_file():
-                    errors.append(issue("adapter_registry_profile_missing", "Registered adapter profile is missing or outside the Framewright package.", target_model=target_model, profile=profile))
+        if "core_native_profile" in record:
+            errors.append(issue("legacy_core_native_profile_forbidden", "Every target must use a formal adapter; Core Native profile records are forbidden.", target_model=target_model))
+        if not isinstance(adapter_id, str) or not adapter_id:
+            errors.append(issue("adapter_registry_id_invalid", "Every target requires one non-empty adapter ID.", target_model=target_model))
+        else:
+            adapter_ids.append(adapter_id)
+        if not isinstance(profile, str) or not profile:
+            errors.append(issue("adapter_registry_profile_invalid", "Every target requires one adapter profile path.", target_model=target_model))
+        else:
+            resolved = (registry_path.parent / profile).resolve()
+            if package_root not in resolved.parents or not resolved.is_file():
+                errors.append(issue("adapter_registry_profile_missing", "Registered adapter profile is missing or outside the Framewright package.", target_model=target_model, profile=profile))
     if len(owners) != len(set(owners)):
         errors.append(issue("adapter_registry_owner_duplicate", "Serialization owners must be unique across registered targets."))
     if len(adapter_ids) != len(set(adapter_ids)):
@@ -279,38 +294,29 @@ def validate_serialization_ownership(
         errors.append(issue("target_owner_mismatch", "Target model and serialization owner do not match the registry.", target_model=target_model, serialization_owner=owner))
 
     expected_adapter = registered.get("adapter_id") if isinstance(registered, dict) else None
-    expected_native_profile = registered.get("core_native_profile") if isinstance(registered, dict) else None
     actual_adapter = data.get("adapter_id")
-    if expected_adapter is None:
-        if actual_adapter is not None:
-            errors.append(issue("core_native_adapter_forbidden", "Core Native must not claim an adapter ID."))
-        if data.get("adapter_profile_contract") is not None or "seedance25" in data or "minimax_h3" in data:
-            errors.append(issue("core_native_profile_forbidden", "Core Native must not claim an adapter profile contract."))
-        if data.get("core_native_profile_contract") not in (None, expected_native_profile):
-            errors.append(issue("core_native_profile_contract_mismatch", "Core Native profile contract does not match the registered target profile."))
-    else:
-        if data.get("core_native_profile_contract") is not None:
-            errors.append(issue("adapter_core_native_profile_forbidden", "Adapter-owned serialization may not claim a Core Native profile."))
-        if actual_adapter is None:
-            errors.append(issue("adapter_id_missing", "Adapter-owned serialization requires the registered adapter ID.", expected=expected_adapter))
-        elif actual_adapter != expected_adapter:
-            errors.append(issue("adapter_id_mismatch", "Adapter ID does not match the registered target and owner.", expected=expected_adapter, actual=actual_adapter))
-        matching_contract = (
-            isinstance(data.get("seedance25"), dict)
-            if expected_adapter == "seedance_2_5"
-            else isinstance(data.get("minimax_h3"), dict)
-            if expected_adapter == "minimax_h3"
-            else data.get("adapter_profile_contract") == expected_adapter
-        )
-        if not matching_contract and data.get("adapter_profile_contract") != expected_adapter:
-            errors.append(issue("adapter_profile_contract_missing", "Adapter owner requires its matching profile contract.", expected=expected_adapter))
-        foreign_contract = (
-            expected_adapter == "seedance_2_5" and "minimax_h3" in data
-        ) or (
-            expected_adapter == "minimax_h3" and "seedance25" in data
-        )
-        if foreign_contract:
-            errors.append(issue("adapter_profile_contract_mismatch", "A foreign adapter profile contract is present."))
+    if data.get("core_native_profile_contract") is not None:
+        errors.append(issue("legacy_core_native_contract_forbidden", "Serialization may not claim a Core Native profile contract."))
+    if actual_adapter is None:
+        errors.append(issue("adapter_id_missing", "Every target serialization requires the registered adapter ID.", expected=expected_adapter))
+    elif actual_adapter != expected_adapter:
+        errors.append(issue("adapter_id_mismatch", "Adapter ID does not match the registered target and owner.", expected=expected_adapter, actual=actual_adapter))
+    matching_contract = (
+        isinstance(data.get("seedance25"), dict)
+        if expected_adapter == "seedance_2_5"
+        else isinstance(data.get("minimax_h3"), dict)
+        if expected_adapter == "minimax_h3"
+        else data.get("adapter_profile_contract") == expected_adapter
+    )
+    if not matching_contract and data.get("adapter_profile_contract") != expected_adapter:
+        errors.append(issue("adapter_profile_contract_missing", "Adapter owner requires its matching profile contract.", expected=expected_adapter))
+    foreign_contract = (
+        expected_adapter == "seedance_2_5" and "minimax_h3" in data
+    ) or (
+        expected_adapter == "minimax_h3" and "seedance25" in data
+    )
+    if foreign_contract:
+        errors.append(issue("adapter_profile_contract_mismatch", "A foreign adapter profile contract is present."))
 
     sources = data.get("compiler_instruction_sources")
     if not isinstance(sources, list) or not sources or any(not isinstance(value, str) or not value for value in sources):
@@ -321,14 +327,10 @@ def validate_serialization_ownership(
         allowed_sources = set(required_sources)
         allowed_sources.add("skill/framewright-merge/references/runtime_profiles/adapter_registry.yaml")
         profile = registered.get("profile") if isinstance(registered, dict) else None
-        native_profile = registered.get("core_native_profile") if isinstance(registered, dict) else None
         if isinstance(profile, str):
             profile_source = registered_profile_source(profile)
             required_sources.add(profile_source)
             allowed_sources.add(profile_source)
-        if isinstance(native_profile, str):
-            required_sources.add(native_profile)
-            allowed_sources.add(native_profile)
         missing_sources = sorted(required_sources - set(sources))
         foreign_sources = sorted(set(sources) - allowed_sources)
         if missing_sources:
@@ -405,6 +407,53 @@ def validate_prompt_text(
         if unused:
             errors.append(issue("native_binding_unused", "A declared native binding is unused.", values=unused))
     del used_mentions
+    return errors
+
+
+def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict) or not isinstance(document.get("video_prompt_ir"), dict):
+        return [issue("prompt_ir_root_missing", "Prompt IR must contain a video_prompt_ir mapping.")]
+    prompt_ir = document["video_prompt_ir"]
+    for key in PROMPT_IR_REQUIRED:
+        if key not in prompt_ir:
+            errors.append(issue("prompt_ir_key_missing", "Required Prompt IR key is missing.", key=key))
+
+    registry, registry_errors = load_adapter_registry()
+    errors.extend(registry_errors)
+    targets = registry.get("registered_targets", {}) if isinstance(registry, dict) else {}
+    target = prompt_ir.get("target_model")
+    if not isinstance(target, str) or target not in targets:
+        errors.append(issue("prompt_ir_target_unregistered", "Prompt IR target must resolve to one registered adapter.", target_model=target))
+    if prompt_ir.get("adapter_input_status") != "approved":
+        errors.append(issue("prompt_ir_not_approved", "Adapter input status must be approved before serialization."))
+    unresolved = prompt_ir.get("unresolved_material_decisions")
+    if not isinstance(unresolved, list):
+        errors.append(issue("prompt_ir_unresolved_invalid", "Unresolved material decisions must be a list."))
+    elif unresolved:
+        errors.append(issue("prompt_ir_unresolved_material", "Approved Prompt IR cannot contain unresolved material decisions."))
+    if not prompt_ir.get("generation_unit"):
+        errors.append(issue("prompt_ir_generation_unit_missing", "Prompt IR requires one active generation unit."))
+
+    scopes: dict[str, set[Any]] = {}
+    for key in ("completed_beats", "current_beats", "reserved_future_beats"):
+        values = prompt_ir.get(key)
+        if not isinstance(values, list):
+            errors.append(issue("prompt_ir_beat_scope_invalid", "Each Prompt IR beat scope must be a list.", key=key))
+            scopes[key] = set()
+        else:
+            scopes[key] = set(values)
+    overlap = (
+        (scopes["completed_beats"] & scopes["current_beats"])
+        | (scopes["completed_beats"] & scopes["reserved_future_beats"])
+        | (scopes["current_beats"] & scopes["reserved_future_beats"])
+    )
+    if overlap:
+        errors.append(issue("prompt_ir_beat_scope_overlap", "Prompt IR completed, current, and future beat scopes must be disjoint.", beats=sorted(overlap)))
+
+    for forbidden_key in ("serialization_owner", "adapter_id", "native_ref", "ui_mode", "route", "prompt_headings"):
+        if forbidden_key in prompt_ir:
+            errors.append(issue("adapter_dialect_in_prompt_ir", "Model-neutral Prompt IR contains an adapter-owned field.", key=forbidden_key))
     return errors
 
 
@@ -1102,6 +1151,8 @@ def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     kind = data.get("kind")
     if kind == "compile_trace":
         errors = validate_compile_trace(data)
+    elif kind == "prompt_ir":
+        errors = validate_prompt_ir_data(data.get("document"))
     elif kind == "state":
         errors = validate_state_data(data.get("document"), check_locators=False)
     elif kind == "generation_evidence":
@@ -1132,8 +1183,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.3-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.3-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.4-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.4-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
@@ -1196,8 +1247,6 @@ def validate_video_prompt_path(
         sources = list(registry_data.get("compiler_instruction_sources", []) or [])
         if isinstance(record, dict) and isinstance(record.get("profile"), str):
             sources.append(registered_profile_source(record["profile"]))
-        if isinstance(record, dict) and isinstance(record.get("core_native_profile"), str):
-            sources.append(record["core_native_profile"])
     data: dict[str, Any] = {
         "artifact_stage": "video_prompt",
         "target_model": target_model,

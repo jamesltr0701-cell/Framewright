@@ -1,0 +1,30 @@
+kind: prompt_ir
+expected: fail
+expected_errors: [adapter_dialect_in_prompt_ir]
+document:
+  video_prompt_ir:
+    ir_schema_version: "1.0"
+    core_version: "3.5.4-merge.4-local"
+    target_model: seedance_2_0
+    generation_unit: GU01
+    directing_intention: keep the action legible
+    scene_grammar: kinetic_scene
+    final_look: neutral daylight
+    active_references: []
+    start_state: door closed
+    end_state: door open
+    endpoint_purpose: resolve
+    visible_actions: [the door opens]
+    shot_or_phase_plan: [one phase]
+    camera_contract: locked wide
+    performance_contract: deliberate effort
+    sound_contract: hinge and room tone, no music
+    continuity_locks: [screen direction]
+    completed_beats: []
+    current_beats: [door_opens]
+    reserved_future_beats: []
+    hard_constraints: []
+    intentional_freedom: []
+    unresolved_material_decisions: []
+    adapter_input_status: approved
+    prompt_headings: [REFS, BEATS]

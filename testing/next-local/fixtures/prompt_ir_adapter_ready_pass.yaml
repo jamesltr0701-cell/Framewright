@@ -1,0 +1,29 @@
+kind: prompt_ir
+expected: pass
+document:
+  video_prompt_ir:
+    ir_schema_version: "1.0"
+    core_version: "3.5.4-merge.4-local"
+    target_model: seedance_2_0
+    generation_unit: GU01
+    directing_intention: hold the viewer outside the character's private decision
+    directorial_voice: null
+    scene_grammar: observational_scene
+    final_look: muted winter daylight with restrained contrast
+    active_references: []
+    start_state: the woman stands beside the unopened letter
+    end_state: the letter remains unopened and her hand has withdrawn
+    endpoint_purpose: resolve
+    visible_actions: [her hand approaches the letter, pauses, then withdraws]
+    shot_or_phase_plan: [one locked medium-wide observation]
+    camera_contract: fixed camera, no reframing
+    performance_contract: hesitation carried by breath and hand withdrawal
+    sound_contract: quiet room tone and paper contact, no music
+    continuity_locks: [letter position, winter light direction]
+    completed_beats: []
+    current_beats: [decision_refused]
+    reserved_future_beats: [letter_opened]
+    hard_constraints: [do not open the letter]
+    intentional_freedom: [minor breathing rhythm]
+    unresolved_material_decisions: []
+    adapter_input_status: approved

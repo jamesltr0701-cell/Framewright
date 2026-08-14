@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-merge.3-local"
+candidate_version: "3.5.4-merge.4-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -29,8 +29,8 @@ protected_anchors:
   - "Music remains `no_music` unless the user explicitly requests music"
   - "The storyboard recommendation does not override core one-generation-unit / one-board authority"
   - "Framewright owns compilation for every explicit Framewright request."
-  - "Core Native currently targets Seedance 2.0"
-  - "internal target-knowledge profile"
+  - "Core compiles every approved Video Prompt scope into one model-neutral `video_prompt_ir`"
+  - "Every registered target, including Seedance 2.0, uses one formal subordinate adapter."
   - "The target model selects the dialect"
   - "A Video Prompt cannot pass by claiming multiple owners"
   - "Intake Presentation Layer"
