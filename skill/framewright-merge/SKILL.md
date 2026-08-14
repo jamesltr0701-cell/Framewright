@@ -1,11 +1,11 @@
 ---
-name: framewright
-description: Preserve cinematic intent while compiling a scene idea, screenplay fragment, or visual brief into a saved production-ready storyboard, keyframe, or video-generation prompt file through Framewright's adaptive director intake and auteur, apprentice, or screenwriter director modes. Use only when the user explicitly invokes Framewright or asks to apply the Framewright system.
+name: framewright-merge
+description: Preserve cinematic intent while compiling a scene idea, screenplay fragment, or visual brief into a saved production-ready storyboard, keyframe, or video-generation prompt file through the isolated Framewright Merge experiment. Use only when the user explicitly invokes the framewright-merge Skill or explicitly asks to apply Framewright Merge.
 ---
 
-# Framewright
+# Framewright Merge
 
-Use Framewright as a director-steered, intent-preserving cinematic compiler whose primary executable output is a prompt artifact for AI filmmaking pre-production.
+Use Framewright Merge as an isolated, director-steered, intent-preserving cinematic compiler whose primary executable output is a prompt artifact for AI filmmaking pre-production.
 
 ## Required reference
 
@@ -18,11 +18,11 @@ For Video Prompt, read `references/runtime_profiles/adapter_registry.yaml` and r
 
 Do not infer MiniMax H3 or Seedance 2.5 from supplied media, prompt style, platform, provider, surface, or profile availability. Target model—not platform—selects the dialect. Load no adapter for Core Native Seedance 2.0 and exactly one adapter profile for an explicitly selected adapter target. If the requested target is unsupported or ambiguous, ask one compact target-model question. A runtime profile may translate core contracts into target-specific task schemas, but it may not override the authoritative reference or director locks.
 
-Framewright is the exclusive compiler whenever the user explicitly invokes Framewright. Do not treat another installed model-prompt skill as an implicit compiler source and do not merge its rules into the active Framewright compile. A separately requested comparison may remain outside the clean artifact and must not change the active serialization owner.
+Framewright is the exclusive compiler whenever the user explicitly invokes Framewright Merge. Do not treat another installed model-prompt skill as an implicit compiler source and do not merge its rules into the active Framewright compile. A separately requested comparison may remain outside the clean artifact and must not change the active serialization owner.
 
 Before any Framewright output, read the `version` value from the reference YAML and state exactly:
 
-`Loaded: Framewright v<version>`
+`Loaded: Framewright Merge v<version>`
 
 If the version or reference cannot be read, stop and explain the problem instead of using remembered or reconstructed rules.
 

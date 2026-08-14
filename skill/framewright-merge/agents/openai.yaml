@@ -1,0 +1,7 @@
+interface:
+  display_name: "Framewright Merge"
+  short_description: "Isolated Framewright and Seedance fusion test"
+  default_prompt: "Use $framewright-merge to review my scene and compile one isolated test artifact."
+
+policy:
+  allow_implicit_invocation: false

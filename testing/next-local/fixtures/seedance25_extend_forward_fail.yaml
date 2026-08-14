@@ -4,12 +4,12 @@ expected_errors: [extension_boundary_invalid]
 director_modes: [apprentice]
 conversation_mode_declared: true
 target_model: seedance_2_5
-serialization_owner: framewright_adapter_seedance_2_5
+serialization_owner: framewright_merge_adapter_seedance_2_5
 adapter_id: seedance_2_5
 compiler_instruction_sources:
-  - skill/framewright/SKILL.md
-  - skill/framewright/references/framewright.md
-  - skill/framewright/references/runtime_profiles/seedance_2_5.md
+  - skill/framewright-merge/SKILL.md
+  - skill/framewright-merge/references/framewright.md
+  - skill/framewright-merge/references/runtime_profiles/seedance_2_5.md
 prompt: "Extend forward from the opening."
 seedance25:
   route: extend

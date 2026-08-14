@@ -1,35 +1,33 @@
-# Framewright
+# Framewright Merge
 
-Framewright is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It turns a director's approved scene intent, decision state, and production assets into structured storyboard, keyframe, and video-generation prompts.
+Framewright Merge is the isolated local fusion experiment derived from Framewright. It preserves Framewright's director, state, and compiler ownership while testing selectively absorbed Seedance 2.0 knowledge.
 
-- Current core version: **3.5.0**
-- Release status: **stable**
-- Desktop Framewright mirror: **3.5.0**
-- GitHub `main`: **3.5.0**
+- Current merge version: **3.5.4-merge.0-local**
+- Base: **Framewright 3.5.3-local plus the reviewed Intake candidate**
+- Release status: **local experiment**
+- Global invocation: **`$framewright-merge` only**
 
 Author: **Tairan Li**
 
 ## Repository structure
 
-- [`skill/framewright/`](skill/framewright/) — installable Codex Skill
-- [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md) — current authoritative Framewright specification
-- [`skill/framewright/references/runtime_profiles/`](skill/framewright/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
+- [`skill/framewright-merge/`](skill/framewright-merge/) — installable Codex Skill
+- [`skill/framewright-merge/references/framewright.md`](skill/framewright-merge/references/framewright.md) — current authoritative Framewright specification
+- [`skill/framewright-merge/references/runtime_profiles/`](skill/framewright-merge/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
 - [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
 
-GitHub `main` is the source of truth for the synchronized stable release. Framewright 3.5.0 is the current release across the local source repository, Desktop mirror, and GitHub `main`.
+This local repository is the editable Source for `framewright-merge`. It has no publication remote and must not replace, publish to, or mutate the stable `framewright` Source.
 
 ## Install in Codex
 
-For the synchronized stable 3.5.0 release, ask Codex:
+Install the validated local package from `skill/framewright-merge/` into a separately named global `framewright-merge/` folder. Never install it over `framewright/`.
 
-> Install the Framewright skill from `https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright`
+After installation, invoke it explicitly with `$framewright-merge`.
 
-After installation, invoke it explicitly with `$framewright`.
-
-Framewright is configured for explicit invocation and one active stage at a time. The 3.5.0 release adds dependency-sensitive Adaptive Questioning, a nested Intent Ledger, causal-state and blocking readiness passes, and Semantic Preflight while preserving the existing Material Registry and stage contracts. Target-specific Video Prompt behavior is subordinate to the Core: Seedance 2.5 uses its surface-aware adapter, while the local MiniMax H3 experiment loads a separate H3 adapter only after the director explicitly selects H3. Each adapter owns only target routing and serialization; neither may override the Production Spine, director locks, sound defaults, stage, or generation-unit boundaries. A resolved Storyboard stage still generates exactly one initial board image as part of the same stage package; automatic retries, variants, Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
+Framewright Merge is configured for explicit invocation and one active stage at a time. The 3.5.0 release adds dependency-sensitive Adaptive Questioning, a nested Intent Ledger, causal-state and blocking readiness passes, and Semantic Preflight while preserving the existing Material Registry and stage contracts. Target-specific Video Prompt behavior is subordinate to the Core: Seedance 2.5 uses its surface-aware adapter, while the local MiniMax H3 experiment loads a separate H3 adapter only after the director explicitly selects H3. Each adapter owns only target routing and serialization; neither may override the Production Spine, director locks, sound defaults, stage, or generation-unit boundaries. A resolved Storyboard stage still generates exactly one initial board image as part of the same stage package; automatic retries, variants, Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 
 ## Repository policy
 

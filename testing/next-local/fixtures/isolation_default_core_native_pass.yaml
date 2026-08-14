@@ -6,9 +6,9 @@ artifact_stage: video_prompt
 requested_target_model: null
 target_model: seedance_2_0
 target_model_provenance: core_default
-serialization_owner: framewright_core_native
+serialization_owner: framewright_merge_core_native
 adapter_id: null
 compiler_instruction_sources:
-  - skill/framewright/SKILL.md
-  - skill/framewright/references/framewright.md
+  - skill/framewright-merge/SKILL.md
+  - skill/framewright-merge/references/framewright.md
 prompt: "A woman crosses the room. Quiet ventilation and synchronized footsteps; no music."

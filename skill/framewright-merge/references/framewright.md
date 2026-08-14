@@ -1,6 +1,6 @@
 ---
-project_name: "Framewright"
-version: "3.5.4-local"
+project_name: "Framewright Merge"
+version: "3.5.4-merge.0-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -30,11 +30,11 @@ scene_grammars:
   - "conversational_scene"
 ---
 
-# Framewright
+# Framewright Merge
 
 ## 1. Product Identity
 
-Framewright is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It preserves approved creative meaning while converting a director's scene intent, production assets, and decision state into one saved prompt artifact for the active stage at a time.
+Framewright Merge is an isolated experimental edition of Framewright and is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It preserves approved creative meaning while converting a director's scene intent, production assets, and decision state into one saved prompt artifact for the active stage at a time.
 
 The prompt remains a first-class production artifact and Framewright's primary executable output responsibility. It is compiled from the current approved Production Spine; it is not the source of truth and must not silently replace, expand, or contradict that decision state.
 
@@ -89,7 +89,7 @@ latest explicit user decision
 
 When a revision changes an approved material decision, update the ledger entry and its dependent Spine fields before regenerating the requested artifact. If the revision preserves a surface action but breaks the approved rationale, report the conflict assistant-facing and request a decision instead of silently overwriting it.
 
-For scopes that need continuity beyond the current turn, maintain one conditional project control file at `Framewright/outputs/[project_slug]/framewright_state.yaml`. Create or continue it only when at least one of these triggers is true:
+For scopes that need continuity beyond the current turn, maintain one conditional project control file at `Framewright-Merge/outputs/[project_slug]/framewright_state.yaml`. Create or continue it only when at least one of these triggers is true:
 
 - the project contains two or more approved generation units;
 - the same artifact enters a second material revision;
@@ -1184,11 +1184,11 @@ Core Framewright remains the highest authority for director intent, explicit loc
 
 Framewright owns compilation for every explicit Framewright request. Resolve the target model before serialization using `references/runtime_profiles/adapter_registry.yaml`, which is the single registry of supported target-model / serialization-owner pairs. The target model selects the dialect; a platform, provider, surface, filename, uploaded asset, prompt wording, or installed external skill never selects or owns serialization.
 
-Core Native currently targets Seedance 2.0 with `serialization_owner: framewright_core_native`, `adapter_id: null`, and no runtime adapter profile. Preserve Core fallback headings and contracts for this path. This is a current target mapping, not a permanent claim that Core Native can only target Seedance 2.0.
+Core Native currently targets Seedance 2.0 with `serialization_owner: framewright_merge_core_native`, `adapter_id: null`, and no runtime adapter profile. Preserve Core fallback headings and contracts for this path. This is a current target mapping, not a permanent claim that Core Native can only target Seedance 2.0.
 
-When the target model is explicitly Seedance 2.5, use `serialization_owner: framewright_adapter_seedance_2_5`, `adapter_id: seedance_2_5`, and load the complete subordinate profile at `references/runtime_profiles/seedance_2_5.md` before routing or serialization. Its UI mode and control profiles remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. The profile may translate the approved core contract into target-specific task schemas and syntax, but it may not override explicit direction or any core lock.
+When the target model is explicitly Seedance 2.5, use `serialization_owner: framewright_merge_adapter_seedance_2_5`, `adapter_id: seedance_2_5`, and load the complete subordinate profile at `references/runtime_profiles/seedance_2_5.md` before routing or serialization. Its UI mode and control profiles remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. The profile may translate the approved core contract into target-specific task schemas and syntax, but it may not override explicit direction or any core lock.
 
-When the director explicitly selects MiniMax H3, use `serialization_owner: framewright_adapter_minimax_h3`, `adapter_id: minimax_h3`, and load the complete subordinate profile at `references/runtime_profiles/minimax_h3.md` before routing or serialization. Do not infer H3 from materials, prompt wording, project history, platform, provider, surface, or adapter availability. Its H3 route, input roles, semantic labels, and prompt fields remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. If `H3` is ambiguous in context, ask one compact target-model question before loading the profile.
+When the director explicitly selects MiniMax H3, use `serialization_owner: framewright_merge_adapter_minimax_h3`, `adapter_id: minimax_h3`, and load the complete subordinate profile at `references/runtime_profiles/minimax_h3.md` before routing or serialization. Do not infer H3 from materials, prompt wording, project history, platform, provider, surface, or adapter availability. Its H3 route, input roles, semantic labels, and prompt fields remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. If `H3` is ambiguous in context, ask one compact target-model question before loading the profile.
 
 If the director requests an unregistered target model, stop before prompt compilation and ask for a supported target or an explicitly approved future adapter iteration. Do not route an unsupported model through Core Native, a platform serializer, or the nearest available adapter.
 
@@ -1345,9 +1345,9 @@ When file writing is unavailable, state the limitation and provide the prompt in
 Default paths:
 
 ```text
-Framewright/outputs/[project_slug]/[generation_unit_slug]/prompt_storyboard.txt
-Framewright/outputs/[project_slug]/[generation_unit_slug]/prompt_keyframes.txt
-Framewright/outputs/[project_slug]/[generation_unit_slug]/prompt_video.txt
+Framewright-Merge/outputs/[project_slug]/[generation_unit_slug]/prompt_storyboard.txt
+Framewright-Merge/outputs/[project_slug]/[generation_unit_slug]/prompt_keyframes.txt
+Framewright-Merge/outputs/[project_slug]/[generation_unit_slug]/prompt_video.txt
 ```
 
 Use one distinct output slug per director-declared unit.

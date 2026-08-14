@@ -7,5 +7,5 @@ artifact_stage: video_prompt
 target_model: seedance_2_0
 serialization_owner: external_seedance_skill
 adapter_id: null
-compiler_instruction_sources: [skill/framewright/SKILL.md, skill/framewright/references/framewright.md]
+compiler_instruction_sources: [skill/framewright-merge/SKILL.md, skill/framewright-merge/references/framewright.md]
 prompt: "A clean prompt with room tone and no music."

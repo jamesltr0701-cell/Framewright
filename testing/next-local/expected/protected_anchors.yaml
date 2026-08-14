@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-local"
+candidate_version: "3.5.4-merge.0-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
