@@ -154,8 +154,18 @@ def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str,
             owners.append(owner)
         adapter_id = record.get("adapter_id")
         profile = record.get("profile")
+        core_native_profile = record.get("core_native_profile")
         if (adapter_id is None) != (profile is None):
             errors.append(issue("adapter_registry_profile_pair_invalid", "Adapter ID and profile must both be null or both be scalar values.", target_model=target_model))
+        if adapter_id is None:
+            if not isinstance(core_native_profile, str) or not core_native_profile:
+                errors.append(issue("core_native_profile_missing", "Core Native target requires one registered internal knowledge profile.", target_model=target_model))
+            else:
+                resolved_native = (repository_root / core_native_profile).resolve()
+                if (resolved_native != package_root and package_root not in resolved_native.parents) or not resolved_native.is_file():
+                    errors.append(issue("core_native_profile_path_invalid", "Registered Core Native profile is missing or outside the Framewright Merge package.", target_model=target_model, profile=core_native_profile))
+        elif core_native_profile is not None:
+            errors.append(issue("adapter_core_native_profile_forbidden", "Adapter targets may not load a Core Native profile.", target_model=target_model))
         if adapter_id is not None:
             if not isinstance(adapter_id, str) or not adapter_id:
                 errors.append(issue("adapter_registry_id_invalid", "Adapter ID must be a non-empty scalar.", target_model=target_model))
@@ -197,6 +207,7 @@ def ownership_validation_required(data: dict[str, Any]) -> bool:
             "adapter_id",
             "compiler_instruction_sources",
             "adapter_profile_contract",
+            "core_native_profile_contract",
             "seedance25",
             "minimax_h3",
         )
@@ -258,13 +269,18 @@ def validate_serialization_ownership(
         errors.append(issue("target_owner_mismatch", "Target model and serialization owner do not match the registry.", target_model=target_model, serialization_owner=owner))
 
     expected_adapter = registered.get("adapter_id") if isinstance(registered, dict) else None
+    expected_native_profile = registered.get("core_native_profile") if isinstance(registered, dict) else None
     actual_adapter = data.get("adapter_id")
     if expected_adapter is None:
         if actual_adapter is not None:
             errors.append(issue("core_native_adapter_forbidden", "Core Native must not claim an adapter ID."))
         if data.get("adapter_profile_contract") is not None or "seedance25" in data or "minimax_h3" in data:
             errors.append(issue("core_native_profile_forbidden", "Core Native must not claim an adapter profile contract."))
+        if data.get("core_native_profile_contract") not in (None, expected_native_profile):
+            errors.append(issue("core_native_profile_contract_mismatch", "Core Native profile contract does not match the registered target profile."))
     else:
+        if data.get("core_native_profile_contract") is not None:
+            errors.append(issue("adapter_core_native_profile_forbidden", "Adapter-owned serialization may not claim a Core Native profile."))
         if actual_adapter is None:
             errors.append(issue("adapter_id_missing", "Adapter-owned serialization requires the registered adapter ID.", expected=expected_adapter))
         elif actual_adapter != expected_adapter:
@@ -295,10 +311,14 @@ def validate_serialization_ownership(
         allowed_sources = set(required_sources)
         allowed_sources.add("skill/framewright-merge/references/runtime_profiles/adapter_registry.yaml")
         profile = registered.get("profile") if isinstance(registered, dict) else None
+        native_profile = registered.get("core_native_profile") if isinstance(registered, dict) else None
         if isinstance(profile, str):
             profile_source = registered_profile_source(profile)
             required_sources.add(profile_source)
             allowed_sources.add(profile_source)
+        if isinstance(native_profile, str):
+            required_sources.add(native_profile)
+            allowed_sources.add(native_profile)
         missing_sources = sorted(required_sources - set(sources))
         foreign_sources = sorted(set(sources) - allowed_sources)
         if missing_sources:
@@ -964,8 +984,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.0-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.0-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.1-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.1-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
@@ -1028,6 +1048,8 @@ def validate_video_prompt_path(
         sources = list(registry_data.get("compiler_instruction_sources", []) or [])
         if isinstance(record, dict) and isinstance(record.get("profile"), str):
             sources.append(registered_profile_source(record["profile"]))
+        if isinstance(record, dict) and isinstance(record.get("core_native_profile"), str):
+            sources.append(record["core_native_profile"])
     data: dict[str, Any] = {
         "artifact_stage": "video_prompt",
         "target_model": target_model,

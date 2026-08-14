@@ -9,6 +9,7 @@ adapter_id: null
 compiler_instruction_sources:
   - skill/framewright-merge/SKILL.md
   - skill/framewright-merge/references/framewright.md
+  - skill/framewright-merge/references/core_native_profiles/seedance_2_0.md
 prompt: |-
   [MODE: APPRENTICE]
   A woman crosses the room.

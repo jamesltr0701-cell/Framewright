@@ -9,5 +9,6 @@ adapter_id: null
 compiler_instruction_sources:
   - skill/framewright-merge/SKILL.md
   - skill/framewright-merge/references/framewright.md
+  - skill/framewright-merge/references/core_native_profiles/seedance_2_0.md
 assistant_execution_note: "Operator may use LibTV after validation; the provider remains execution-only."
 prompt: "The mechanic closes the hood and wipes one hand on a cloth. Workshop ambience and a synchronized latch impact; no music."

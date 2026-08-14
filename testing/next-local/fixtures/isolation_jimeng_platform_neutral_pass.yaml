@@ -9,5 +9,6 @@ adapter_id: null
 compiler_instruction_sources:
   - skill/framewright-merge/SKILL.md
   - skill/framewright-merge/references/framewright.md
+  - skill/framewright-merge/references/core_native_profiles/seedance_2_0.md
 assistant_execution_note: "Operator may paste the validated clean prompt into Jimeng; the surface does not change its dialect."
 prompt: "A child releases a paper boat into the gutter stream. Rain ambience and water movement; no music."

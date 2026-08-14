@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.0-local"
+version: "3.5.4-merge.1-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -1184,7 +1184,7 @@ Core Framewright remains the highest authority for director intent, explicit loc
 
 Framewright owns compilation for every explicit Framewright request. Resolve the target model before serialization using `references/runtime_profiles/adapter_registry.yaml`, which is the single registry of supported target-model / serialization-owner pairs. The target model selects the dialect; a platform, provider, surface, filename, uploaded asset, prompt wording, or installed external skill never selects or owns serialization.
 
-Core Native currently targets Seedance 2.0 with `serialization_owner: framewright_merge_core_native`, `adapter_id: null`, and no runtime adapter profile. Preserve Core fallback headings and contracts for this path. This is a current target mapping, not a permanent claim that Core Native can only target Seedance 2.0.
+Core Native currently targets Seedance 2.0 with `serialization_owner: framewright_merge_core_native`, `adapter_id: null`, and the internal target-knowledge profile at `references/core_native_profiles/seedance_2_0.md`. Read that profile completely for this target. It is not an adapter, serialization owner, second compiler, or platform contract; it may qualify feasibility and expression only after Core has approved the Production Spine. Preserve Core fallback headings and contracts for this path. This is a current target mapping, not a permanent claim that Core Native can only target Seedance 2.0.
 
 When the target model is explicitly Seedance 2.5, use `serialization_owner: framewright_merge_adapter_seedance_2_5`, `adapter_id: seedance_2_5`, and load the complete subordinate profile at `references/runtime_profiles/seedance_2_5.md` before routing or serialization. Its UI mode and control profiles remain inside the Video Prompt stage and may not change director mode, scene grammar, the active stage, or a generation-unit boundary. The profile may translate the approved core contract into target-specific task schemas and syntax, but it may not override explicit direction or any core lock.
 
@@ -1194,7 +1194,7 @@ If the director requests an unregistered target model, stop before prompt compil
 
 The clean Video Prompt must not expose `target_model`, `serialization_owner`, `adapter_id`, `compiler_instruction_sources`, registry records, platform setup, or compiler provenance. Keep those fields in the internal compile trace and Run Card only. Before saving, validate the actual prompt file with the ownership-aware validator using the resolved target and scalar owner. A Video Prompt cannot pass by claiming multiple owners, a route name as owner, an external skill as owner, or a platform-specific serializer.
 
-Load exactly one target runtime profile for one model-facing prompt. If the user requests a comparison across target models, compile separate candidate prompts from the same approved Core Spine and keep their adapter traces distinct; do not combine two serialization schemas into one prompt.
+Load exactly one target profile for one model-facing prompt: the registered internal Core Native profile for Seedance 2.0 or one registered adapter profile for an adapter target. If the user requests a comparison across target models, compile separate candidate prompts from the same approved Core Spine and keep their target traces distinct; do not combine two target profiles or serialization schemas into one prompt.
 
 The router may recommend a Seedance task and explain the reason assistant-facing; the director may override it. First-Frame Continuation, First and Last Frames, and Extend remain distinct authority contracts. Obey explicit first / last / both / Extend assignments; if the assignment is ambiguous, return to the Intake Hard Stop and ask before freezing the Spine.
 
