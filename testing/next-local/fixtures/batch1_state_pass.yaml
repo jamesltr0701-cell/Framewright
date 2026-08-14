@@ -30,6 +30,29 @@ document:
     cross_gu_continuity: {GU01_to_GU02: running east, camera retreating west}
     selected_generated_takes:
       - take_id: GU01_take_03
+        source_generation_unit: GU01
         director_selected: true
+        continuity_status: accepted
+        observation_provenance: observed
+        observation_confidence: high
+        requires_confirmation: false
+        planned_end_state: {subject_position: doorway, motion: slowing}
+        accepted_actual_end_state: {subject_position: doorway, motion: running east}
+        completed_beats: [beat_01]
+        reserved_future_beats: [beat_03]
+    beat_scope:
+      completed: [beat_01]
+      current_unit: [beat_02]
+      reserved_future: [beat_03]
+    continuation_contracts:
+      - continuation_id: CONT-001
+        continuation_type: seamless_extension
+        source_take_id: GU01_take_03
+        source_state: {subject_position: doorway, motion: running east}
+        planned_start_state: {subject_position: doorway, motion: running east}
+        start_state_reconciled: true
+        open_motion_state: true
+        explicit_cut: false
+        camera_reset: false
     last_approved_revision: 2
     last_updated: "2026-08-13T12:00:00+08:00"

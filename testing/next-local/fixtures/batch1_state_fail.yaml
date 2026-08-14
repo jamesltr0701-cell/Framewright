@@ -33,6 +33,19 @@ document:
     cross_gu_continuity: {}
     selected_generated_takes:
       - take_id: GU01_take_01
+        source_generation_unit: GU01
         director_selected: false
+        continuity_status: accepted
+        observation_provenance: observed
+        observation_confidence: high
+        requires_confirmation: false
+        accepted_actual_end_state: {subject_position: doorway, motion: stopped}
+        completed_beats: []
+        reserved_future_beats: []
+    beat_scope:
+      completed: []
+      current_unit: [beat_01]
+      reserved_future: []
+    continuation_contracts: []
     last_approved_revision: 2
     last_updated: "2026-08-13T12:00:00+08:00"

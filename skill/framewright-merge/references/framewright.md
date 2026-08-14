@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.1-local"
+version: "3.5.4-merge.2-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -117,11 +117,23 @@ framewright_state:
   active_material_roles:
   cross_gu_continuity:
   selected_generated_takes:
+  beat_scope:
+  continuation_contracts:
   last_approved_revision:
   last_updated:
 ```
 
-Each tracked artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one revision may be active for the same artifact identity; replaced revisions move to `superseded_artifacts` and retain their provenance. Classify a material change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director may enter `selected_generated_takes` or become continuity truth. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
+Each tracked artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one revision may be active for the same artifact identity; replaced revisions move to `superseded_artifacts` and retain their provenance. Classify a material change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director and accepted for continuity may enter `selected_generated_takes` or become continuity truth. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
+
+### Selected-Take Canon and Continuation Reconciliation
+
+A selected take becomes continuity canon only when its record identifies the source generation unit, declares `director_selected: true` and `continuity_status: accepted`, and records the accepted actual end state. The accepted actual end state outranks the planned end state for every downstream continuation. Keep the planned state for provenance; never rewrite observed footage to make it agree with the plan.
+
+Record how the take state was obtained. `observation_provenance: observed` means Framewright directly inspected the accepted result. `observation_provenance: reported` means the state came from the director or another uninspected report and must carry `observation_confidence: low` plus `requires_confirmation: true` until verified. Reported state may support a provisional continuation but must never be presented as inspected fact.
+
+Maintain disjoint beat scopes in `beat_scope.completed`, `beat_scope.current_unit`, and `beat_scope.reserved_future`. Completed beats must not replay, and beats reserved for a future unit must not leak into the current prompt. A selected take may additionally state the completed and reserved beat IDs it actually establishes; those values must not overlap.
+
+Every downstream handoff uses one explicit continuation type: `seamless_extension`, `next_shot`, `bridge`, `tail_repair`, or `re_anchor`. Its source take must be continuity canon, its `source_state` must equal that take's accepted actual end state, and its planned start must be marked `start_state_reconciled: true`. `seamless_extension` requires an open motion state and forbids a cut or camera reset. A `next_shot` may reset the camera only when the contract declares an explicit cut.
 
 Do not carry stage choice, reference authority, generation-unit boundaries, or unstated assumptions into a different scope.
 
@@ -1049,7 +1061,9 @@ For MiniMax H3, the loaded profile owns its semantic label system (`<Subject N>`
 
 Activate `first_frame_reference` only when the director explicitly requests continuation of the same shot using a prior final frame.
 
-It controls only the next unit's initial composition, identity, pose, object state, environment state, and camera-subject relationship. It does not silently control later motion, rhythm, action path, camera path, or global style.
+Start from the accepted actual end state of the director-selected continuity take, not merely the previous prompt's planned end state. Reconcile any observed difference before compilation and exclude beats already completed by the accepted take.
+
+The first-frame reference controls only the next unit's initial composition, identity, pose, object state, environment state, and camera-subject relationship. It does not silently control later motion, rhythm, action path, camera path, or global style.
 
 The continuation prompt must remain independently executable and must not imply a cut when the director intends one extended shot.
 
@@ -1211,6 +1225,8 @@ Every video prompt must:
 - exclude literal Director Mode labels and other compiler metadata;
 - include active runtime references only;
 - state final visual style through executable carriers;
+- begin from the accepted actual state of the selected continuity take when a continuation is active;
+- exclude completed beats and beats reserved for future generation units;
 - preserve start state, end state, and continuity;
 - preserve relevant operator body path, lens target, and cross-unit motion-state handoff without forcing embodied-camera detail into stable shots;
 - preserve production-critical physical causality and intermediate topology without expanding ordinary actions;
@@ -1401,6 +1417,10 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - The Production Spine is current and frozen.
 - The Intent Ledger is nested in that Spine; its material entries have one owner, materially important decisions preserve rationale, and every derived question, assumption, trace, delta, or revision-conflict view agrees with it.
 - When a state trigger is active, `framewright_state.yaml` matches the latest explicit decision, current active artifacts, approved generation units, selected takes, and material roles; exactly one revision is active per artifact identity and every replaced revision remains superseded rather than active.
+- Every continuity-canon take records accepted status, source generation unit, observation provenance, confidence, confirmation need, and accepted actual end state; reported but uninspected state remains low-confidence and visibly provisional.
+- Every continuation starts from the accepted actual state rather than a superseded planned state, and its source take is the selected continuity canon.
+- Completed, current-unit, and reserved-future beat scopes are disjoint; completed beats do not replay and future beats do not leak early.
+- Seamless extensions preserve open motion without a cut or camera reset; next-shot camera resets declare an explicit cut.
 - Material causal state and blocking readiness were resolved before the Committed Shot / Phase Spine froze; no parallel world, blocking, capture-logic, or viewer-relationship registry exists.
 - Every compiler-inferred shot passes the Capture Necessity Test without creating a shot quota or altering AUTEUR locks.
 - Exactly one Director Mode is resolved internally and declared to the user; no clean Prompt contains its literal label.

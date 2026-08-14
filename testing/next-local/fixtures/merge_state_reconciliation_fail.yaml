@@ -1,0 +1,51 @@
+kind: state
+expected: fail
+expected_errors:
+  - reported_take_overclaimed
+  - beat_scope_overlap
+  - continuation_source_state_mismatch
+  - seamless_open_motion_missing
+  - seamless_reset_forbidden
+document:
+  framewright_state:
+    schema_version: "1.1"
+    core_version: "3.5.4-merge.2-local"
+    project_slug: bad_reconciliation
+    current_scope: continuation
+    active_stage: video_prompt
+    director_mode: apprentice
+    approved_generation_units: [GU01, GU02]
+    active_artifacts: []
+    superseded_artifacts: []
+    active_intent_entries: []
+    intentional_freedom: []
+    unresolved_material_decisions: []
+    active_material_roles: []
+    cross_gu_continuity: {}
+    selected_generated_takes:
+      - take_id: GU01_take_bad
+        source_generation_unit: GU01
+        director_selected: true
+        continuity_status: accepted
+        observation_provenance: reported
+        observation_confidence: high
+        requires_confirmation: false
+        accepted_actual_end_state: {pose: standing, motion: running}
+        completed_beats: [beat_01]
+        reserved_future_beats: [beat_03]
+    beat_scope:
+      completed: [beat_01]
+      current_unit: [beat_01, beat_02]
+      reserved_future: [beat_03]
+    continuation_contracts:
+      - continuation_id: CONT-BAD-01
+        continuation_type: seamless_extension
+        source_take_id: GU01_take_bad
+        source_state: {pose: crouched, motion: stopped}
+        planned_start_state: {pose: standing, motion: running}
+        start_state_reconciled: true
+        open_motion_state: false
+        explicit_cut: true
+        camera_reset: true
+    last_approved_revision: 1
+    last_updated: "2026-08-14T12:00:00+08:00"

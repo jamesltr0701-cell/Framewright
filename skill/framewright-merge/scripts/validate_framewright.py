@@ -52,6 +52,8 @@ STATE_REQUIRED = (
     "active_material_roles",
     "cross_gu_continuity",
     "selected_generated_takes",
+    "beat_scope",
+    "continuation_contracts",
     "last_approved_revision",
     "last_updated",
 )
@@ -70,6 +72,9 @@ CHANGE_CLASSES = {
     "model_workaround",
 }
 RISKS = {"low", "medium", "high"}
+OBSERVATION_PROVENANCE = {"observed", "reported"}
+OBSERVATION_CONFIDENCE = {"low", "medium", "high"}
+CONTINUATION_TYPES = {"seamless_extension", "next_shot", "bridge", "tail_repair", "re_anchor"}
 SEEDANCE_ROUTES = {"omni_reference", "smart_edit", "long_video", "first_last_frames", "extend"}
 SEEDANCE_CONTROLS = {"multi_keyframe", "blockout_coarse", "blockout_fine", "seamless_transition"}
 H3_ROUTES = {"t2va", "i2va", "fl2va", "l2va", "ref2va"}
@@ -451,9 +456,83 @@ def validate_state_data(
     if overlap:
         errors.append(issue("active_superseded_overlap", "The same artifact revision is both active and superseded.", values=sorted(overlap)))
 
-    for take in state.get("selected_generated_takes", []) or []:
-        if not isinstance(take, dict) or take.get("director_selected") is not True:
+    selected_takes = state.get("selected_generated_takes", []) or []
+    if not isinstance(selected_takes, list):
+        errors.append(issue("selected_takes_invalid", "Selected generated takes must be a list."))
+        selected_takes = []
+    canon_by_id: dict[str, dict[str, Any]] = {}
+    for index, take in enumerate(selected_takes):
+        if not isinstance(take, dict):
+            errors.append(issue("selected_take_invalid", "Selected generated take must be a mapping.", index=index))
+            continue
+        if take.get("director_selected") is not True:
             errors.append(issue("take_not_director_selected", "Only a director-selected generated take may become continuity truth."))
+        take_id = take.get("take_id")
+        source_unit = take.get("source_generation_unit")
+        if not isinstance(take_id, str) or not take_id or not isinstance(source_unit, str) or not source_unit:
+            errors.append(issue("selected_take_identity_missing", "Continuity-canon take requires take ID and source generation unit.", index=index))
+        if take.get("continuity_status") != "accepted":
+            errors.append(issue("selected_take_not_accepted", "Continuity-canon take must have accepted continuity status.", take_id=take_id))
+        provenance = take.get("observation_provenance")
+        confidence = take.get("observation_confidence")
+        confirmation = take.get("requires_confirmation")
+        if provenance not in OBSERVATION_PROVENANCE or confidence not in OBSERVATION_CONFIDENCE or not isinstance(confirmation, bool):
+            errors.append(issue("take_observation_contract_invalid", "Selected take requires valid provenance, confidence, and confirmation fields.", take_id=take_id))
+        if provenance == "reported" and (confidence != "low" or confirmation is not True):
+            errors.append(issue("reported_take_overclaimed", "Reported, uninspected take state must remain low-confidence and require confirmation.", take_id=take_id))
+        actual_end_state = take.get("accepted_actual_end_state")
+        if not isinstance(actual_end_state, dict) or not actual_end_state:
+            errors.append(issue("accepted_end_state_missing", "Selected take requires a non-empty accepted actual end state.", take_id=take_id))
+        completed = set(take.get("completed_beats", []) or [])
+        reserved = set(take.get("reserved_future_beats", []) or [])
+        if completed & reserved:
+            errors.append(issue("selected_take_beat_overlap", "Selected take cannot complete and reserve the same beat.", take_id=take_id, beats=sorted(completed & reserved)))
+        if isinstance(take_id, str) and take_id:
+            canon_by_id[take_id] = take
+
+    beat_scope = state.get("beat_scope")
+    if not isinstance(beat_scope, dict):
+        errors.append(issue("beat_scope_invalid", "Beat scope must be a mapping."))
+    else:
+        scopes: dict[str, set[Any]] = {}
+        for key in ("completed", "current_unit", "reserved_future"):
+            values = beat_scope.get(key)
+            if not isinstance(values, list):
+                errors.append(issue("beat_scope_invalid", "Each beat scope must be a list.", key=key))
+                scopes[key] = set()
+            else:
+                scopes[key] = set(values)
+        overlaps = (scopes["completed"] & scopes["current_unit"]) | (scopes["completed"] & scopes["reserved_future"]) | (scopes["current_unit"] & scopes["reserved_future"])
+        if overlaps:
+            errors.append(issue("beat_scope_overlap", "Completed, current-unit, and reserved-future beat scopes must be disjoint.", beats=sorted(overlaps)))
+
+    continuations = state.get("continuation_contracts", []) or []
+    if not isinstance(continuations, list):
+        errors.append(issue("continuation_contracts_invalid", "Continuation contracts must be a list."))
+        continuations = []
+    for index, contract in enumerate(continuations):
+        if not isinstance(contract, dict):
+            errors.append(issue("continuation_contract_invalid", "Continuation contract must be a mapping.", index=index))
+            continue
+        contract_id = contract.get("continuation_id")
+        continuation_type = contract.get("continuation_type")
+        if not isinstance(contract_id, str) or not contract_id or continuation_type not in CONTINUATION_TYPES:
+            errors.append(issue("continuation_identity_invalid", "Continuation requires an ID and supported type.", index=index))
+        source_take_id = contract.get("source_take_id")
+        source_take = canon_by_id.get(str(source_take_id))
+        if source_take is None or source_take.get("director_selected") is not True or source_take.get("continuity_status") != "accepted":
+            errors.append(issue("continuation_source_not_canon", "Continuation source must be the selected accepted continuity take.", source_take_id=source_take_id))
+        elif contract.get("source_state") != source_take.get("accepted_actual_end_state"):
+            errors.append(issue("continuation_source_state_mismatch", "Continuation source state must match the selected take's accepted actual end state.", source_take_id=source_take_id))
+        if not isinstance(contract.get("planned_start_state"), dict) or contract.get("start_state_reconciled") is not True:
+            errors.append(issue("continuation_start_unreconciled", "Continuation requires a planned start state reconciled to canon.", continuation_id=contract_id))
+        if continuation_type == "seamless_extension":
+            if contract.get("open_motion_state") is not True:
+                errors.append(issue("seamless_open_motion_missing", "Seamless extension requires an open motion state.", continuation_id=contract_id))
+            if contract.get("explicit_cut") is True or contract.get("camera_reset") is True:
+                errors.append(issue("seamless_reset_forbidden", "Seamless extension forbids cuts and camera resets.", continuation_id=contract_id))
+        if continuation_type == "next_shot" and contract.get("camera_reset") is True and contract.get("explicit_cut") is not True:
+            errors.append(issue("next_shot_reset_requires_cut", "Next-shot camera reset requires an explicit cut.", continuation_id=contract_id))
     return errors
 
 
@@ -984,8 +1063,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.1-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.1-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.2-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.2-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
