@@ -112,6 +112,13 @@ H3_ROUTES = {"t2va", "i2va", "fl2va", "l2va", "ref2va"}
 H3_API_ROLES = {"first_frame", "last_frame", "reference_image", "reference_video", "reference_audio"}
 H3_VISIBLE_RELATIONSHIPS = {"fully_preserved", "partially_preserved", "attribute_transfer", "weak_reference"}
 H3_AUDIO_RELATIONSHIPS = {"fully_copy", "partially_copy", "reference", "weak_reference"}
+DRAMATIC_LENSES = {
+    "turn_or_progression",
+    "objective_obstacle_tactic",
+    "subtext_contradiction",
+    "power_or_information_change",
+}
+INSTRUMENT_RELATIONSHIPS = {"support", "counterpoint", "neutral"}
 DEFAULT_REGISTRY = (
     Path(__file__).resolve().parent.parent
     / "references"
@@ -965,6 +972,36 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         if not carriers:
             errors.append(issue("observable_intent_orphan", "A material abstract intent has no observable carrier."))
 
+    direction = data.get("directing_intention_contract")
+    if direction is not None:
+        if not isinstance(direction, dict) or not direction.get("statement") or not direction.get("source"):
+            errors.append(issue("directing_intention_invalid", "Directing intention requires one functional statement and source."))
+        else:
+            lenses = direction.get("dramatic_lenses", []) or []
+            if not isinstance(lenses, list) or any(value not in DRAMATIC_LENSES for value in lenses):
+                errors.append(issue("dramatic_lens_invalid", "Dramatic lenses must be selective registered lenses."))
+            if direction.get("non_narrative") is True and direction.get("psychology_forced") is True:
+                errors.append(issue("non_narrative_psychology_forced", "Non-narrative work may not be forced into psychological story logic."))
+            instruments = direction.get("instrument_coherence", {})
+            if not isinstance(instruments, dict) or not instruments:
+                errors.append(issue("instrument_coherence_missing", "Material directing intention requires an instrument-coherence review."))
+            else:
+                for instrument, record in instruments.items():
+                    if not isinstance(record, dict) or record.get("relationship") not in INSTRUMENT_RELATIONSHIPS:
+                        errors.append(issue("instrument_relationship_invalid", "Each active instrument must support, counterpoint, or remain neutral.", instrument=instrument))
+                    elif record.get("relationship") == "counterpoint" and not record.get("function"):
+                        errors.append(issue("instrument_counterpoint_unmotivated", "A counterpoint instrument requires a stated function.", instrument=instrument))
+
+    for review in data.get("default_solution_review", []) or []:
+        if not isinstance(review, dict) or any(
+            not review.get(key)
+            for key in ("tempting_default", "why_it_weakens_this_specific_scene", "chosen_replacement", "replacement_carrier")
+        ):
+            errors.append(issue("default_solution_review_incomplete", "A default review requires a scene-specific weakness and executable replacement."))
+            continue
+        if review.get("director_locked") is True and review.get("rejected") is True:
+            errors.append(issue("auteur_locked_default_rejected", "A director-locked conventional choice may not be rejected merely as a default."))
+
     for beat in data.get("performance_beats", []) or []:
         if not isinstance(beat, dict):
             errors.append(issue("performance_beat_invalid", "Performance beat must be a mapping."))
@@ -1183,8 +1220,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.4-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.4-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.5-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.5-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):

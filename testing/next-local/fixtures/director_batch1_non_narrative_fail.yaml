@@ -1,0 +1,15 @@
+kind: compile_trace
+expected: fail
+expected_errors: [non_narrative_psychology_forced]
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "The product rotates against a clean field. Motor hum; no music."
+directing_intention_contract:
+  statement: reveal the material finish clearly
+  source: user_explicit
+  dramatic_lenses: []
+  non_narrative: true
+  psychology_forced: true
+  instrument_coherence:
+    light: {relationship: support}
+    camera: {relationship: neutral}

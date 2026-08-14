@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.4-local"
+version: "3.5.4-merge.5-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -373,6 +373,7 @@ After resolving director mode and scene grammar, establish one internal scene-le
 
 ```yaml
 visual_strategy:
+  directing_intention:
   dramatic_alignment:
   viewer_knowledge:
   spatial_pressure:
@@ -382,9 +383,37 @@ visual_strategy:
   camera_progression:
   rupture_point:
   production_feasibility:
+  dramatic_lenses:
+  default_solution_review:
+  instrument_coherence:
 ```
 
 Visual Strategy owns the scene-level camera premise, dominant rule, progression, and any motivated rupture. It remains internal unless translated into concrete composition, viewpoint, action, blocking, or camera carriers. The Production Spine's `camera_logic` is a derived executable summary and must not rewrite the approved Visual Strategy.
+
+`directing_intention` is one concise statement of what viewer experience or dramatic relationship the scene's execution must create. Use an explicit user intention when available; otherwise infer it only within the current Director Mode and record the source and rationale in the Intent Ledger. It is a coordination constraint, not a slogan, genre label, plot summary, compulsory theme, or license to overwrite AUTEUR choices.
+
+Apply only dramatic lenses that materially sharpen this scene:
+
+- `turn_or_progression`: what changes, accumulates, reverses, or deliberately remains unresolved;
+- `objective_obstacle_tactic`: what playable pursuit, resistance, or adjustment organizes behavior;
+- `subtext_contradiction`: what visible behavior or sound carries a meaningful gap between stated and enacted intent;
+- `power_or_information_change`: what changes who controls space, attention, knowledge, or choice.
+
+Reuse `viewer_knowledge`, `camera_attitude`, and the existing camera-agency contracts for point of view. Do not force a turn, psychology, objective, obstacle, subtext, or power contest onto observational, ritual, landscape, process, product, abstract, or deliberately non-narrative work. A lens that does not change an executable choice stays omitted.
+
+For unlocked or compiler-inferred craft, run an internal `Default Solution Review` only when a familiar answer is tempting:
+
+```yaml
+default_solution_review:
+  - tempting_default:
+    why_it_weakens_this_specific_scene:
+    chosen_replacement:
+    replacement_carrier:
+```
+
+Reject a default only for a scene-specific reason and only when the replacement has a visible, audible, spatial, temporal, or performance carrier. Never reject an AUTEUR-locked conventional choice merely because it is conventional. Serialize only the chosen positive carrier, never the critique or rejected option.
+
+Then run the `Instrument Coherence Test` across the instruments actually in play: camera, blocking, light, performance, sound, rhythm, and cut. Each active instrument must support the directing intention, deliberately counterpoint it for a stated function, or remain neutral so another instrument can carry the work. Coherence is not sameness: a motivated counterpoint may be the strongest choice. Do not invent work for an otherwise irrelevant instrument.
 
 Mode authority:
 
@@ -397,6 +426,8 @@ For inferred or improved structure, run these compact pre-save tests:
 - `Scene-Level Camera Premise Test`: the scene has one explainable viewer relationship and compositional rule.
 - `Default Coverage Substitution Test`: neutral wide / medium / close coverage cannot replace the chosen progression without losing meaning.
 - `Repetition and Rupture Test`: repetition is motivated, and any exception has a specific dramatic or informational job.
+- `Directing Intention Test`: the scene has one functional viewer-experience aim, and every material inferred choice either supports it, deliberately counterpoints it, or stays neutral.
+- `Anti-Default Test`: any rejected familiar solution has a scene-specific weakness and an executable positive replacement; director-locked convention remains protected.
 - `Visual Sentence Test`: adjacent unlocked shots develop knowledge, pressure, space, action, or performance rather than merely vary angle.
 - `Function-Label Laundering Test`: a function label cannot justify a shot whose actual framing and visible content do not perform that function.
 - `Reference Pose Contamination Test`: identity or style references do not silently dictate pose, camera, crop, or composition.
@@ -1395,6 +1426,9 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - No hidden batch or paired-output behavior is active.
 - Director mode and scene grammar are resolved.
 - Visual Strategy is resolved within the selected director mode's authority; AUTEUR locks remain protective, APPRENTICE additions derive from existing shot intent, and SCREENWRITER structure begins from an explainable camera premise rather than generic coverage.
+- Directing intention is functional rather than decorative; selective dramatic lenses are used only when they change execution, and non-narrative work is not forced into psychological story logic.
+- Any Default Solution Review protects AUTEUR locks, identifies a scene-specific weakness, and sends only an executable positive replacement into the artifact.
+- Active camera, blocking, light, performance, sound, rhythm, and cut choices pass the Instrument Coherence Test by supporting, purposefully counterpointing, or remaining neutral to the directing intention.
 - `camera_logic` is derived from the approved Visual Strategy and does not rewrite it.
 - Applicable Scene-Level Camera Premise, Default Coverage Substitution, Repetition and Rupture, Visual Sentence, Function-Label Laundering, and Reference Pose Contamination tests pass without angle or movement quotas.
 - Explicit user structure is preserved.

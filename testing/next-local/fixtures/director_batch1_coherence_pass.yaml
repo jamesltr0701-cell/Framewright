@@ -1,0 +1,20 @@
+kind: compile_trace
+expected: pass
+director_modes: [screenwriter]
+conversation_mode_declared: true
+prompt: "The camera remains outside the doorway while she hides the letter; warm room sound continues without music."
+directing_intention_contract:
+  statement: keep the viewer outside the character's private choice
+  source: safe_execution_inference
+  dramatic_lenses: [subtext_contradiction, power_or_information_change]
+  non_narrative: false
+  instrument_coherence:
+    camera: {relationship: support}
+    blocking: {relationship: support}
+    light: {relationship: neutral}
+    sound: {relationship: counterpoint, function: ordinary warmth continues against her secrecy}
+default_solution_review:
+  - tempting_default: cut inside for a close-up of the letter
+    why_it_weakens_this_specific_scene: it gives the viewer privileged access too early
+    chosen_replacement: remain outside the doorway
+    replacement_carrier: doorframe occlusion and fixed camera position

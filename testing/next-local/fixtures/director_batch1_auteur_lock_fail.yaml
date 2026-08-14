@@ -1,0 +1,13 @@
+kind: compile_trace
+expected: fail
+expected_errors: [auteur_locked_default_rejected]
+director_modes: [auteur]
+conversation_mode_declared: true
+prompt: "A conventional locked close-up holds on her face. Quiet room tone; no music."
+default_solution_review:
+  - tempting_default: locked close-up
+    why_it_weakens_this_specific_scene: it is conventional
+    chosen_replacement: circling handheld shot
+    replacement_carrier: continuous camera orbit
+    director_locked: true
+    rejected: true
