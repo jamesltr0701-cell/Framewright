@@ -607,6 +607,38 @@ def validate_state_data(
     return errors
 
 
+def validate_seedance20(data: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(data, dict):
+        return [issue("seedance20_contract_invalid", "Seedance 2.0 qualification data must be a mapping.")]
+
+    focus = data.get("focus_hierarchy")
+    if isinstance(focus, dict) and focus.get("required") is True:
+        if not focus.get("focal_action") or not focus.get("background_motion"):
+            errors.append(issue("seedance20_focus_hierarchy_incomplete", "Required focus hierarchy needs one focal action and simple persistent background motion."))
+        if focus.get("fragile_contact") is True and focus.get("warning_issued") is not True:
+            errors.append(issue("seedance20_fragile_contact_warning_missing", "Fragile multi-character contact requires an assistant-facing warning."))
+    if isinstance(focus, dict) and focus.get("forced_exact_three_tiers") is True:
+        errors.append(issue("seedance20_focus_quota_forbidden", "Seedance focus hierarchy may not force an exact three-tier quota."))
+
+    source_look = data.get("source_look")
+    if isinstance(source_look, dict) and source_look.get("adapter_owns_artistic_lock") is True:
+        errors.append(issue("seedance20_source_look_authority_leak", "Artistic source-look locks remain Core-owned."))
+
+    evidence = data.get("audio_lipsync_evidence")
+    if isinstance(evidence, dict) and evidence.get("active_surface_verified") is not True and evidence.get("definite_claims"):
+        errors.append(issue("seedance20_unverified_audio_claim", "Unverified Seedance audio or lip-sync facts must remain unknown."))
+
+    overload = data.get("overload")
+    if isinstance(overload, dict):
+        active_systems = overload.get("active_systems", []) or []
+        if len(active_systems) >= 4 and overload.get("warning_issued") is not True:
+            errors.append(issue("seedance20_overload_warning_missing", "Competing fragile systems require an assistant-facing overload warning."))
+        if overload.get("creative_simplification_applied") is True and overload.get("director_approved") is not True:
+            errors.append(issue("seedance20_unapproved_simplification", "An overload warning does not authorize creative simplification."))
+    return errors
+
+
 def validate_seedance25(data: Any, prompt: str) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     if not isinstance(data, dict):
@@ -964,6 +996,10 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     if seedance is not None:
         errors.extend(validate_seedance25(seedance, prompt if isinstance(prompt, str) else ""))
 
+    seedance20 = data.get("seedance20")
+    if seedance20 is not None:
+        errors.extend(validate_seedance20(seedance20))
+
     minimax_h3 = data.get("minimax_h3")
     if minimax_h3 is not None:
         errors.extend(validate_minimax_h3(minimax_h3, prompt if isinstance(prompt, str) else ""))
@@ -1274,8 +1310,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.7-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.7-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.8-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.8-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):

@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.7-local"
+version: "3.5.4-merge.8-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -1510,6 +1510,7 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Keyframes are frozen production-purpose images.
 - Video prompts include final look, continuity, and visible motion.
 - When Video Prompt targets Seedance 2.0, the formal subordinate adapter was loaded completely; Seedance-specific schema and execution mechanics did not enter Core or alter creative semantics.
+- Seedance 2.0 multi-character focus hierarchy remains conditional, fragile contact is warned rather than silently removed, source-look authority remains Core-owned, unverified audio or lip-sync facts stay unknown, and overload warnings do not authorize creative simplification.
 - When Video Prompt targets Seedance 2.5, the subordinate runtime profile was loaded completely; its task route does not alter director mode, scene grammar, active stage, or generation-unit boundaries.
 - When Video Prompt explicitly targets MiniMax H3, the subordinate runtime profile was loaded completely; H3 was not inferred, and its route, input roles, labels, timing syntax, and sound fields do not alter director mode, scene grammar, active stage, or generation-unit boundaries.
 - Exactly one approved model-neutral Prompt IR, one target adapter, and one serialization owner apply to each model-facing prompt.

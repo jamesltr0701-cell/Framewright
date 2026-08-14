@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Merge Seedance 2.0 Runtime Profile"
-profile_version: "2.0.0"
+profile_version: "2.1.0"
 profile_role: "subordinate_video_prompt_adapter"
 target_model: "seedance_2_0"
 evidence_scope: "model_execution_heuristics_not_platform_guarantees"
@@ -52,6 +52,8 @@ An artistic source-look lock comes from Core's approved final-look and source-au
 - Prefer a positive observable state over stacked negatives. Retain a negative only when it prevents a realistic current failure.
 
 For multi-character scenes, establish a conditional focus hierarchy only when competing action needs it: one focal action, subordinate reaction or counter-action, and simple persistent background motion. Do not force an exact three-tier pattern, prohibit large action, or flatten intentionally equal ensemble staging. Warn when fragile contact, crossing, occlusion, identity, or lip-sync objectives compete.
+
+The hierarchy is an attention aid, not a cast-importance ranking. Preserve deliberately simultaneous ensemble action when Core approves it; qualify the increased stability risk rather than inventing a single hero.
 
 Choose one temporal grammar:
 

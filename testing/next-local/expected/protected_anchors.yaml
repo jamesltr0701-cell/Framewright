@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-merge.7-local"
+candidate_version: "3.5.4-merge.8-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -36,6 +36,7 @@ protected_anchors:
   - "A pattern break is valid only after the pattern is perceptibly established"
   - "Do not imitate a named living director"
   - "Endpoint purpose explains what the boundary must do"
+  - "The hierarchy is an attention aid, not a cast-importance ranking."
   - "The target model selects the dialect"
   - "A Video Prompt cannot pass by claiming multiple owners"
   - "Intake Presentation Layer"
