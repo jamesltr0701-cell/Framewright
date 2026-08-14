@@ -1,0 +1,20 @@
+kind: generation_evidence
+expected: fail
+expected_errors:
+  - unapproved_boundary_change
+document:
+  generation_evidence:
+    root_cause_classification: planning
+    take_disposition: rewrite_or_split
+    changed_variable: generation_unit_boundary
+    attempt_budget:
+      authorized_attempts: 2
+      attempts_used: 1
+      attempts_remaining: 1
+      budget_unit: generation_attempt
+      cost_known: true
+    exit_condition: Pause until the director approves or rejects the proposed split.
+    next_attempt_authorized: false
+    unaffected_contracts_preserved: true
+    boundary_change_requested: true
+    director_boundary_change_approved: false

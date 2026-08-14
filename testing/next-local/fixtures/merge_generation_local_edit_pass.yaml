@@ -1,0 +1,18 @@
+kind: generation_evidence
+expected: pass
+document:
+  generation_evidence:
+    root_cause_classification: serialization
+    take_disposition: local_edit
+    changed_variable: null
+    attempt_budget:
+      authorized_attempts: 1
+      attempts_used: 1
+      attempts_remaining: 0
+      budget_unit: generation_attempt
+      cost_known: false
+    exit_condition: Repair the subtitle locally without another model generation.
+    next_attempt_authorized: false
+    unaffected_contracts_preserved: true
+    boundary_change_requested: false
+    director_boundary_change_approved: false

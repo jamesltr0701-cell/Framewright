@@ -34,6 +34,9 @@ FORBIDDEN_PROMPT_TERMS = (
     "semantic_trace",
     "intent_ledger",
     "framewright_state",
+    "generation_evidence",
+    "take_disposition",
+    "attempt_budget",
     "RUN CARD",
 )
 STATE_REQUIRED = (
@@ -75,6 +78,8 @@ RISKS = {"low", "medium", "high"}
 OBSERVATION_PROVENANCE = {"observed", "reported"}
 OBSERVATION_CONFIDENCE = {"low", "medium", "high"}
 CONTINUATION_TYPES = {"seamless_extension", "next_shot", "bridge", "tail_repair", "re_anchor"}
+TAKE_DISPOSITIONS = {"accept", "post_fix", "local_edit", "retry", "rewrite_or_split", "do_not_generate"}
+ROOT_CAUSE_CLASSES = {"planning", "serialization", "rendering", "reference_authority", "runtime_or_surface", "model_behavior"}
 SEEDANCE_ROUTES = {"omni_reference", "smart_edit", "long_video", "first_last_frames", "extend"}
 SEEDANCE_CONTROLS = {"multi_keyframe", "blockout_coarse", "blockout_fine", "seamless_transition"}
 H3_ROUTES = {"t2va", "i2va", "fl2va", "l2va", "ref2va"}
@@ -1028,6 +1033,68 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     return errors
 
 
+def validate_generation_evidence(document: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict) or not isinstance(document.get("generation_evidence"), dict):
+        return [issue("generation_evidence_invalid", "Generation evidence must contain a generation_evidence mapping.")]
+    evidence = document["generation_evidence"]
+
+    disposition = evidence.get("take_disposition")
+    if disposition not in TAKE_DISPOSITIONS:
+        errors.append(issue("take_disposition_invalid", "Generation evidence requires one supported take disposition.", value=disposition))
+    root_cause = evidence.get("root_cause_classification")
+    if root_cause not in ROOT_CAUSE_CLASSES:
+        errors.append(issue("root_cause_classification_invalid", "Generation evidence requires one supported root-cause class.", value=root_cause))
+
+    budget = evidence.get("attempt_budget")
+    remaining: int | None = None
+    if not isinstance(budget, dict):
+        errors.append(issue("attempt_budget_invalid", "Generation evidence requires an explicit finite attempt budget."))
+    else:
+        values: dict[str, int] = {}
+        for key in ("authorized_attempts", "attempts_used", "attempts_remaining"):
+            value = budget.get(key)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                errors.append(issue("attempt_budget_unbounded", "Attempt counts must be finite non-negative integers.", key=key, value=value))
+            else:
+                values[key] = value
+        if len(values) == 3 and values["attempts_remaining"] != values["authorized_attempts"] - values["attempts_used"]:
+            errors.append(issue("attempt_budget_inconsistent", "Remaining attempts must equal authorized attempts minus used attempts."))
+        if not isinstance(budget.get("budget_unit"), str) or not budget.get("budget_unit"):
+            errors.append(issue("attempt_budget_unit_missing", "Attempt budget must name its counting unit."))
+        if not isinstance(budget.get("cost_known"), bool):
+            errors.append(issue("cost_known_not_explicit", "Attempt budget must explicitly state whether cost is known."))
+        remaining = values.get("attempts_remaining")
+
+    exit_condition = evidence.get("exit_condition")
+    if not isinstance(exit_condition, str) or not exit_condition.strip():
+        errors.append(issue("exit_condition_missing", "Every take disposition requires a non-empty exit condition."))
+    next_authorized = evidence.get("next_attempt_authorized")
+    if not isinstance(next_authorized, bool):
+        errors.append(issue("next_attempt_authorization_invalid", "Generation evidence must explicitly state whether another attempt is authorized."))
+    unaffected_preserved = evidence.get("unaffected_contracts_preserved")
+    if not isinstance(unaffected_preserved, bool):
+        errors.append(issue("unaffected_contracts_invalid", "Generation evidence must explicitly state whether unaffected contracts were preserved."))
+
+    if disposition == "retry":
+        if next_authorized is not True:
+            errors.append(issue("retry_not_authorized", "Retry disposition requires explicit next-attempt authorization."))
+        if remaining is None or remaining <= 0:
+            errors.append(issue("retry_budget_exhausted", "Retry disposition requires positive remaining attempt budget."))
+        changed_variable = evidence.get("changed_variable")
+        if not isinstance(changed_variable, str) or not changed_variable.strip():
+            errors.append(issue("retry_changed_variable_invalid", "Retry must name exactly one changed variable."))
+        if unaffected_preserved is not True:
+            errors.append(issue("retry_contract_preservation_missing", "Retry must preserve every unaffected contract."))
+
+    if disposition == "rewrite_or_split" and evidence.get("boundary_change_requested") is True:
+        if evidence.get("director_boundary_change_approved") is not True:
+            errors.append(issue("unapproved_boundary_change", "A rewrite or split may not change generation-unit boundaries without director approval."))
+    if disposition == "do_not_generate" and (not isinstance(exit_condition, str) or not exit_condition.strip()):
+        errors.append(issue("do_not_generate_exit_missing", "Do-not-generate disposition must explain why the generation loop ends."))
+    return errors
+
+
 def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     data = load_yaml(path)
     if not isinstance(data, dict):
@@ -1037,6 +1104,8 @@ def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         errors = validate_compile_trace(data)
     elif kind == "state":
         errors = validate_state_data(data.get("document"), check_locators=False)
+    elif kind == "generation_evidence":
+        errors = validate_generation_evidence(data.get("document"))
     elif kind == "prompt":
         errors = validate_prompt_text(
             str(data.get("prompt", "")),
@@ -1063,8 +1132,8 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.2-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.2-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.3-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.3-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):

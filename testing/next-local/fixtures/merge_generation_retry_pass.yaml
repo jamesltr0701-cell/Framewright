@@ -1,0 +1,34 @@
+kind: generation_evidence
+expected: pass
+document:
+  generation_evidence:
+    core_version: "3.5.4-merge.3-local"
+    runtime_profile_version: "seedance-2.0-internal-1"
+    task_route: image_to_video
+    prompt_artifact: prompt_video.txt
+    prompt_fingerprint: synthetic-001
+    active_material_mapping: [hero_identity]
+    director_locks_checked: true
+    generated_result_locator: take_01.mp4
+    attempt_index: 1
+    retry_or_credit_cost: unknown
+    observed_successes: [identity preserved]
+    observed_failures: [hand contact missed]
+    root_cause_classification: model_behavior
+    causal_confidence: low
+    stochastic_suspected: true
+    repair_scope: hand_contact_clause
+    evidence_status: reviewed
+    take_disposition: retry
+    changed_variable: hand_contact_timing
+    attempt_budget:
+      authorized_attempts: 2
+      attempts_used: 1
+      attempts_remaining: 1
+      budget_unit: generation_attempt
+      cost_known: false
+    exit_condition: Stop after the next authorized attempt whether or not contact improves.
+    next_attempt_authorized: true
+    unaffected_contracts_preserved: true
+    boundary_change_requested: false
+    director_boundary_change_approved: false

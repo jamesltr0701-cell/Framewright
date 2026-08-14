@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.2-local"
+version: "3.5.4-merge.3-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -1527,7 +1527,26 @@ generation_evidence:
   stochastic_suspected:
   repair_scope:
   evidence_status:
+  take_disposition:
+  changed_variable:
+  attempt_budget:
+    authorized_attempts:
+    attempts_used:
+    attempts_remaining:
+    budget_unit:
+    cost_known:
+  exit_condition:
+  next_attempt_authorized:
+  unaffected_contracts_preserved:
+  boundary_change_requested:
+  director_boundary_change_approved:
 ```
+
+Resolve `take_disposition` to exactly one of `accept`, `post_fix`, `local_edit`, `retry`, `rewrite_or_split`, or `do_not_generate`. Prefer `post_fix` or `local_edit` when the generated take is usable and the defect can be repaired without another model generation. Use `retry` only when one named variable can be changed while all unaffected contracts remain fixed. Use `rewrite_or_split` only when scene-local repair is insufficient; any generation-unit boundary change requires explicit director approval. Use `do_not_generate` when further generation is infeasible, unauthorized, outside budget, or no longer the best production action.
+
+The attempt budget is finite and explicit. `authorized_attempts`, `attempts_used`, and `attempts_remaining` are non-negative integers with `attempts_remaining = authorized_attempts - attempts_used`; `budget_unit` names what is counted, and `cost_known` records whether price or credit cost is confirmed. Unknown cost must remain visibly unknown and must not be converted into a fabricated estimate. No evidence record may imply unlimited attempts.
+
+Every disposition states an `exit_condition`, whether another attempt is authorized, and whether unaffected contracts were preserved. A retry requires `next_attempt_authorized: true`, positive remaining budget, exactly one non-empty `changed_variable`, and `unaffected_contracts_preserved: true`. A rewrite or split that changes a generation-unit boundary requires `boundary_change_requested: true` and `director_boundary_change_approved: true`. Evidence for `do_not_generate` must state why the generation loop ends.
 
 Classify a failure as one primary layer before repair:
 
@@ -1551,7 +1570,7 @@ Map broader diagnostic terms onto those existing owners instead of creating a pa
 | Model capability failure | `model_behavior` |
 | Stochastic failure | `model_behavior` with low causal confidence and attempt evidence |
 
-Repair only the smallest affected scene, unit, task schema, material binding, or prompt clause. Preserve director locks and unaffected contracts. A rendering, runtime, stochastic, or model-behavior failure is not proof that the Intent Ledger, causal state, or Shot Spine is defective; a planning defect is not repaired with serializer wording alone.
+Repair only the smallest affected scene, unit, task schema, material binding, or prompt clause. Preserve director locks and unaffected contracts. A rendering, runtime, stochastic, or model-behavior failure is not proof that the Intent Ledger, causal state, or Shot Spine is defective; a planning defect is not repaired with serializer wording alone. Keep `generation_evidence`, `take_disposition`, `attempt_budget`, and all retry-control fields assistant-facing and out of every clean model prompt.
 
 Retries and regenerations always require the authorization applicable to that production action. One successful generation is scene-local evidence, not permission to promote a new global core rule. Promote adapter or core changes only after repeatable evidence and a separately approved iteration.
 

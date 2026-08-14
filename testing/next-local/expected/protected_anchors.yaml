@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-merge.2-local"
+candidate_version: "3.5.4-merge.3-local"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -45,3 +45,6 @@ protected_anchors:
   - "Selected-Take Canon and Continuation Reconciliation"
   - "accepted actual end state outranks the planned end state"
   - "Completed beats must not replay"
+  - "The attempt budget is finite and explicit."
+  - "No evidence record may imply unlimited attempts."
+  - "any generation-unit boundary change requires explicit director approval"

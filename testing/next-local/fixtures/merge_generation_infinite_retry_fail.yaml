@@ -1,0 +1,21 @@
+kind: generation_evidence
+expected: fail
+expected_errors:
+  - attempt_budget_unbounded
+  - retry_budget_exhausted
+document:
+  generation_evidence:
+    root_cause_classification: model_behavior
+    take_disposition: retry
+    changed_variable: camera_speed
+    attempt_budget:
+      authorized_attempts: unlimited
+      attempts_used: 4
+      attempts_remaining: unlimited
+      budget_unit: generation_attempt
+      cost_known: false
+    exit_condition: Retry until it works.
+    next_attempt_authorized: true
+    unaffected_contracts_preserved: true
+    boundary_change_requested: false
+    director_boundary_change_approved: false
