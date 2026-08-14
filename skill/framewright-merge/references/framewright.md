@@ -123,7 +123,7 @@ framewright_state:
   last_updated:
 ```
 
-Each tracked artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one revision may be active for the same artifact identity; replaced revisions move to `superseded_artifacts` and retain their provenance. Classify a material change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director and accepted for continuity may enter `selected_generated_takes` or become continuity truth. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
+Each tracked artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one revision may be active for the same artifact identity; replaced revisions move to `superseded_artifacts` and retain their provenance. Classify a material change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director may enter `selected_generated_takes` or become continuity truth. It must also be accepted for continuity before it becomes continuity canon. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
 
 ### Selected-Take Canon and Continuation Reconciliation
 
