@@ -1,5 +1,5 @@
 ---
-profile_name: "Framewright Merge Seedance 2.0 Runtime Profile"
+profile_name: "Framewright Seedance 2.0 Runtime Profile"
 profile_version: "2.2.0"
 profile_role: "subordinate_video_prompt_adapter"
 target_model: "seedance_2_0"

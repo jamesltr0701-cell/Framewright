@@ -1,4 +1,4 @@
-candidate_version: "3.5.4-merge.10-local"
+candidate_version: "4.0.0"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -38,7 +38,7 @@ protected_anchors:
   - "Endpoint purpose explains what the boundary must do"
   - "The hierarchy is an attention aid, not a cast-importance ranking."
   - "Lossless Chinese Overflow Re-serialization"
-  - "No currently registered merge adapter uses it"
+  - "No currently registered adapter uses it"
   - "The target model selects the dialect"
   - "A Video Prompt cannot pass by claiming multiple owners"
   - "Intake Presentation Layer"

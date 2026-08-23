@@ -160,9 +160,9 @@ OWNERSHIP_PROMPT_TERMS = (
     "serialization_owner",
     "adapter_id",
     "compiler_instruction_sources",
-    "framewright_merge_adapter_seedance_2_0",
-    "framewright_merge_adapter_seedance_2_5",
-    "framewright_merge_adapter_minimax_h3",
+    "framewright_adapter_seedance_2_0",
+    "framewright_adapter_seedance_2_5",
+    "framewright_adapter_minimax_h3",
 )
 PLATFORM_SERIALIZER_KEY_RE = re.compile(
     r"(?:platform|surface|provider|jimeng|libtv).*(?:dialect|serializ|owner)"
@@ -308,7 +308,7 @@ def load_image_adapter_registry(path: Path = DEFAULT_IMAGE_REGISTRY) -> tuple[di
 
 
 def registered_profile_source(profile: str) -> str:
-    return f"skill/framewright-merge/references/runtime_profiles/{profile}"
+    return f"skill/framewright/references/runtime_profiles/{profile}"
 
 
 def ownership_validation_required(data: dict[str, Any]) -> bool:
@@ -416,7 +416,7 @@ def validate_serialization_ownership(
         base_sources = registry.get("compiler_instruction_sources", []) if isinstance(registry, dict) else []
         required_sources = set(base_sources if isinstance(base_sources, list) else [])
         allowed_sources = set(required_sources)
-        allowed_sources.add("skill/framewright-merge/references/runtime_profiles/adapter_registry.yaml")
+        allowed_sources.add("skill/framewright/references/runtime_profiles/adapter_registry.yaml")
         profile = registered.get("profile") if isinstance(registered, dict) else None
         if isinstance(profile, str):
             profile_source = registered_profile_source(profile)
@@ -1593,9 +1593,9 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.10-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.10-local.", actual=core_meta.get("version")))
-    if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
+    if core_meta.get("version") != "4.0.0":
+        errors.append(issue("release_version_mismatch", "Framewright release must identify as 4.0.0.", actual=core_meta.get("version")))
+    if skill_meta.get("name") != "framewright" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
         if not profile_meta.get("profile_version") or profile_meta.get("profile_role") != "subordinate_video_prompt_adapter":

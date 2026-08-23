@@ -4,10 +4,10 @@ director_modes: [screenwriter]
 conversation_mode_declared: true
 artifact_stage: video_prompt
 target_model: minimax_h3
-serialization_owner: framewright_merge_adapter_minimax_h3
+serialization_owner: framewright_adapter_minimax_h3
 adapter_id: minimax_h3
 adapter_profile_contract: minimax_h3
-compiler_instruction_sources: [skill/framewright-merge/SKILL.md, skill/framewright-merge/references/framewright.md, skill/framewright-merge/references/runtime_profiles/minimax_h3.md]
+compiler_instruction_sources: [skill/framewright/SKILL.md, skill/framewright/references/framewright.md, skill/framewright/references/runtime_profiles/minimax_h3.md]
 prompt: |-
   integrated_multimodal_description: [Shot 1] <Subject 1>沿走廊奔跑，低位镜头后退；她在门前急停。
   overall_soundscape: 雨声、脚步与呼吸同步，无对白。

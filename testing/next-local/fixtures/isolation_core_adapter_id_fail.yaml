@@ -5,8 +5,8 @@ director_modes: [apprentice]
 conversation_mode_declared: true
 artifact_stage: video_prompt
 target_model: seedance_2_0
-serialization_owner: framewright_merge_adapter_seedance_2_0
+serialization_owner: framewright_adapter_seedance_2_0
 adapter_id: seedance_2_5
 adapter_profile_contract: seedance_2_0
-compiler_instruction_sources: [skill/framewright-merge/SKILL.md, skill/framewright-merge/references/framewright.md, skill/framewright-merge/references/runtime_profiles/seedance_2_0.md]
+compiler_instruction_sources: [skill/framewright/SKILL.md, skill/framewright/references/framewright.md, skill/framewright/references/runtime_profiles/seedance_2_0.md]
 prompt: "A clean prompt with room tone and no music."

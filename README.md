@@ -1,34 +1,35 @@
-# Framewright Merge
+# Framewright
 
-Framewright Merge is the isolated local fusion experiment derived from Framewright. It preserves Framewright's director, state, and compiler ownership while testing selectively absorbed Seedance 2.0 knowledge.
+Framewright is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It turns a director's approved scene intent, decision state, and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-- Current merge version: **3.5.4-merge.10-local**
-- Base: **Framewright 3.5.3-local plus the reviewed Intake candidate**
-- Release status: **local experiment**
-- Global invocation: **`$framewright-merge` only**
+- Current core version: **4.0.0**
+- Release status: **stable**
+- Desktop Framewright mirror: **4.0.0**
+- GitHub `main`: **4.0.0**
+- Global invocation: **`$framewright` only**
 
 Author: **Tairan Li**
 
 ## Repository structure
 
-- [`skill/framewright-merge/`](skill/framewright-merge/) — installable Codex Skill
-- [`skill/framewright-merge/references/framewright.md`](skill/framewright-merge/references/framewright.md) — current authoritative Framewright specification
-- [`skill/framewright-merge/references/runtime_profiles/`](skill/framewright-merge/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
-- [`skill/framewright-merge/references/keyframe_profiles/`](skill/framewright-merge/references/keyframe_profiles/) — subordinate Midjourney V7 Keyframe and ChatGPT Image 2 edit adapters
+- [`skill/framewright/`](skill/framewright/) — installable Codex Skill
+- [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md) — current authoritative Framewright specification
+- [`skill/framewright/references/runtime_profiles/`](skill/framewright/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
+- [`skill/framewright/references/keyframe_profiles/`](skill/framewright/references/keyframe_profiles/) — subordinate Midjourney V7 Keyframe and ChatGPT Image 2 edit adapters
 - [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
 
-This local repository is the editable Source for `framewright-merge`. It has no publication remote and must not replace, publish to, or mutate the stable `framewright` Source.
+GitHub `main` is the source of truth for the synchronized stable release. Framewright 4.0.0 is the intended release across the local Source, Desktop mirror, and GitHub `main`.
 
 ## Install in Codex
 
-Install the validated local package from `skill/framewright-merge/` into a separately named global `framewright-merge/` folder. Never install it over `framewright/`.
+Install the stable package from `https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright` into the global `framewright/` folder.
 
-After installation, invoke it explicitly with `$framewright-merge`.
+After installation, invoke it explicitly with `$framewright`.
 
-Framewright Merge is configured for explicit invocation and one active stage at a time. The current local candidate adds a once-per-unit Storyboard Preflight gate, branching live-action / 2D / VFX Look Development, provisional-to-committed Shot Spine review, and generation routing for continuous single shots, whole edited sequences, or one shot at a time. Keyframes default to a Midjourney V7 adapter; user-requested Image 2 edits always return to the immutable original master rather than stacking edited pixels. Target-specific Video Prompt behavior remains subordinate to Core: Seedance 2.0, Seedance 2.5, and MiniMax H3 each retain separate registered adapters. A resolved Storyboard stage still generates exactly one initial board image; automatic retries, variants, unrequested Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
+Framewright is configured for explicit invocation and one active stage at a time. Version 4.0.0 adds a once-per-unit Storyboard Preflight gate, branching live-action / 2D / VFX Look Development, provisional-to-committed Shot Spine review, and generation routing for continuous single shots, whole edited sequences, or one shot at a time. Keyframes default to a Midjourney V7 adapter; user-requested Image 2 edits always return to the immutable original master rather than stacking edited pixels. Target-specific Video Prompt behavior remains subordinate to Core: Seedance 2.0, Seedance 2.5, and MiniMax H3 each retain separate registered adapters. A resolved Storyboard stage still generates exactly one initial board image; automatic retries, variants, unrequested Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 
 ## Repository policy
 

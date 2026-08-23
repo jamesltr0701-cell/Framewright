@@ -4,12 +4,12 @@ expected_errors: [h3_context_ir_unauthorized]
 director_modes: [screenwriter]
 conversation_mode_declared: true
 target_model: minimax_h3
-serialization_owner: framewright_merge_adapter_minimax_h3
+serialization_owner: framewright_adapter_minimax_h3
 adapter_id: minimax_h3
 compiler_instruction_sources:
-  - skill/framewright-merge/SKILL.md
-  - skill/framewright-merge/references/framewright.md
-  - skill/framewright-merge/references/runtime_profiles/minimax_h3.md
+  - skill/framewright/SKILL.md
+  - skill/framewright/references/framewright.md
+  - skill/framewright/references/runtime_profiles/minimax_h3.md
 prompt: |-
   integrated_multimodal_description: [Shot 1] Cinematic wide shot of a woman crossing an empty station platform while the camera tracks beside her.
   overall_soundscape: Distant ventilation, footsteps, and a low electrical hum.
