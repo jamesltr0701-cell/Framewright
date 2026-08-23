@@ -1,0 +1,10 @@
+kind: generation_strategy
+expected: pass
+document:
+  storyboard_preflight: proceed_without_storyboard
+  committed_shot_count: 3
+  strategy: shot_by_shot
+  active_shot_id: SHOT_02
+  prompt_scope_shots: [SHOT_02]
+  keyframe_priority: preferred
+  full_storyboard_runtime_status: withheld_from_runtime

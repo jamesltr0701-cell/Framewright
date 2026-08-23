@@ -2,7 +2,7 @@
 
 Framewright Merge is the isolated local fusion experiment derived from Framewright. It preserves Framewright's director, state, and compiler ownership while testing selectively absorbed Seedance 2.0 knowledge.
 
-- Current merge version: **3.5.4-merge.0-local**
+- Current merge version: **3.5.4-merge.10-local**
 - Base: **Framewright 3.5.3-local plus the reviewed Intake candidate**
 - Release status: **local experiment**
 - Global invocation: **`$framewright-merge` only**
@@ -14,6 +14,7 @@ Author: **Tairan Li**
 - [`skill/framewright-merge/`](skill/framewright-merge/) — installable Codex Skill
 - [`skill/framewright-merge/references/framewright.md`](skill/framewright-merge/references/framewright.md) — current authoritative Framewright specification
 - [`skill/framewright-merge/references/runtime_profiles/`](skill/framewright-merge/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
+- [`skill/framewright-merge/references/keyframe_profiles/`](skill/framewright-merge/references/keyframe_profiles/) — subordinate Midjourney V7 Keyframe and ChatGPT Image 2 edit adapters
 - [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
@@ -27,7 +28,7 @@ Install the validated local package from `skill/framewright-merge/` into a separ
 
 After installation, invoke it explicitly with `$framewright-merge`.
 
-Framewright Merge is configured for explicit invocation and one active stage at a time. The 3.5.0 release adds dependency-sensitive Adaptive Questioning, a nested Intent Ledger, causal-state and blocking readiness passes, and Semantic Preflight while preserving the existing Material Registry and stage contracts. Target-specific Video Prompt behavior is subordinate to the Core: Seedance 2.5 uses its surface-aware adapter, while the local MiniMax H3 experiment loads a separate H3 adapter only after the director explicitly selects H3. Each adapter owns only target routing and serialization; neither may override the Production Spine, director locks, sound defaults, stage, or generation-unit boundaries. A resolved Storyboard stage still generates exactly one initial board image as part of the same stage package; automatic retries, variants, Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
+Framewright Merge is configured for explicit invocation and one active stage at a time. The current local candidate adds a once-per-unit Storyboard Preflight gate, branching live-action / 2D / VFX Look Development, provisional-to-committed Shot Spine review, and generation routing for continuous single shots, whole edited sequences, or one shot at a time. Keyframes default to a Midjourney V7 adapter; user-requested Image 2 edits always return to the immutable original master rather than stacking edited pixels. Target-specific Video Prompt behavior remains subordinate to Core: Seedance 2.0, Seedance 2.5, and MiniMax H3 each retain separate registered adapters. A resolved Storyboard stage still generates exactly one initial board image; automatic retries, variants, unrequested Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 
 ## Repository policy
 

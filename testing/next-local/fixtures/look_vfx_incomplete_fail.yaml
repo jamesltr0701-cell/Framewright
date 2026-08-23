@@ -1,0 +1,14 @@
+kind: look_development
+expected: fail
+expected_errors:
+  - vfx_contract_incomplete
+document:
+  render_family: mixed_media
+  material_only: true
+  intake_questions: []
+  resolved_dimensions:
+    light: graphic hard key
+  vfx:
+    active: true
+    source: the floor symbol
+    material_behavior: paper-cut flame

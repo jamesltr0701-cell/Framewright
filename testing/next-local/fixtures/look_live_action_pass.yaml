@@ -1,0 +1,13 @@
+kind: look_development
+expected: pass
+document:
+  render_family: live_action_or_near_live_action
+  material_only: true
+  intake_questions:
+    - "Spherical or anamorphic lens geometry?"
+    - "Stable, handheld, or Steadicam-like movement texture?"
+  resolved_dimensions:
+    light: motivated soft window light with practical falloff
+    color: restrained cool-warm separation
+    lens_geometry: spherical
+    camera_support_texture: Steadicam stability with slight operator breath

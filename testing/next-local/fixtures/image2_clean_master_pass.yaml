@@ -1,0 +1,15 @@
+kind: clean_master_edit
+expected: pass
+document:
+  clean_master_edit:
+    original_master_id: KF_MASTER_01
+    base_input_id: KF_MASTER_01
+    attempt_authorized_by_user: true
+    automatic_retry: false
+    based_on_previous_candidate: false
+    cumulative_edit_spec:
+      - change the coat to deep red
+      - preserve the original face and composition
+    previous_candidate_ids: [KF_CANDIDATE_01]
+    candidate_output_id: KF_CANDIDATE_02
+    master_reset: false

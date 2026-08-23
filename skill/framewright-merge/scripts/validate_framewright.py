@@ -131,10 +131,28 @@ ENDPOINT_PURPOSES = {
     "reveal_or_payoff",
 }
 NATIVE_BINDING_ADAPTERS = {"seedance_2_0", "seedance_2_5", "minimax_h3"}
+GENERATION_STRATEGIES = {
+    "single_shot_continuous",
+    "edited_sequence_single_generation",
+    "shot_by_shot",
+}
+KEYFRAME_ROLES = {"look_anchor", "shot_first_frame", "endpoint_frame"}
+LOOK_FAMILIES = {
+    "live_action_or_near_live_action",
+    "stylized_3d",
+    "two_dimensional",
+    "mixed_media",
+}
 DEFAULT_REGISTRY = (
     Path(__file__).resolve().parent.parent
     / "references"
     / "runtime_profiles"
+    / "adapter_registry.yaml"
+)
+DEFAULT_IMAGE_REGISTRY = (
+    Path(__file__).resolve().parent.parent
+    / "references"
+    / "keyframe_profiles"
     / "adapter_registry.yaml"
 )
 OWNERSHIP_PROMPT_TERMS = (
@@ -236,6 +254,56 @@ def load_adapter_registry(path: Path = DEFAULT_REGISTRY) -> tuple[dict[str, Any]
     except (OSError, yaml.YAMLError) as exc:
         return {}, [issue("adapter_registry_unreadable", str(exc), path=str(path))]
     errors = validate_registry_data(document, path)
+    return document if isinstance(document, dict) else {}, errors
+
+
+def validate_image_registry_data(document: Any, registry_path: Path) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict):
+        return [issue("image_adapter_registry_invalid", "Image adapter registry must be a mapping.")]
+    targets = document.get("registered_targets")
+    if not isinstance(targets, dict) or not targets:
+        return [issue("image_adapter_targets_missing", "Image adapter registry has no registered targets.")]
+    if document.get("default_keyframe_target") != "midjourney_v7":
+        errors.append(issue("keyframe_default_target_invalid", "Midjourney V7 must remain the current default Keyframe target."))
+    if document.get("edit_target") != "chatgpt_image_2_edit":
+        errors.append(issue("keyframe_edit_target_invalid", "ChatGPT Image 2 must remain the registered Keyframe edit target."))
+    expected_roles = {
+        "midjourney_v7": "subordinate_keyframe_prompt_adapter",
+        "chatgpt_image_2_edit": "subordinate_keyframe_edit_adapter",
+    }
+    ids: list[str] = []
+    package_root = registry_path.resolve().parents[2]
+    for target, expected_role in expected_roles.items():
+        record = targets.get(target)
+        if not isinstance(record, dict):
+            errors.append(issue("image_adapter_record_missing", "Required image adapter record is missing.", target=target))
+            continue
+        adapter_id = record.get("adapter_id")
+        profile = record.get("profile")
+        if not isinstance(adapter_id, str) or not adapter_id:
+            errors.append(issue("image_adapter_id_invalid", "Image adapter requires a non-empty adapter ID.", target=target))
+        else:
+            ids.append(adapter_id)
+        if record.get("profile_role") != expected_role:
+            errors.append(issue("image_adapter_role_invalid", "Image adapter profile role does not match its registered function.", target=target))
+        if not isinstance(profile, str) or not profile:
+            errors.append(issue("image_adapter_profile_invalid", "Image adapter requires a profile path.", target=target))
+        else:
+            resolved = (registry_path.parent / profile).resolve()
+            if package_root not in resolved.parents or not resolved.is_file():
+                errors.append(issue("image_adapter_profile_missing", "Registered image adapter profile is missing or outside the package.", target=target, profile=profile))
+    if len(ids) != len(set(ids)):
+        errors.append(issue("image_adapter_id_duplicate", "Image adapter IDs must be unique."))
+    return errors
+
+
+def load_image_adapter_registry(path: Path = DEFAULT_IMAGE_REGISTRY) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    try:
+        document = load_yaml(path)
+    except (OSError, yaml.YAMLError) as exc:
+        return {}, [issue("image_adapter_registry_unreadable", str(exc), path=str(path))]
+    errors = validate_image_registry_data(document, path)
     return document if isinstance(document, dict) else {}, errors
 
 
@@ -1337,6 +1405,144 @@ def validate_generation_evidence(document: Any) -> list[dict[str, Any]]:
     return errors
 
 
+def validate_look_development(document: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict):
+        return [issue("look_development_invalid", "Look Development contract must be a mapping.")]
+    family = document.get("render_family")
+    if family not in LOOK_FAMILIES:
+        errors.append(issue("render_family_invalid", "Look Development requires one supported render family.", value=family))
+    questions = document.get("intake_questions", [])
+    if not isinstance(questions, list) or len(questions) > 5:
+        errors.append(issue("look_intake_question_batch_invalid", "Look Development may ask no more than five current high-impact questions."))
+    if document.get("material_only") is not True:
+        errors.append(issue("look_intake_not_material", "Look Development questions must be limited to downstream-changing decisions."))
+    resolved = document.get("resolved_dimensions")
+    if not isinstance(resolved, dict) or not resolved:
+        errors.append(issue("look_dimensions_missing", "Look Development requires at least one approved or authorized visible dimension."))
+        resolved = {}
+    if family == "live_action_or_near_live_action" and not any(
+        key in resolved for key in ("light", "color", "lens_geometry", "camera_support_texture", "motion_rendering", "surface_finish")
+    ):
+        errors.append(issue("live_action_look_missing", "Live-action look requires at least one executable cinematography dimension."))
+    if family == "two_dimensional" and not any(
+        key in resolved for key in ("line_behavior", "fill_and_shading", "motion_cadence", "deformation", "parallax", "edge_treatment")
+    ):
+        errors.append(issue("two_dimensional_look_missing", "Two-dimensional look requires at least one executable drawing or animation dimension."))
+    vfx = document.get("vfx")
+    if isinstance(vfx, dict) and vfx.get("active") is True:
+        for key in ("source", "material_behavior", "path", "interaction", "light_response", "dissipation", "residual_result"):
+            if not vfx.get(key):
+                errors.append(issue("vfx_contract_incomplete", "Active VFX lacks one visible behavior field.", key=key))
+    return errors
+
+
+def validate_generation_strategy(document: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict):
+        return [issue("generation_strategy_invalid", "Generation Strategy contract must be a mapping.")]
+    strategy = document.get("strategy")
+    shot_count = document.get("committed_shot_count")
+    prompt_scope = document.get("prompt_scope_shots")
+    if document.get("storyboard_preflight") not in {"storyboard_first", "proceed_without_storyboard"}:
+        errors.append(issue("storyboard_preflight_missing", "Video generation routing requires a current Storyboard Preflight decision."))
+    if strategy not in GENERATION_STRATEGIES:
+        errors.append(issue("generation_strategy_unknown", "Generation Strategy is missing or unsupported.", value=strategy))
+    if not isinstance(shot_count, int) or shot_count < 1:
+        errors.append(issue("committed_shot_count_invalid", "Generation Strategy requires a positive committed shot count."))
+        shot_count = 0
+    if not isinstance(prompt_scope, list) or not prompt_scope:
+        errors.append(issue("prompt_shot_scope_missing", "Generation Strategy requires a non-empty prompt shot scope."))
+        prompt_scope = []
+    if shot_count == 1 and strategy != "single_shot_continuous":
+        errors.append(issue("single_shot_strategy_mismatch", "One committed shot must use the continuous single-shot route unless a new boundary is approved."))
+    if shot_count > 1 and strategy == "single_shot_continuous":
+        errors.append(issue("multi_shot_strategy_mismatch", "A multi-shot spine cannot use the continuous single-shot route."))
+    if strategy == "shot_by_shot":
+        active = document.get("active_shot_id")
+        if not active or prompt_scope != [active]:
+            errors.append(issue("shot_by_shot_scope_leak", "Shot-by-shot generation must contain exactly the active shot."))
+        if document.get("full_storyboard_runtime_status") not in {"planning_only", "withheld_from_runtime"}:
+            errors.append(issue("shot_by_shot_storyboard_attached", "Shot-by-shot generation withholds the full Storyboard by default."))
+    if strategy == "edited_sequence_single_generation":
+        if len(prompt_scope) != shot_count:
+            errors.append(issue("edited_sequence_scope_incomplete", "Edited-sequence generation must cover every committed shot in the approved unit."))
+        if document.get("keyframe_priority") not in {"optional", "low"}:
+            errors.append(issue("edited_sequence_keyframe_overweighted", "Keyframes must remain optional or low-priority for an edited sequence."))
+    multi = document.get("multi_keyframe")
+    if isinstance(multi, dict) and multi.get("selected") is True:
+        if strategy != "single_shot_continuous" or multi.get("cuts_implied") is not False:
+            errors.append(issue("multi_keyframe_strategy_invalid", "Ordered multi-keyframes may not encode edited cuts."))
+        if multi.get("support_evidence") != "official_documented_workflow":
+            errors.append(issue("multi_keyframe_support_unverified", "Multi-keyframe recommendation requires explicit official workflow support for the selected target."))
+        if multi.get("complexity") == "high":
+            errors.append(issue("multi_keyframe_overconstrained", "High-complexity continuous choreography must not be controlled by adding more Keyframes."))
+        anchors = multi.get("ordered_anchors")
+        if not isinstance(anchors, list) or len(anchors) < 2:
+            errors.append(issue("multi_keyframe_anchor_count_invalid", "Selected multi-keyframe control requires at least two ordered major-state anchors."))
+    return errors
+
+
+def validate_keyframe_ir(document: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict) or not isinstance(document.get("keyframe_ir"), dict):
+        return [issue("keyframe_ir_root_missing", "Keyframe IR must contain a keyframe_ir mapping.")]
+    ir = document["keyframe_ir"]
+    registry, registry_errors = load_image_adapter_registry()
+    errors.extend(registry_errors)
+    if ir.get("adapter_id") != registry.get("default_keyframe_target"):
+        errors.append(issue("keyframe_default_adapter_mismatch", "Un-overridden Keyframe compilation must use the registered Midjourney V7 default."))
+    strategy = ir.get("generation_strategy")
+    blocks = ir.get("blocks")
+    active_shot = ir.get("active_shot_id")
+    if strategy not in GENERATION_STRATEGIES:
+        errors.append(issue("keyframe_strategy_invalid", "Keyframe IR requires one supported Generation Strategy."))
+    if not isinstance(blocks, list) or not blocks:
+        return errors + [issue("keyframe_blocks_missing", "Keyframe IR requires at least one block.")]
+    for index, block in enumerate(blocks):
+        if not isinstance(block, dict):
+            errors.append(issue("keyframe_block_invalid", "Keyframe block must be a mapping.", index=index))
+            continue
+        if block.get("role") not in KEYFRAME_ROLES:
+            errors.append(issue("keyframe_role_invalid", "Keyframe block requires one production role.", index=index))
+        if not block.get("supported_shot") or not block.get("frozen_instant") or not block.get("downstream_job"):
+            errors.append(issue("keyframe_contract_incomplete", "Keyframe block requires shot scope, frozen instant, and downstream job.", index=index))
+        if strategy == "shot_by_shot" and block.get("supported_shot") != active_shot:
+            errors.append(issue("keyframe_cross_shot_leak", "Shot-by-shot Keyframe block references another shot.", index=index))
+        prompt = str(block.get("prompt", ""))
+        if re.search(r"\b(?:then|continues|begins to|ends up)\b", prompt, re.IGNORECASE):
+            errors.append(issue("keyframe_temporal_sequence", "Keyframe prompt must depict one frozen instant.", index=index))
+        omni = block.get("omni_reference")
+        if isinstance(omni, dict):
+            refs = omni.get("references")
+            if not isinstance(refs, list) or len(refs) != 1 or omni.get("authority") not in {"identity", "form"}:
+                errors.append(issue("midjourney_omni_contract_invalid", "Midjourney V7 Omni Reference requires exactly one admitted identity or form reference.", index=index))
+    return errors
+
+
+def validate_clean_master_edit(document: Any) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    if not isinstance(document, dict) or not isinstance(document.get("clean_master_edit"), dict):
+        return [issue("clean_master_edit_root_missing", "Image edit trace must contain a clean_master_edit mapping.")]
+    edit = document["clean_master_edit"]
+    original = edit.get("original_master_id")
+    if not original or edit.get("base_input_id") != original:
+        errors.append(issue("image_edit_not_from_original", "Every Image 2 attempt must return to the immutable original master."))
+    if edit.get("based_on_previous_candidate") is not False:
+        errors.append(issue("image_edit_candidate_stacking", "An edited candidate may not become the next attempt's pixel input."))
+    if edit.get("automatic_retry") is not False or edit.get("attempt_authorized_by_user") is not True:
+        errors.append(issue("image_edit_attempt_unauthorized", "Each Image 2 attempt requires one explicit user edit instruction and forbids automatic retry."))
+    spec = edit.get("cumulative_edit_spec")
+    if not isinstance(spec, list) or not spec:
+        errors.append(issue("image_edit_spec_missing", "Image 2 attempt requires a non-empty cumulative semantic edit specification."))
+    previous = edit.get("previous_candidate_ids", [])
+    if isinstance(previous, list) and edit.get("base_input_id") in previous:
+        errors.append(issue("image_edit_previous_candidate_reused", "A previous candidate is being reused as the edit base."))
+    if edit.get("master_reset") is True and edit.get("master_reset_explicit_by_user") is not True:
+        errors.append(issue("image_edit_master_reset_unauthorized", "A Keyframe master reset requires explicit user instruction."))
+    return errors
+
+
 def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     data = load_yaml(path)
     if not isinstance(data, dict):
@@ -1350,6 +1556,14 @@ def validate_fixture(path: Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         errors = validate_state_data(data.get("document"), check_locators=False)
     elif kind == "generation_evidence":
         errors = validate_generation_evidence(data.get("document"))
+    elif kind == "look_development":
+        errors = validate_look_development(data.get("document"))
+    elif kind == "generation_strategy":
+        errors = validate_generation_strategy(data.get("document"))
+    elif kind == "keyframe_ir":
+        errors = validate_keyframe_ir(data.get("document"))
+    elif kind == "clean_master_edit":
+        errors = validate_clean_master_edit(data.get("document"))
     elif kind == "prompt":
         errors = validate_prompt_text(
             str(data.get("prompt", "")),
@@ -1365,19 +1579,22 @@ def validate_core(
     core: Path,
     skill: Path,
     profiles: list[Path],
+    image_profiles: list[Path],
     manifest: Path,
     registry: Path = DEFAULT_REGISTRY,
+    image_registry: Path = DEFAULT_IMAGE_REGISTRY,
 ) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     try:
         core_meta, core_text = frontmatter(core)
         skill_meta, skill_text = frontmatter(skill)
         loaded_profiles = [frontmatter(profile) for profile in profiles]
+        loaded_image_profiles = [frontmatter(profile) for profile in image_profiles]
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "3.5.4-merge.9-local":
-        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.9-local.", actual=core_meta.get("version")))
+    if core_meta.get("version") != "3.5.4-merge.10-local":
+        errors.append(issue("candidate_version_mismatch", "Merge candidate must identify as 3.5.4-merge.10-local.", actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright-merge" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
@@ -1385,10 +1602,17 @@ def validate_core(
             errors.append(issue("profile_frontmatter_invalid", "Runtime profile version or role is missing.", profile=str(profile)))
         if profile_meta.get("overflow_language_strategy") != "lossless_zh_payload":
             errors.append(issue("profile_overflow_language_strategy_missing", "Runtime profile must declare lossless Chinese payload re-serialization.", profile=str(profile)))
+    allowed_image_roles = {"subordinate_keyframe_prompt_adapter", "subordinate_keyframe_edit_adapter"}
+    for profile, (profile_meta, _) in zip(image_profiles, loaded_image_profiles):
+        if not profile_meta.get("profile_version") or profile_meta.get("profile_role") not in allowed_image_roles:
+            errors.append(issue("image_profile_frontmatter_invalid", "Image profile version or role is missing.", profile=str(profile)))
 
     documents = [("core", core_text), ("skill", skill_text)] + [
         (f"profile:{profile.name}", profile_text)
         for profile, (_, profile_text) in zip(profiles, loaded_profiles)
+    ] + [
+        (f"image-profile:{profile.name}", profile_text)
+        for profile, (_, profile_text) in zip(image_profiles, loaded_image_profiles)
     ]
     for name, text in documents:
         if len(re.findall(r"^```", text, re.MULTILINE)) % 2:
@@ -1399,7 +1623,7 @@ def validate_core(
     for anchor in anchors:
         if str(anchor) not in core_text and str(anchor) not in skill_text and not any(
             str(anchor) in profile_text for _, profile_text in loaded_profiles
-        ):
+        ) and not any(str(anchor) in profile_text for _, profile_text in loaded_image_profiles):
             errors.append(issue("protected_anchor_missing", "A protected semantic anchor is missing.", anchor=anchor))
     registry_data, registry_errors = load_adapter_registry(registry)
     errors.extend(registry_errors)
@@ -1416,6 +1640,23 @@ def validate_core(
                 "Core validation must load exactly the adapter profiles declared by the registry.",
                 registered=sorted(registered_profiles),
                 supplied=sorted(supplied_profiles),
+            )
+        )
+    image_registry_data, image_registry_errors = load_image_adapter_registry(image_registry)
+    errors.extend(image_registry_errors)
+    registered_image_profiles = {
+        str(record.get("profile"))
+        for record in image_registry_data.get("registered_targets", {}).values()
+        if isinstance(record, dict) and record.get("profile")
+    }
+    supplied_image_profiles = {profile.name for profile in image_profiles}
+    if supplied_image_profiles != registered_image_profiles:
+        errors.append(
+            issue(
+                "registered_image_profile_set_mismatch",
+                "Core validation must load exactly the image adapter profiles declared by the image registry.",
+                registered=sorted(registered_image_profiles),
+                supplied=sorted(supplied_image_profiles),
             )
         )
     return errors
@@ -1453,6 +1694,38 @@ def validate_video_prompt_path(
     text = path.read_text(encoding="utf-8")
     errors.extend(validate_prompt_text(text, character_limit))
     errors.extend(validate_serialization_ownership(data, text, registry))
+    return errors
+
+
+def validate_keyframe_prompt_path(
+    path: Path,
+    adapter_id: str,
+    registry: Path = DEFAULT_IMAGE_REGISTRY,
+) -> list[dict[str, Any]]:
+    registry_data, registry_errors = load_image_adapter_registry(registry)
+    errors = list(registry_errors)
+    if errors:
+        return errors
+    targets = registry_data.get("registered_targets", {})
+    record = targets.get(adapter_id) if isinstance(targets, dict) else None
+    if not isinstance(record, dict) or record.get("adapter_id") != adapter_id:
+        errors.append(issue("keyframe_adapter_unregistered", "Keyframe prompt requires one registered image adapter.", adapter_id=adapter_id))
+        return errors
+
+    text = path.read_text(encoding="utf-8")
+    if not text.strip():
+        errors.append(issue("keyframe_prompt_empty", "Keyframe prompt may not be empty."))
+        return errors
+    if adapter_id == "midjourney_v7":
+        if not re.search(r"(?:^|\s)--v\s+7(?:\s|$)", text):
+            errors.append(issue("midjourney_v7_parameter_missing", "Midjourney V7 Keyframe prompt must include --v 7."))
+        if re.search(r"\b(?:then|continues|begins to|ends up)\b", text, re.IGNORECASE):
+            errors.append(issue("keyframe_temporal_sequence", "Midjourney Keyframe prompt must depict one frozen instant."))
+        if len(re.findall(r"(?:^|\s)--oref(?:\s|$)", text)) > 1:
+            errors.append(issue("midjourney_omni_reference_count", "Midjourney V7 accepts at most one Omni Reference image."))
+        for raw_weight in re.findall(r"(?:^|\s)--ow\s+([0-9]+(?:\.[0-9]+)?)", text):
+            if float(raw_weight) >= 400:
+                errors.append(issue("midjourney_omni_weight_excessive", "Omni Reference weight must remain below 400 unless the director explicitly overrides it."))
     return errors
 
 
@@ -1519,6 +1792,11 @@ def main() -> int:
     video_prompt_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     video_prompt_parser.add_argument("--character-limit", type=int, default=10_000)
 
+    keyframe_prompt_parser = subparsers.add_parser("keyframe-prompt")
+    keyframe_prompt_parser.add_argument("path", type=Path)
+    keyframe_prompt_parser.add_argument("--adapter-id", default="midjourney_v7")
+    keyframe_prompt_parser.add_argument("--image-registry", type=Path, default=DEFAULT_IMAGE_REGISTRY)
+
     state_parser = subparsers.add_parser("state")
     state_parser.add_argument("path", type=Path)
     state_parser.add_argument("--check-locators", action="store_true")
@@ -1533,8 +1811,10 @@ def main() -> int:
     core_parser.add_argument("--core", type=Path, required=True)
     core_parser.add_argument("--skill", type=Path, required=True)
     core_parser.add_argument("--profile", type=Path, required=True, action="append")
+    core_parser.add_argument("--image-profile", type=Path, required=True, action="append")
     core_parser.add_argument("--manifest", type=Path, required=True)
     core_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
+    core_parser.add_argument("--image-registry", type=Path, default=DEFAULT_IMAGE_REGISTRY)
 
     args = parser.parse_args()
     if args.command == "prompt":
@@ -1554,6 +1834,12 @@ def main() -> int:
             ),
             args.json,
         )
+    if args.command == "keyframe-prompt":
+        return emit(
+            str(args.path),
+            validate_keyframe_prompt_path(args.path, args.adapter_id, args.image_registry),
+            args.json,
+        )
     if args.command == "state":
         return emit(str(args.path), validate_state_data(load_yaml(args.path), args.path, args.check_locators), args.json)
     if args.command == "fixture":
@@ -1564,7 +1850,15 @@ def main() -> int:
     if args.command == "core":
         return emit(
             str(args.core),
-            validate_core(args.core, args.skill, args.profile, args.manifest, args.registry),
+            validate_core(
+                args.core,
+                args.skill,
+                args.profile,
+                args.image_profile,
+                args.manifest,
+                args.registry,
+                args.image_registry,
+            ),
             args.json,
         )
     return 2

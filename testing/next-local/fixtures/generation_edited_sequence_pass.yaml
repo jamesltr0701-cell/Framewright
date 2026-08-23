@@ -1,0 +1,9 @@
+kind: generation_strategy
+expected: pass
+document:
+  storyboard_preflight: storyboard_first
+  committed_shot_count: 3
+  strategy: edited_sequence_single_generation
+  prompt_scope_shots: [SHOT_01, SHOT_02, SHOT_03]
+  keyframe_priority: low
+  full_storyboard_runtime_status: planning_only

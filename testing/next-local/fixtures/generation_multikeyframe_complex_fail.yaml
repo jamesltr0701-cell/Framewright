@@ -1,0 +1,18 @@
+kind: generation_strategy
+expected: fail
+expected_errors:
+  - multi_keyframe_overconstrained
+document:
+  storyboard_preflight: proceed_without_storyboard
+  committed_shot_count: 1
+  strategy: single_shot_continuous
+  active_shot_id: SHOT_01
+  prompt_scope_shots: [SHOT_01]
+  keyframe_priority: preferred
+  full_storyboard_runtime_status: planning_only
+  multi_keyframe:
+    selected: true
+    support_evidence: official_documented_workflow
+    complexity: high
+    cuts_implied: false
+    ordered_anchors: [KF01, KF02, KF03, KF04]

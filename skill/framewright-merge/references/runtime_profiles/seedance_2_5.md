@@ -300,6 +300,8 @@ Use these only when the corresponding already-declared control profile is active
 
 `multi_keyframe`:
 
+Seedance 2.5's official prompt guide documents ordered multi-keyframes as an advanced reference-driven workflow, not as a separate top-level UI mode and not as a reliability guarantee. Use the `omni_reference` route and bind each independent image to one ordered major state. This workflow is eligible only for Core `single_shot_continuous` strategy or another explicitly continuous process without implied cuts. Do not recommend it merely because several images exist.
+
 ```yaml
 multi_keyframe_contract:
   ordered_anchors:
@@ -313,6 +315,8 @@ multi_keyframe_contract:
 ```
 
 Every anchor is an independent image in declared order and owns only its named major state. An anchor never creates a cut by itself and never authorizes automatic keyframe-image generation.
+
+For `edited_sequence_single_generation`, do not use ordered keyframes to encode shot boundaries; cuts come from the Committed Shot Spine and transition policy. For `shot_by_shot`, admit only Keyframes belonging to the active shot. A full multi-panel Storyboard remains withheld unless the director separately admits it through the Storyboard Runtime Admission contract.
 
 `blockout_coarse` may own approved action paths, blocking, camera path, cut structure, lighting progression, and sound timing. It denies identity, costume, final surface, texture, and visual-style authority; map every geometric stand-in to its final subject or prop.
 

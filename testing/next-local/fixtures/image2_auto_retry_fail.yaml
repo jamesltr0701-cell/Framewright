@@ -1,0 +1,16 @@
+kind: clean_master_edit
+expected: fail
+expected_errors:
+  - image_edit_attempt_unauthorized
+document:
+  clean_master_edit:
+    original_master_id: KF_MASTER_01
+    base_input_id: KF_MASTER_01
+    attempt_authorized_by_user: false
+    automatic_retry: true
+    based_on_previous_candidate: false
+    cumulative_edit_spec:
+      - change the coat to deep red
+    previous_candidate_ids: []
+    candidate_output_id: KF_CANDIDATE_01
+    master_reset: false

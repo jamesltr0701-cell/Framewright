@@ -1,0 +1,10 @@
+kind: generation_strategy
+expected: fail
+expected_errors:
+  - storyboard_preflight_missing
+document:
+  committed_shot_count: 2
+  strategy: edited_sequence_single_generation
+  prompt_scope_shots: [SHOT_01, SHOT_02]
+  keyframe_priority: optional
+  full_storyboard_runtime_status: planning_only

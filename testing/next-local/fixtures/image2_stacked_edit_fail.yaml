@@ -1,0 +1,19 @@
+kind: clean_master_edit
+expected: fail
+expected_errors:
+  - image_edit_not_from_original
+  - image_edit_candidate_stacking
+  - image_edit_previous_candidate_reused
+document:
+  clean_master_edit:
+    original_master_id: KF_MASTER_01
+    base_input_id: KF_CANDIDATE_01
+    attempt_authorized_by_user: true
+    automatic_retry: false
+    based_on_previous_candidate: true
+    cumulative_edit_spec:
+      - preserve the red coat
+      - remove the sign
+    previous_candidate_ids: [KF_CANDIDATE_01]
+    candidate_output_id: KF_CANDIDATE_02
+    master_reset: false

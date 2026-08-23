@@ -1,0 +1,12 @@
+registry_version: "1.0.0"
+default_keyframe_target: midjourney_v7
+edit_target: chatgpt_image_2_edit
+registered_targets:
+  midjourney_v7:
+    adapter_id: midjourney_v7
+    profile: midjourney_v7.md
+    profile_role: subordinate_keyframe_prompt_adapter
+  chatgpt_image_2_edit:
+    adapter_id: chatgpt_image_2_edit
+    profile: chatgpt_image_2_edit.md
+    profile_role: subordinate_keyframe_edit_adapter

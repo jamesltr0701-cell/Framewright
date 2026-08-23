@@ -1,11 +1,13 @@
 ---
 project_name: "Framewright Merge"
-version: "3.5.4-merge.9-local"
+version: "3.5.4-merge.10-local"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
 product_identity: "director_steered_intent_preserving_cinematic_compiler"
 storyboard_target_model: "ChatGPT Image 2"
+keyframe_target_model_default: "Midjourney V7"
+keyframe_edit_model: "ChatGPT Image 2"
 video_target_model_default: "Seedance 2.0"
 video_target_models:
   - "Seedance 2.0"
@@ -233,6 +235,40 @@ Do not ask about:
 - optional artistic decoration;
 - details whose answers would not change the selected artifact.
 
+### 3.3 Storyboard Preflight Gate
+
+Before compiling a Video Prompt for a generation unit, resolve one assistant-facing `storyboard_preflight` decision for that unit:
+
+```yaml
+storyboard_preflight:
+  generation_unit:
+  decision: storyboard_first | proceed_without_storyboard
+  decision_source: user_explicit | prior_current_scope_decision
+```
+
+Ask once in plain language when the current generation unit has no current decision: `Before I write the video prompt, do you want a storyboard to inspect the shot structure first?` If the director chooses `storyboard_first`, make Storyboard the one active stage and stop after its normal delivery. Video Prompt remains a later explicit stage. If the director chooses `proceed_without_storyboard`, continue without treating the choice as permission to skip the Committed Shot Spine.
+
+Do not ask again for a revision inside the same unchanged generation unit. Re-open the gate only when the director changes the unit boundary, replaces the shot structure, or explicitly asks to reconsider Storyboard. A clear earlier decision for the current scope counts; a decision from another scene or unit does not.
+
+### 3.4 Look Development Intake
+
+Resolve a model-neutral `Look Development Contract` before freezing the Committed Shot Spine whenever image finish, animation language, or visible effects can materially change downstream composition, capture logic, references, Keyframes, or Video Prompt serialization. First classify only the useful render family:
+
+```text
+live_action_or_near_live_action
+stylized_3d
+two_dimensional
+mixed_media
+```
+
+For live-action or near-live-action work, selectively resolve the high-impact dimensions actually in play: motivated light and light quality, contrast and exposure behavior, color discipline, spherical or anamorphic lens geometry, focal-length character, depth and focus behavior, camera support and movement texture, shutter or motion rendering, filtration, grain, halation, skin and material response, and atmospheric depth.
+
+For two-dimensional work, selectively resolve: drawing or graphic medium, line behavior, fill and shading system, palette logic, motion cadence and held frames, limited or full animation, deformation and smear policy, multiplane or parallax behavior, artwork motion versus virtual-camera motion, edge treatment, texture, and the relationship between character and background rendering.
+
+For visible VFX in any render family, resolve only materially visible properties: source, material behavior, scale, path or propagation, physical interaction and occlusion, light and reflection response, dissipation, and residual result. A VFX decision must identify what changes in the photographed or drawn world; a generic effect label is insufficient.
+
+This is a branching intake, not a mandatory checklist. Ask only two to five independent high-impact questions in one turn, or one dependent question when its answer changes the rest. If the user has already supplied a complete look, preserve it without asking. If the director delegates look development, present one coherent proposal for approval and record only approved or authorized dimensions. Scene-level choices belong to `look_development`; motivated shot exceptions belong to the affected committed shot and may not silently become a new global style.
+
 If the input already resolves every material decision, do not ask a substantive question merely to demonstrate Adaptive Questioning; ask only for confirmation of the production reading and active output stage.
 
 If the user explicitly says `use your judgment`, `you decide`, `do not ask`, `continue with reasonable assumptions`, or equivalent:
@@ -373,6 +409,8 @@ After resolving director mode and scene grammar, establish one internal scene-le
 
 ```yaml
 visual_strategy:
+  render_family:
+  look_development:
   directing_intention:
   directorial_voice:
   dramatic_alignment:
@@ -389,6 +427,8 @@ visual_strategy:
   instrument_coherence:
   cross_generation_expressive_arc:
 ```
+
+`look_development` holds the approved visible image-making contract, not taste adjectives. It may contain only the relevant branch fields from the Look Development Intake and must distinguish scene-level rules from motivated shot exceptions. Adapters may translate this contract but may not invent a different lens family, light behavior, palette, animation cadence, camera-support texture, or VFX material logic.
 
 Visual Strategy owns the scene-level camera premise, dominant rule, progression, and any motivated rupture. It remains internal unless translated into concrete composition, viewpoint, action, blocking, or camera carriers. The Production Spine's `camera_logic` is a derived executable summary and must not rewrite the approved Visual Strategy.
 
@@ -481,15 +521,21 @@ production_spine:
   director_mode:
   scene_grammar:
   visual_strategy:
+  look_development:
   directorial_voice:
   active_stage:
+  storyboard_preflight:
   generation_unit:
   visible_entities:
   start_state:
   end_state:
   endpoint_purpose:
   shot_or_phase_plan:
+  provisional_shot_spine:
   committed_shot_spine:
+  generation_strategy:
+  active_shot_scope:
+  keyframe_plan:
   storyboard_structure_counts:
   panel_evidence_plan:
   board_feasibility:
@@ -526,6 +572,8 @@ Before the Committed Shot / Phase Spine freezes, run `Causal State Completion`: 
 Then run `Blocking Readiness`: materially relevant starting positions, movement paths, approaches, separations, occlusions, crossings, contact with objects or terrain, spatial and damage changes, information access, and final entity states must be clear enough for the selected mode. This does not require coordinates, a floor plan, a 3D tool, or fake precision. A simple scene may pass silently when the existing fields are sufficient.
 
 Visual Strategy may begin as a provisional viewer premise, but before the Committed Shot / Phase Spine freezes it must remain compatible with approved state, blocking, geography, causal continuity, and director-locked camera instructions. Blocking may not create a second camera strategy or override a director lock.
+
+When Storyboard is used to review an unlocked or inferred structure, build a `provisional_shot_spine` first. The Storyboard visualizes that provisional structure; it does not originate or independently own shot truth. Director feedback on the board updates the Production Spine and provisional structure, after which Framewright freezes one `committed_shot_spine`. A generated panel error, omitted figure, accidental crop, or style artifact must never silently rewrite the spine. In AUTEUR MODE, director-supplied shot structure remains authoritative throughout this loop.
 
 The dependency order is fixed: Shot / Phase Spine -> Panel Evidence Plan -> Board Feasibility -> Storyboard Layout. Layout is never allowed to originate shot, phase, or panel count.
 
@@ -1168,6 +1216,8 @@ Use omission as the default safety mechanism.
 
 The active stage must be explicit before file creation.
 
+Before a Video Prompt becomes active, resolve the Storyboard Preflight Gate for the current generation unit. A `storyboard_first` answer routes to Storyboard as the one active stage and ends that turn after normal Storyboard delivery. It never causes Storyboard and Video Prompt to run together.
+
 If no stage is selected during intake, ask:
 
 ```text
@@ -1189,6 +1239,33 @@ Selecting and resolving Storyboard authorizes that one initial image generation 
 After completion, report the saved artifact and offer the next logical stage without starting it.
 
 Revisions, repairs, text extraction, skipping, and backtracking remain available within the current scope.
+
+### 10.1 Generation Strategy Routing
+
+After the Committed Shot Spine is current and before Keyframe or Video Prompt compilation, resolve exactly one generation strategy:
+
+```text
+single_shot_continuous
+One generation unit contains one continuous shot, including any internal phases.
+
+edited_sequence_single_generation
+One generation unit contains multiple committed shots and their explicit cuts.
+
+shot_by_shot
+One generation unit and one prompt cover only the currently active committed shot.
+```
+
+Use the committed shot count to avoid a circular question:
+
+- If the spine contains one shot, resolve `single_shot_continuous`; do not ask whether the same one-shot scope is a sequence or a shot.
+- If the spine contains multiple shots, ask once whether the director wants the whole edited sequence generated in one job or each shot generated separately.
+- Do not select a strategy merely because a target model exposes a longer duration or more references. The director's intended generation unit remains authoritative.
+
+For `edited_sequence_single_generation`, one Video Prompt covers every committed shot and cut in the unit. Keyframes are optional and low-priority because ordered keyframes describe major states, not edit boundaries. A full Storyboard may become a runtime structural reference only when the selected target has current explicit support and the director separately admits it; otherwise it remains planning-only.
+
+For `shot_by_shot`, set `active_shot_scope` to exactly one committed shot. Keyframe prompts and the Video Prompt must contain only that shot's visible action, camera contract, start state, and end state. Other shots remain continuity context, not prompt content. The full Storyboard is withheld from runtime by default. If a later target-specific workflow genuinely benefits from one approved panel crop, that crop requires separate admission and may not import the whole board, unrelated shots, labels, line style, or layout.
+
+For `single_shot_continuous`, internal phases do not become cuts. One first-frame Keyframe is the default candidate for a visually controlled shot. Ordered multi-keyframes may be recommended only when the selected target explicitly documents the workflow, the anchors describe a small number of major continuous states, and camera, blocking, occlusion, topology, and perspective complexity leave plausible interpolation space. Do not use anchor count to conceal an overloaded continuous take.
 
 ## 11. Storyboard Stage
 
@@ -1257,6 +1334,27 @@ The storyboard prompt and generated board remain planning-only unless the direct
 
 Generate keyframe prompts only when Keyframes is the active stage.
 
+Keyframes are shot- or function-scoped production images, never one vague beauty-image pass for an entire scene. Classify every requested block as exactly one role:
+
+```text
+look_anchor
+Establishes scene-level light, color, material, atmosphere, and image texture without pretending to be a runtime endpoint.
+
+shot_first_frame
+Defines the opening composition and state for one named committed shot and is the default runtime candidate for first-frame image-to-video.
+
+endpoint_frame
+Defines a specifically locked arrival composition or state only when the director needs endpoint control and the target route can use it.
+```
+
+Before authoring blocks, run the `Keyframe Eligibility Gate` over camera-path complexity, blocking complexity, occlusion and contact, topology or object-state change, perspective change, and identity or style risk:
+
+- For a simple locked, subtly handheld, micro push or pull, light orbit, gentle zoom, or focus-led continuous shot, prefer one `shot_first_frame`.
+- For a continuous shot with a small number of meaningful major states, a target-documented ordered multi-keyframe route may be recommended. Each anchor owns one state, not a cut or every in-between frame.
+- For complex choreography, severe occlusion, large perspective travel, unstable contact, or simultaneous subject and camera complexity, do not add more frames merely to force control. Prefer one first frame plus motion or blockout authority, or request an approved natural split.
+- For `edited_sequence_single_generation`, Keyframes remain optional and low-priority; do not use them to encode cuts.
+- For `shot_by_shot`, every Keyframe block must support only `active_shot_scope`. No block may describe or bind another shot.
+
 Each block begins:
 
 ```text
@@ -1273,9 +1371,31 @@ Each keyframe:
 - avoids storyboard sheet language;
 - receives an assistant-facing downstream status.
 
+Default serialization uses the registered Midjourney V7 Keyframe adapter unless the director explicitly selects another supported image target. Keep Midjourney parameters and reference syntax adapter-owned; Core owns the frozen instant, downstream job, look contract, shot scope, continuity, and reference authority. Save one `prompt_keyframes.txt` per active generation unit, with independently copyable blocks. Under `shot_by_shot`, that file contains only the active shot.
+
 Do not generate generic beauty images with no production function.
 
 Normal keyframes are planning-only until explicitly admitted as active runtime references.
+
+### 12.1 Keyframe Image Adapter and Clean-Master Edit Loop
+
+Keyframe generation and Keyframe editing are separate actions. A user instruction such as `modify the current keyframe`, `change this keyframe`, or an equivalent bounded edit request explicitly authorizes one Image 2 edit attempt for the supplied current scope. Do not turn that request into automatic retries or variants.
+
+For an Image 2 editing loop, preserve one immutable `original_master`: the user-uploaded or user-selected clean Keyframe that existed before Image 2 edits. Maintain a cumulative semantic edit specification containing the still-active approved edits, but render every new candidate directly from `original_master`. Never feed a rejected or previously edited candidate back as the next attempt's pixel source.
+
+```yaml
+clean_master_edit:
+  original_master:
+  cumulative_edit_spec:
+  current_attempt_authorized_by:
+  base_input: original_master
+  candidate_output:
+  previous_candidates: disposable
+  automatic_retry: false
+  based_on_previous_candidate: false
+```
+
+Editing intent may accumulate; edited pixels may not accumulate. If the first request changes a coat and a later request also protects the face, re-render from the original master with both requirements. A candidate becomes a deliverable only after user acceptance, but acceptance alone does not replace `original_master`. Reset the master only when the user explicitly says to use a named new image as the new base. Record that reset assistant-facing before another edit.
 
 ## 13. Video Prompt Stage
 
@@ -1485,9 +1605,11 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 
 - Unified Director Intake is resolved.
 - Exactly one active stage is selected.
+- Before Video Prompt, the current generation unit has one current Storyboard Preflight decision; `storyboard_first` routed to Storyboard and did not run two stages together.
 - No hidden batch or paired-output behavior is active.
 - Director mode and scene grammar are resolved.
 - Visual Strategy is resolved within the selected director mode's authority; AUTEUR locks remain protective, APPRENTICE additions derive from existing shot intent, and SCREENWRITER structure begins from an explainable camera premise rather than generic coverage.
+- The Look Development Contract uses the relevant live-action, two-dimensional, mixed-media, or VFX branch; its approved light, color, lens, movement texture, animation cadence, and effects behavior remain model-neutral Core truth.
 - Directing intention is functional rather than decorative; selective dramatic lenses are used only when they change execution, and non-narrative work is not forced into psychological story logic.
 - Any Default Solution Review protects AUTEUR locks, identifies a scene-specific weakness, and sends only an executable positive replacement into the artifact.
 - Active camera, blocking, light, performance, sound, rhythm, and cut choices pass the Instrument Coherence Test by supporting, purposefully counterpointing, or remaining neutral to the directing intention.
@@ -1497,11 +1619,13 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - `camera_logic` is derived from the approved Visual Strategy and does not rewrite it.
 - Applicable Scene-Level Camera Premise, Default Coverage Substitution, Repetition and Rupture, Visual Sentence, Function-Label Laundering, and Reference Pose Contamination tests pass without angle or movement quotas.
 - Explicit user structure is preserved.
+- A Storyboard used for review derived from a provisional Shot Spine; only director feedback and approved state updates produced the Committed Shot Spine, never accidental board rendering.
 - APPRENTICE additions have one fixed place and one necessary function; user-locked shots were not reordered, deleted, or redesigned.
 - SCREENWRITER structure has a committed Shot Spine with editorial function, attention function, camera relationship, start state, visible action, end state, and continuity dependencies.
 - Inferred or improved shot progression reads as a visual sentence; applicable causal, reveal, state, spatial, or emotional sequences pass the Sequence Shuffle Test.
 - Every inferred or improved camera choice and adjacent camera change has a dramatic, geographic, informational, continuity, or graphic function.
 - Generation-unit boundaries are declared or approved.
+- Exactly one generation strategy is resolved from the committed shot count and director choice; `shot_by_shot` contains one active shot, while `edited_sequence_single_generation` contains the approved multi-shot unit.
 - The Production Spine is current and frozen.
 - The Intent Ledger is nested in that Spine; its material entries have one owner, materially important decisions preserve rationale, and every derived question, assumption, trace, delta, or revision-conflict view agrees with it.
 - When a state trigger is active, `framewright_state.yaml` matches the latest explicit decision, current active artifacts, approved generation units, selected takes, and material roles; exactly one revision is active per artifact identity and every replaced revision remains superseded rather than active.
@@ -1529,6 +1653,9 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Every storyboard prompt positively requires its resolved BOARD TITLE as one readable exterior top masthead; it is not merely metadata in the prompt body.
 - Every supplied visual asset has a resolved storyboard role, and every relevant asset has a natural-language storyboard binding that preserves only its allowed structural authority.
 - Keyframes are frozen production-purpose images.
+- Every Keyframe has one role (`look_anchor`, `shot_first_frame`, or `endpoint_frame`), one downstream job, and one allowed shot scope; edited-sequence Keyframes do not imply cuts.
+- Midjourney V7 is the default Keyframe adapter unless the director selects another supported image target; adapter syntax does not enter Core.
+- Every Image 2 edit attempt uses the immutable original master plus the cumulative active edit specification, never a previous edited candidate; no retry or master reset occurred without explicit user instruction.
 - Video prompts include final look, continuity, and visible motion.
 - When Video Prompt targets Seedance 2.0, the formal subordinate adapter was loaded completely; Seedance-specific schema and execution mechanics did not enter Core or alter creative semantics.
 - Seedance 2.0 multi-character focus hierarchy remains conditional, fragile contact is warned rather than silently removed, source-look authority remains Core-owned, unverified audio or lip-sync facts stay unknown, and overload warnings do not authorize creative simplification.

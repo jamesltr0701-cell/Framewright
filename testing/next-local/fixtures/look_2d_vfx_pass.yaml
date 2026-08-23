@@ -1,0 +1,20 @@
+kind: look_development
+expected: pass
+document:
+  render_family: two_dimensional
+  material_only: true
+  intake_questions: []
+  resolved_dimensions:
+    line_behavior: dry ink line with controlled boil
+    fill_and_shading: flat fill with two-tone shadow shapes
+    motion_cadence: held drawings with selective full-motion accents
+    parallax: three-plane multiplane depth
+  vfx:
+    active: true
+    source: the cracked lantern seam
+    material_behavior: flat painted smoke ribbons with granular edges
+    path: curls upward and drifts screen right
+    interaction: passes behind the hand and in front of the wall
+    light_response: warm rim brightens nearby ink edges
+    dissipation: breaks into sparse flecks
+    residual_result: a faint soot mark remains on the wall
