@@ -1,0 +1,23 @@
+kind: state
+expected: pass
+document:
+  framewright_state:
+    schema_version: "1.1"
+    core_version: "4.1.0"
+    project_slug: lightweight_single_scope
+    current_scope: scene_03
+    active_stage: video_prompt
+    director_mode: auteur
+    approved_generation_units: [GU03]
+    active_artifacts:
+      - artifact_id: video_prompt
+        stage: video_prompt
+        generation_unit: GU03
+        revision: 1
+        locator: GU03/prompt_video.txt
+        change_class: director_refinement
+    active_intent_entries: [INT-003]
+    unresolved_material_decisions: []
+    active_material_roles: [hero_identity]
+    last_approved_revision: 1
+    last_updated: "2026-09-05T12:00:00+08:00"

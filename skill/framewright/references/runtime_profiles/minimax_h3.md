@@ -45,6 +45,8 @@ Treat an unambiguous explicit name such as `MiniMax H3`, `MiniMax-H3`, or `H3` a
 
 If this profile conflicts with core Framewright, preserve core and report the adapter conflict assistant-facing.
 
+Read `generation_strategy`, `prompt_scope_shots`, `reference_allocation`, and any present `edit_use_relationship` from the approved Core Prompt IR. Do not expose those field names in the clean prompt. For `shot_by_shot`, serialize only the active shot; neighboring shot context may protect the incoming state or edit landing but may not contribute its action. For `edited_sequence_single_generation`, preserve every committed cut and retain independent character, location, object, or style references when the sequence needs authority that its Keyframes do not carry. Do not duplicate properties already carried by an admitted Keyframe.
+
 ## 2. Runtime Routes
 
 Resolve exactly one H3 route inside the existing Video Prompt stage:

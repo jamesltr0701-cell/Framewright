@@ -52,6 +52,8 @@ seedance_runtime:
 
 Director mode and `ui_mode` are independent. A task route is model execution syntax, not a new Framewright stage or scene grammar.
 
+Read `generation_strategy`, `prompt_scope_shots`, `reference_allocation`, and any present `edit_use_relationship` from the approved Core Prompt IR. Do not expose those field names in the clean prompt. For `shot_by_shot`, serialize only the active shot; neighboring shot context may protect the incoming state or edit landing but may not contribute its action. For `edited_sequence_single_generation`, preserve every committed cut and retain independent character, location, object, or style references when the sequence needs authority that its Keyframes do not carry. Do not duplicate properties already carried by an admitted Keyframe.
+
 The router may recommend one route and explain the reason in the Run Card. The director may override the recommendation when the requested route is compatible with the supplied materials and target surface. If an override would violate a core lock or lacks required material, ask one compact material question.
 
 ## 3. Capability and Feasibility

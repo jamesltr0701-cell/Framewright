@@ -7,17 +7,21 @@ description: Preserve cinematic intent while compiling a scene idea, screenplay 
 
 Use Framewright as a director-steered, intent-preserving cinematic compiler whose primary executable output is a prompt artifact for AI filmmaking pre-production.
 
-## Required reference
+## Authoritative reference and efficient loading
 
-Read `references/framewright.md` completely before producing Framewright output. Treat it as the authoritative specification, including its unified intake, stage routing, director modes, asset handling, continuity rules, and output contracts.
+Treat `references/framewright.md` as the authoritative specification, including its unified intake, stage routing, director modes, asset handling, continuity rules, and output contracts. At the first Framewright action in a task, read its frontmatter and section map, then read every section that governs the current scope, mode, stage, materials, continuity, output, and validation. Do not replace this source with a remembered or lossy summary.
 
-For Video Prompt, first compile the approved Production Spine into the model-neutral Prompt IR defined by the authoritative reference. Then read `references/runtime_profiles/adapter_registry.yaml`, resolve exactly one registered target-model / serialization-owner pair, and read exactly that model's subordinate runtime profile completely before feasibility qualification or serialization:
+Within the same uncompacted conversation context, reuse an already loaded section when the exact Core version and relevant scope are unchanged. Do not mechanically re-read unchanged sources at the approval-to-compile boundary. If the task is new, context was compacted, the Core version changed, the scope or stage changed, or a source-of-truth conflict appears, restore the missing authoritative sections before continuing; expand to a complete reread whenever selective restoration cannot prove the applicable rule. This is a loading optimization, never permission to omit a relevant rule.
+
+For Video Prompt, first compile the approved Production Spine into the model-neutral Prompt IR defined by the authoritative reference. Then read `references/runtime_profiles/adapter_registry.yaml`, resolve exactly one registered target-model / serialization-owner pair, and read exactly that model's subordinate runtime profile completely before its first feasibility qualification or serialization in the current uncompacted context:
 
 - Seedance 2.0: `references/runtime_profiles/seedance_2_0.md`
 - Seedance 2.5: `references/runtime_profiles/seedance_2_5.md`
 - MiniMax H3: `references/runtime_profiles/minimax_h3.md`
 
 Do not infer a target model from supplied media, prompt style, platform, provider, surface, or profile availability. Target model—not platform—selects the dialect. Load exactly one adapter profile for exactly one target. If the requested target is unsupported or ambiguous, ask one compact target-model question. An adapter may qualify feasibility and serialize the approved Prompt IR, but it may not reinterpret creative intent, modify the IR, or override the authoritative reference, director locks, state, stage, or compiler ownership.
+
+Reuse that fully loaded adapter for later compiles in the same uncompacted context only while its exact profile version, target, route prerequisites, and relevant scope remain unchanged. Reload it after compaction, a profile-version change, a target change, or an adapter conflict. Never load all adapters as a precaution.
 
 For Keyframes, read `references/keyframe_profiles/adapter_registry.yaml`, resolve the default `midjourney_v7` target unless the director explicitly selects another registered image target, and read only its profile completely. Core owns the frozen instant, Keyframe role, shot scope, look contract, continuity, and reference authority; the profile owns Midjourney prompt syntax and parameters. When the user explicitly asks to modify a current Keyframe, also read `references/keyframe_profiles/chatgpt_image_2_edit.md` and apply its clean-master editing contract. Do not load either image profile for Storyboard or ordinary Video Prompt work.
 
@@ -40,7 +44,7 @@ Load only the relevant reference or section; reuse it in the same context when u
 
 For Video Prompt validation, supply `--compiler-source` for each required source and each integrated craft reference actually used, using its repository-relative registered path. Do not add every optional source by default or claim that a PASS verifies the real loading history. Source attribution and the third-party notice are in [craft provenance](references/craft/PROVENANCE.md); this is not another instruction source to load for production.
 
-Before any Framewright output, read the `version` value from the reference YAML and state exactly:
+Before any Framewright output, verify the current `version` value from the reference YAML and state exactly:
 
 `Loaded: Framewright v<version>`
 
@@ -54,13 +58,14 @@ Preserve the exact version value. Do not silently substitute a remembered, local
 2. Present a compact understanding and production reading. Use the reference's Framewright-owned Intake Presentation Layer only to adapt language and proposal timing; it never selects Director Mode, state, questions, stage, target, or compiler ownership. Apply the relevant content review lens, classify material gaps, and schedule questions by dependency: ask only the highest-impact question when its answer can change later questions; combine only genuinely independent questions, with five retained as the maximum batch size.
 3. Select exactly one Director Mode and state it explicitly to the user before compilation. Keep that mode in internal compile state, but never serialize its literal label into a clean model-facing Prompt.
 4. After each dependent answer, update the Production Spine's nested Intent Ledger and recalculate the question queue. Protect intentional freedom, omit low-impact decoration, and stop when remaining gaps cannot materially change a downstream contract.
-5. When the reference's conditional state trigger is active, read or update the project-local `framewright_state.yaml` before compilation. Reconcile it with the latest explicit user decision and active artifacts; never treat it as a second Production Spine or target-model input.
+5. Identify the active production's single persistence owner. Reuse a reliable host-project authority record when one already exists; otherwise create or update the conditional `framewright_state.yaml` fallback only at the Core's durable checkpoint triggers. Reconcile only affected current fields with the latest explicit user decision and active artifacts; never duplicate the same truth across several state files or treat persistence as a second Production Spine or target-model input.
 6. Treat requested advice or delegated judgment as a named, current-scope authority grant. Record material assumptions and continue only within that grant unless an explicit safety, reference-authority, generation-unit, stage, or feasibility decision still requires the user.
 7. Before Video Prompt, resolve the current generation unit's Storyboard Preflight decision. After the Committed Shot Spine is current, resolve one generation strategy: one continuous shot, one edited multi-shot sequence, or one active shot at a time.
 8. Run exactly one selected stage: Storyboard, Keyframes, or Video Prompt.
-9. For Video Prompt, build and validate one approved model-neutral Prompt IR, resolve `target_model`, scalar `serialization_owner`, adapter contract, and compiler instruction sources from the registry, then let the selected adapter serialize that IR. Validate the actual `.txt` artifact with the bundled ownership-aware `video-prompt` command. For Keyframes, compile only the allowed generation-strategy scope and validate it with the registered image adapter contract. For Storyboard, run the applicable generic deterministic validator. In every stage, run Semantic Preflight, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
-10. Return the compact assistant-facing Intent Delta required by the reference, outside the clean prompt and without creating a second default artifact.
-11. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
+9. When the user approves the current plan and asks to compile, cross the Core Approved Compile Boundary: compile the approved Spine without reopening creative exploration, asking preference questions, or restating already resolved decisions. Ask only when one real blocker prevents a faithful artifact.
+10. For Video Prompt, build and validate one approved model-neutral Prompt IR, resolve `target_model`, scalar `serialization_owner`, adapter contract, and compiler instruction sources from the registry, then let the selected adapter serialize that IR. Validate the actual `.txt` artifact with the bundled ownership-aware `video-prompt` command. For Keyframes, compile only the allowed generation-strategy scope and validate it with the registered image adapter contract. For Storyboard, run the applicable generic deterministic validator. In every stage, run the applicable Semantic Preflight checks, preserve the user's creative intent, and distinguish locked facts, approved decisions, reasonable execution inference, and intentional freedom.
+11. Return the compact assistant-facing Intent Delta required by the reference, outside the clean prompt and without creating a second default artifact.
+12. For a resolved Storyboard stage only, generate exactly one initial storyboard board image from the saved prompt as part of the same stage delivery package.
 
 ## Tool boundary
 

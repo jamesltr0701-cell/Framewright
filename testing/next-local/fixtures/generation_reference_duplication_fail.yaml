@@ -1,5 +1,9 @@
 kind: generation_strategy
-expected: pass
+expected: fail
+expected_errors:
+  - neighboring_shot_action_leak
+  - reference_authority_duplicated
+  - generation_edit_use_invalid
 document:
   storyboard_preflight: proceed_without_storyboard
   committed_shot_count: 3
@@ -10,8 +14,8 @@ document:
   full_storyboard_runtime_status: withheld_from_runtime
   neighboring_context:
     used_for: [previous_accepted_end_state, next_edit_purpose]
-    serialized_neighboring_action: false
+    serialized_neighboring_action: true
   reference_allocation:
-    keyframe_carried_properties: [character_identity, wardrobe, location, visual_style, opening_composition]
-    separate_reference_properties: [voice]
-  edit_use_relationship: shot_segment
+    keyframe_carried_properties: [character_identity, wardrobe]
+    separate_reference_properties: [character_identity, voice]
+  edit_use_relationship: one_final_shot_only

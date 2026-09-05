@@ -7,3 +7,8 @@ document:
   prompt_scope_shots: [SHOT_01, SHOT_02, SHOT_03]
   keyframe_priority: low
   full_storyboard_runtime_status: planning_only
+  one_take_assumed: false
+  reference_allocation:
+    keyframe_carried_properties: []
+    separate_reference_properties: [character_identity, location, visual_style]
+  edit_use_relationship: whole_generated_sequence

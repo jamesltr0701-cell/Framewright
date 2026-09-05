@@ -2,10 +2,10 @@
 
 Framewright is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It turns a director's approved scene intent, decision state, and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-- Current core version: **4.1.0**
-- Release status: **stable**
-- Desktop Framewright mirror: **4.1.0**
-- GitHub `main`: **4.1.0**
+- Local candidate core version: **4.1.0**
+- Candidate status: **isolated local validation**
+- Desktop Framewright mirror: **4.0.0 stable**
+- GitHub `main`: **4.0.0 stable**
 - Global invocation: **`$framewright` only**
 
 Author: **Tairan Li**
@@ -22,15 +22,15 @@ Author: **Tairan Li**
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
 
-GitHub `main` is the source of truth for the synchronized stable release. Framewright 4.1.0 is the intended release across the local Source, Desktop mirror, and GitHub `main`.
+GitHub `main` remains the source of truth for the synchronized stable release. This branch is an isolated 4.1.0 candidate; it does not claim that the formal Source, Desktop mirror, or GitHub `main` has been promoted.
 
 ## Install in Codex
 
-Install the stable package from `https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright` into the global `framewright/` folder.
+Install the stable package from `https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright` into the global `framewright/` folder. The isolated 4.1.0 candidate is not the public install source until separate promotion approval.
 
 After installation, invoke it explicitly with `$framewright`.
 
-Version 4.1.0 integrates selected practical craft and repair guidance into Framewright-owned, conditionally loaded references. The external Seedance 2.0 skill pack is not required. Core retains all director decisions; the selected target adapter retains serialization ownership. The release does not promote the separate local Midjourney V8.2 or ChatGPT Image 2 base-create candidates. Adapted reference material and its MIT notice are identified in [craft provenance](skill/framewright/references/craft/PROVENANCE.md).
+The 4.1.0 candidate integrates selected practical craft and repair guidance into Framewright-owned, conditionally loaded references, adds scoped source reuse, a single-persistence-owner policy, an approval-to-compile boundary, and clearer sequence/shot asset allocation. Once promoted, the external Seedance 2.0 skill pack will not be required. Core retains all director decisions; the selected target adapter retains serialization ownership. This candidate does not promote the separate local Midjourney V8.2 or ChatGPT Image 2 base-create candidates. Adapted reference material and its MIT notice are identified in [craft provenance](skill/framewright/references/craft/PROVENANCE.md).
 
 Framewright is configured for explicit invocation and one active stage at a time. Version 4.0.0 adds a once-per-unit Storyboard Preflight gate, branching live-action / 2D / VFX Look Development, provisional-to-committed Shot Spine review, and generation routing for continuous single shots, whole edited sequences, or one shot at a time. Keyframes default to a Midjourney V7 adapter; user-requested Image 2 edits always return to the immutable original master rather than stacking edited pixels. Target-specific Video Prompt behavior remains subordinate to Core: Seedance 2.0, Seedance 2.5, and MiniMax H3 each retain separate registered adapters. A resolved Storyboard stage still generates exactly one initial board image; automatic retries, variants, unrequested Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 

@@ -88,7 +88,7 @@ Translate Core's approved `endpoint_purpose` without changing it:
 
 ## 7. Prompt IR Input Contract
 
-Accept only an IR whose `adapter_input_status` is `approved`, whose target is `seedance_2_0`, whose unresolved material decisions are empty, and whose completed/current/future beat scopes are disjoint. Never serialize internal fields such as Director Mode, directing-intention rationale, directorial-voice rationale, Intent Ledger, risk analysis, target ownership, or provenance.
+Accept only an IR whose `adapter_input_status` is `approved`, whose target is `seedance_2_0`, whose unresolved material decisions are empty, and whose completed/current/future beat scopes are disjoint. Preserve its `generation_strategy`, `prompt_scope_shots`, `reference_allocation`, and any present `edit_use_relationship` without turning those internal field names into prompt text. In shot-by-shot work, serialize only the active shot and use neighboring context only to protect continuity or the edit landing. In edited-sequence work, preserve every committed cut and retain independent references only for authority the active Keyframe or text cannot carry. Never serialize internal fields such as Director Mode, directing-intention rationale, directorial-voice rationale, Intent Ledger, risk analysis, target ownership, or provenance.
 
 ## 8. Serialization
 

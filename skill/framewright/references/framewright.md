@@ -91,16 +91,21 @@ latest explicit user decision
 
 When a revision changes an approved material decision, update the ledger entry and its dependent Spine fields before regenerating the requested artifact. If the revision preserves a surface action but breaks the approved rationale, report the conflict assistant-facing and request a decision instead of silently overwriting it.
 
-For scopes that need continuity beyond the current turn, maintain one conditional project control file at `Framewright/outputs/[project_slug]/framewright_state.yaml`. Create or continue it only when at least one of these triggers is true:
+Before creating or updating a Framewright control file, identify one persistence owner for the active production scope. If the host project already has a reliable, current, reviewable record that owns approved scope, artifact locators, active material authority, and continuity, use that record and do not maintain the same facts again in `framewright_state.yaml`, a Run Card, a task packet, or a global ledger. If no such host record exists and continuity must survive the current task, use `Framewright/outputs/[project_slug]/framewright_state.yaml` as the simple recoverable fallback. There must be one persistence owner, not several writable copies of the same truth.
 
-- the project contains two or more approved generation units;
-- the same artifact enters a second material revision;
+Create or continue the fallback only when at least one of these triggers is true:
+
+- the project contains multiple approved generation units whose dependency or beat state must survive the current task;
 - the director selects a generated take for repair or downstream continuity;
-- the director explicitly continues the same Framewright production across tasks.
+- the director explicitly continues the same Framewright production across tasks;
+- a scene checkpoint records a newly accepted canonical artifact, a cross-scene dependency, a selected-take continuity change, or a high-risk authority conflict;
+- the director explicitly requests durable Framewright state.
 
-Do not create this file for a one-off, single-unit, single-revision compilation without a generation loop. The state file is a reviewable serialization of the current approved Production Spine and Intent Ledger subset, not a second editable Spine, a target-model attachment, or an additional prompt artifact. A later explicit user decision always outranks stored state. Reconcile the state before compiling when it conflicts with the latest decision, an active artifact, or an existing `PROGRESS.md`; do not silently choose one record or rewrite `PROGRESS.md`.
+Do not create a fallback state file for a one-off compilation, an ordinary candidate, a rejected draft, or a narrow revision that does not change accepted authority or continuity. An ordinary candidate does not create a global state checkpoint. Preserve such history through its artifact file and version control; only acceptance, promotion, a selected take, or a material continuity/authority change updates the persistence owner.
 
-Use this minimum state shape:
+The fallback state is a reviewable serialization of the current approved Production Spine and Intent Ledger subset, not a second editable Spine, a target-model attachment, or an additional prompt artifact. A later explicit user decision always outranks stored state. Reconcile a conflict before compiling; do not silently choose one record or rewrite a host-owned record outside the current Framewright scope. Update only the affected current state, artifact locator, authority, or continuity fields. Do not refresh unrelated scene, episode, runtime, task-packet, Run Card, or global-ledger documents after every prompt.
+
+Use this minimum fallback shape:
 
 ```yaml
 framewright_state:
@@ -112,20 +117,36 @@ framewright_state:
   director_mode:
   approved_generation_units:
   active_artifacts:
-  superseded_artifacts:
   active_intent_entries:
-  intentional_freedom:
   unresolved_material_decisions:
   active_material_roles:
-  cross_gu_continuity:
-  selected_generated_takes:
-  beat_scope:
-  continuation_contracts:
   last_approved_revision:
   last_updated:
 ```
 
-Each tracked artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one revision may be active for the same artifact identity; replaced revisions move to `superseded_artifacts` and retain their provenance. Classify a material change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director may enter `selected_generated_takes` or become continuity truth. It must also be accepted for continuity before it becomes continuity canon. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
+Append only the conditional groups that are active:
+
+```yaml
+framewright_state:
+  superseded_artifacts: []
+  intentional_freedom: []
+  cross_gu_continuity: {}
+  selected_generated_takes: []
+  beat_scope: {}
+  continuation_contracts: []
+```
+
+Each tracked accepted artifact must resolve one stable artifact identity, stage, generation-unit scope, revision, status, and locator. Exactly one accepted revision may be active for the same artifact identity; a replaced accepted revision moves to `superseded_artifacts` and retains provenance. Rejected and unpromoted candidates do not need formal active/superseded entries. Classify a material accepted change as `director_refinement`, `compiler_inference`, `repair`, or `model_workaround`. Only a generated take explicitly selected by the director may enter `selected_generated_takes` or become continuity truth. It must also be accepted for continuity before it becomes continuity canon. Do not backfill historical projects automatically, embed complete prompts or diagnostic reports in state, or upload the state file to a target model.
+
+### Authoritative Source Loading and Reuse
+
+Load the exact Core sections, one selected adapter, and only the on-demand craft references required by the current scope. Within the same uncompacted conversation context, reuse already loaded unchanged rules and completed intake or approved Spine decisions. Do not mechanically re-read unchanged sources when the user crosses from approval into compilation.
+
+After a new task, context compaction, Core or adapter version change, scope or stage change, or source-of-truth conflict, restore the missing authoritative basis before acting. Selective restoration is allowed only when the applicable rules can be identified with confidence; otherwise expand to a complete reread. Never pretend remembered text is current, invent a summary Core, or let a speed optimization weaken an authorization, continuity, reference, stage, or ownership boundary.
+
+Reading and validation are different jobs. Source loading establishes the rules that apply. Artifact validation checks the current output against those applicable rules. Neither requires reloading inactive adapters, unrelated craft references, old superseded state, or every project document.
+
+For a materially resolved ordinary scope, use roughly five to ten minutes from compile instruction to saved initial prompt as an operational target, not a promise or a release claim. Measure actual waits when evaluating performance. Do not invent a percentage improvement or attribute delay to Core length, YAML, validation, network, or any other single cause without observed evidence.
 
 ### Selected-Take Canon and Continuation Reconciliation
 
@@ -294,6 +315,12 @@ Before the Unified Director Intake is resolved, Framewright must not:
 - bind ambiguous references.
 
 Uploaded assets and paths may be inspected during intake, but they do not authorize output selection or file creation by themselves.
+
+### Approved Compile Boundary
+
+When the current intake, Production Spine, active stage, generation strategy, target, and required material authority are resolved, a clear instruction such as `通过，编译吧`, `approved, compile`, or an equivalent approval closes creative exploration for that artifact. Compile directly from the approved Spine. Do not reopen taste questions, add unsolicited alternatives, re-pitch the shot design, or ask the user to reconfirm decisions that are already current.
+
+After this boundary, ask only when one real blocker prevents a faithful and valid artifact: a missing required asset or role, contradictory current authority, an unapproved generation-unit change, unsupported target, safety or consent issue, or an impossible required output path. A non-critical preference, optional improvement, or desire for more detail is not a blocker. Preserve all unaffected approvals when resolving a blocker, then continue compilation without restarting intake.
 
 ### Retired Workflow Labels
 
@@ -1255,6 +1282,14 @@ Revisions, repairs, text extraction, skipping, and backtracking remain available
 
 ### 10.1 Generation Strategy Routing
 
+The operating path is:
+
+```text
+Director Mode + scene grammar -> approved Shot Spine -> generation strategy -> user-selected target adapter -> saved prompt
+```
+
+YAML state, derived traces, and validators support this path; they do not add user-facing routes or replace the Shot Spine.
+
 After the Committed Shot Spine is current and before Keyframe or Video Prompt compilation, resolve exactly one generation strategy:
 
 ```text
@@ -1276,9 +1311,15 @@ Use the committed shot count to avoid a circular question:
 
 For `edited_sequence_single_generation`, one Video Prompt covers every committed shot and cut in the unit. Keyframes are optional and low-priority because ordered keyframes describe major states, not edit boundaries. A full Storyboard may become a runtime structural reference only when the selected target has current explicit support and the director separately admits it; otherwise it remains planning-only.
 
+A sequence generation may contain multiple committed shots and cuts; it is not a one-take synonym. Select runtime assets by what the entire sequence must preserve. Character, location, object, or style references may remain independent active materials when one opening Keyframe cannot carry their required authority across the sequence. Do not manufacture a Keyframe merely to satisfy the route.
+
 For `shot_by_shot`, set `active_shot_scope` to exactly one committed shot. Keyframe prompts and the Video Prompt must contain only that shot's visible action, camera contract, start state, and end state. Other shots remain continuity context, not prompt content. The full Storyboard is withheld from runtime by default. If a later target-specific workflow genuinely benefits from one approved panel crop, that crop requires separate admission and may not import the whole board, unrelated shots, labels, line style, or layout.
 
+For shot-by-shot work, use the previous accepted end state and the next edit purpose only as neighboring continuity context. Do not serialize neighboring shot action into the current prompt. If the active shot's admitted Keyframe already carries identity, wardrobe, location, style, and opening composition, do not duplicate those same properties through extra references or verbose text. Add a separate reference or compact text only for a required property that the Keyframe does not show or cannot own, such as an unseen back design, a later prop state, voice, motion, or off-frame geography.
+
 For `single_shot_continuous`, internal phases do not become cuts. One first-frame Keyframe is the default candidate for a visually controlled shot. Ordered multi-keyframes may be recommended only when the selected target explicitly documents the workflow, the anchors describe a small number of major continuous states, and camera, blocking, occlusion, topology, and perspective complexity leave plausible interpolation space. Do not use anchor count to conceal an overloaded continuous take.
+
+A generated material unit is not required to equal one final edit shot. Depending on the approved editorial plan, one generated result may supply a trimmed segment, a complete edit shot, or material used at multiple edit positions. Record that intended relationship in the current generation strategy or assistant-facing handoff only when it affects timing, handles, continuity, or asset responsibility. Do not create a second timeline, database, or shot registry to express it.
 
 ## 11. Storyboard Stage
 
@@ -1390,6 +1431,12 @@ Do not generate generic beauty images with no production function.
 
 Normal keyframes are planning-only until explicitly admitted as active runtime references.
 
+### MJ Plate Exploration
+
+Retain MJ Plate as an optional visual-discovery method inside the existing Keyframes / material workflow, not as a fourth stage or a required asset type. A Plate may explore composition, light, atmosphere, spatial depth, or a specific visual relationship before the director decides whether a shot needs a formal Keyframe.
+
+An approved Plate may proceed directly to the selected Video Prompt strategy as a limited runtime reference when its actual required properties and target support are clear. Do not force it through another Keyframe generation, promote it automatically to canonical identity, or assume it is a first frame. If the director assigns it as a `shot_first_frame`, endpoint, or another stronger role, record that explicit role and its denied authority through the normal Material Registry. A Plate that is sufficient for the current job is not incomplete merely because no additional Keyframe was created.
+
 ### 12.1 Keyframe Image Adapter and Clean-Master Edit Loop
 
 Keyframe generation and Keyframe editing are separate actions. A user instruction such as `modify the current keyframe`, `change this keyframe`, or an equivalent bounded edit request explicitly authorizes one Image 2 edit attempt for the supplied current scope. Do not turn that request into automatic retries or variants.
@@ -1424,10 +1471,14 @@ Core compiles every approved Video Prompt scope into one model-neutral `video_pr
 
 ```yaml
 video_prompt_ir:
-  ir_schema_version:
+  ir_schema_version: "1.1"
   core_version:
   target_model:
   generation_unit:
+  generation_strategy:
+  prompt_scope_shots:
+  reference_allocation:
+  edit_use_relationship:  # omit when it does not affect execution or handoff
   directing_intention:
   directorial_voice:
   scene_grammar:
@@ -1597,6 +1648,15 @@ The assistant-facing handoff includes:
 - a compact `INTENT DELTA` for the material decision change in this compilation turn;
 - optional recommended next stage.
 
+When runtime references are active, also include one compact material responsibility table. Keep it assistant-facing and show the exact executable connection without repeating the full registry:
+
+```text
+PROMPT MARKER | ASSET LOCATOR | RESPONSIBILITY
+@Image 1      | [path or stable locator] | character identity and wardrobe only
+```
+
+Use the selected adapter's actual marker system. Omit the table when no runtime material is active. This table is a delivery view, not a new registry, state file, upload-order rule, or prompt block.
+
 Use this assistant-facing structure when there is a material delta:
 
 ```text
@@ -1610,11 +1670,15 @@ UNRESOLVED / RESIDUAL RISK: [remaining material issues only]
 
 Show only the current material delta. Do not paste the full Intent Ledger, turn it into a second script, place it in the clean prompt, or save it as a separate default file.
 
-For target-specific Video Prompt output, structure these fields as the Run Card required by the selected runtime profile. Keep the handoff outside generated prompt files and do not save a separate `run_card.md` by default.
+For target-specific Video Prompt output, structure these fields as the Run Card required by the selected runtime profile, followed by a short shot/revision summary, the prompt link, applicable settings, the material responsibility table when references are active, and a small watch list. Keep the handoff outside generated prompt files and do not save a separate `run_card.md` by default.
+
+Do not create a separate recovery handoff, task capsule, checkpoint wrapper, or automatic summary file unless the director explicitly requests one. The normal assistant-facing delivery above remains concise and does not itself become durable project state.
 
 ## 16. Validation
 
-Before saving, and before the Storyboard stage's one initial generation, verify:
+Before saving, and before the Storyboard stage's one initial generation, verify the checks that apply to the current stage, strategy, target, materials, and changed scope. Do not run repository-wide regression, reload inactive adapters, or reconstruct unrelated project state for an ordinary artifact compile. A release, schema change, adapter change, validator change, or explicit audit still runs its required broader suite.
+
+Applicable checks include:
 
 - Unified Director Intake is resolved.
 - Exactly one active stage is selected.
@@ -1639,9 +1703,12 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Every inferred or improved camera choice and adjacent camera change has a dramatic, geographic, informational, continuity, or graphic function.
 - Generation-unit boundaries are declared or approved.
 - Exactly one generation strategy is resolved from the committed shot count and director choice; `shot_by_shot` contains one active shot, while `edited_sequence_single_generation` contains the approved multi-shot unit.
+- An edited-sequence compile is allowed to contain cuts and was not mislabeled as a one-take; its independent character, location, object, and style references remain active only when the sequence needs authority that its Keyframes do not carry.
+- A shot-by-shot compile serializes only the active shot; neighboring shots inform continuity and edit purpose without leaking their action, while properties already carried by the active Keyframe are not duplicated through extra references or text.
+- When editorial use affects execution, the handoff states whether the generated material is expected to supply a segment, one complete edit shot, or multiple edit positions without creating another shot registry.
 - The Production Spine is current and frozen.
 - The Intent Ledger is nested in that Spine; its material entries have one owner, materially important decisions preserve rationale, and every derived question, assumption, trace, delta, or revision-conflict view agrees with it.
-- When a state trigger is active, `framewright_state.yaml` matches the latest explicit decision, current active artifacts, approved generation units, selected takes, and material roles; exactly one revision is active per artifact identity and every replaced revision remains superseded rather than active.
+- When durable state is required, exactly one persistence owner is active. It matches the latest explicit decision and affected current artifacts, units, takes, and material roles; exactly one accepted revision is active per artifact identity, replaced accepted revisions remain superseded, and ordinary or rejected candidates did not create global checkpoints.
 - Every continuity-canon take records accepted status, source generation unit, observation provenance, confidence, confirmation need, and accepted actual end state; reported but uninspected state remains low-confidence and visibly provisional.
 - Every continuation starts from the accepted actual state rather than a superseded planned state, and its source take is the selected continuity canon.
 - Completed, current-unit, and reserved-future beat scopes are disjoint; completed beats do not replay and future beats do not leak early.
@@ -1666,6 +1733,7 @@ Before saving, and before the Storyboard stage's one initial generation, verify:
 - Every storyboard prompt positively requires its resolved BOARD TITLE as one readable exterior top masthead; it is not merely metadata in the prompt body.
 - Every supplied visual asset has a resolved storyboard role, and every relevant asset has a natural-language storyboard binding that preserves only its allowed structural authority.
 - Keyframes are frozen production-purpose images.
+- MJ Plate remains an optional composition, light, atmosphere, space, or visual-relationship exploration material; an adequate approved Plate may enter the selected video strategy without forced Keyframe regeneration.
 - Every Keyframe has one role (`look_anchor`, `shot_first_frame`, or `endpoint_frame`), one downstream job, and one allowed shot scope; edited-sequence Keyframes do not imply cuts.
 - Midjourney V7 is the default Keyframe adapter unless the director selects another supported image target; adapter syntax does not enter Core.
 - Every Image 2 edit attempt uses the immutable original master plus the cumulative active edit specification, never a previous edited candidate; no retry or master reset occurred without explicit user instruction.

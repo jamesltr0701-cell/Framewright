@@ -49,15 +49,9 @@ STATE_REQUIRED = (
     "director_mode",
     "approved_generation_units",
     "active_artifacts",
-    "superseded_artifacts",
     "active_intent_entries",
-    "intentional_freedom",
     "unresolved_material_decisions",
     "active_material_roles",
-    "cross_gu_continuity",
-    "selected_generated_takes",
-    "beat_scope",
-    "continuation_contracts",
     "last_approved_revision",
     "last_updated",
 )
@@ -74,6 +68,9 @@ PROMPT_IR_REQUIRED = (
     "core_version",
     "target_model",
     "generation_unit",
+    "generation_strategy",
+    "prompt_scope_shots",
+    "reference_allocation",
     "directing_intention",
     "scene_grammar",
     "final_look",
@@ -136,6 +133,14 @@ GENERATION_STRATEGIES = {
     "edited_sequence_single_generation",
     "shot_by_shot",
 }
+GENERATION_EDIT_USES = {
+    "shot_segment",
+    "complete_edit_shot",
+    "multiple_edit_positions",
+    "whole_generated_sequence",
+    "undecided",
+}
+PROMPT_IR_SCHEMA_VERSION = "1.1"
 KEYFRAME_ROLES = {"look_anchor", "shot_first_frame", "endpoint_frame"}
 LOOK_FAMILIES = {
     "live_action_or_near_live_action",
@@ -516,6 +521,8 @@ def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
     for key in PROMPT_IR_REQUIRED:
         if key not in prompt_ir:
             errors.append(issue("prompt_ir_key_missing", "Required Prompt IR key is missing.", key=key))
+    if prompt_ir.get("ir_schema_version") != PROMPT_IR_SCHEMA_VERSION:
+        errors.append(issue("prompt_ir_schema_version_invalid", "Prompt IR schema version is unsupported.", expected=PROMPT_IR_SCHEMA_VERSION, actual=prompt_ir.get("ir_schema_version")))
 
     registry, registry_errors = load_adapter_registry()
     errors.extend(registry_errors)
@@ -534,6 +541,22 @@ def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
         errors.append(issue("prompt_ir_generation_unit_missing", "Prompt IR requires one active generation unit."))
     if prompt_ir.get("endpoint_purpose") not in ENDPOINT_PURPOSES:
         errors.append(issue("endpoint_purpose_invalid", "Prompt IR requires one supported endpoint purpose."))
+    if prompt_ir.get("generation_strategy") not in GENERATION_STRATEGIES:
+        errors.append(issue("prompt_ir_generation_strategy_invalid", "Prompt IR requires one supported generation strategy."))
+    prompt_scope = prompt_ir.get("prompt_scope_shots")
+    if not isinstance(prompt_scope, list) or not prompt_scope:
+        errors.append(issue("prompt_ir_shot_scope_invalid", "Prompt IR requires a non-empty prompt shot scope."))
+    allocation = prompt_ir.get("reference_allocation")
+    if not isinstance(allocation, dict):
+        errors.append(issue("prompt_ir_reference_allocation_invalid", "Prompt IR requires a reference-allocation mapping."))
+    else:
+        carried = set(allocation.get("keyframe_carried_properties", []) or [])
+        separate = set(allocation.get("separate_reference_properties", []) or [])
+        duplicated = carried & separate
+        if duplicated:
+            errors.append(issue("prompt_ir_reference_authority_duplicated", "Prompt IR duplicates properties between Keyframe and separate runtime references.", values=sorted(duplicated)))
+    if prompt_ir.get("edit_use_relationship") is not None and prompt_ir.get("edit_use_relationship") not in GENERATION_EDIT_USES:
+        errors.append(issue("prompt_ir_edit_use_invalid", "Prompt IR requires one supported generated-material editorial relationship."))
 
     scopes: dict[str, set[Any]] = {}
     for key in ("completed_beats", "current_beats", "reserved_future_beats"):
@@ -693,9 +716,9 @@ def validate_state_data(
             canon_by_id[take_id] = take
 
     beat_scope = state.get("beat_scope")
-    if not isinstance(beat_scope, dict):
-        errors.append(issue("beat_scope_invalid", "Beat scope must be a mapping."))
-    else:
+    if beat_scope is not None and not isinstance(beat_scope, dict):
+        errors.append(issue("beat_scope_invalid", "Beat scope must be a mapping when present."))
+    elif isinstance(beat_scope, dict) and beat_scope:
         scopes: dict[str, set[Any]] = {}
         for key in ("completed", "current_unit", "reserved_future"):
             values = beat_scope.get(key)
@@ -1471,11 +1494,26 @@ def validate_generation_strategy(document: Any) -> list[dict[str, Any]]:
             errors.append(issue("shot_by_shot_scope_leak", "Shot-by-shot generation must contain exactly the active shot."))
         if document.get("full_storyboard_runtime_status") not in {"planning_only", "withheld_from_runtime"}:
             errors.append(issue("shot_by_shot_storyboard_attached", "Shot-by-shot generation withholds the full Storyboard by default."))
+        neighboring = document.get("neighboring_context")
+        if isinstance(neighboring, dict) and neighboring.get("serialized_neighboring_action") is not False:
+            errors.append(issue("neighboring_shot_action_leak", "Neighboring shots may inform continuity and edit purpose but their action must not enter the current shot prompt."))
     if strategy == "edited_sequence_single_generation":
         if len(prompt_scope) != shot_count:
             errors.append(issue("edited_sequence_scope_incomplete", "Edited-sequence generation must cover every committed shot in the approved unit."))
         if document.get("keyframe_priority") not in {"optional", "low"}:
             errors.append(issue("edited_sequence_keyframe_overweighted", "Keyframes must remain optional or low-priority for an edited sequence."))
+        if document.get("one_take_assumed") is True:
+            errors.append(issue("edited_sequence_one_take_conflation", "An edited sequence may contain multiple cuts and must not be treated as a one-take synonym."))
+    allocation = document.get("reference_allocation")
+    if isinstance(allocation, dict):
+        carried = set(allocation.get("keyframe_carried_properties", []) or [])
+        separate = set(allocation.get("separate_reference_properties", []) or [])
+        duplicated = carried & separate
+        if duplicated:
+            errors.append(issue("reference_authority_duplicated", "Properties already carried by the active Keyframe must not be duplicated through separate runtime references.", values=sorted(duplicated)))
+    edit_use = document.get("edit_use_relationship")
+    if edit_use is not None and edit_use not in GENERATION_EDIT_USES:
+        errors.append(issue("generation_edit_use_invalid", "Generated-material editorial use is unsupported.", value=edit_use))
     multi = document.get("multi_keyframe")
     if isinstance(multi, dict) and multi.get("selected") is True:
         if strategy != "single_shot_continuous" or multi.get("cuts_implied") is not False:
@@ -1600,8 +1638,12 @@ def validate_core(
     except (OSError, ValueError, yaml.YAMLError) as exc:
         return [issue("frontmatter_invalid", str(exc))]
 
-    if core_meta.get("version") != "4.0.0":
-        errors.append(issue("release_version_mismatch", "Framewright release must identify as 4.0.0.", actual=core_meta.get("version")))
+    manifest_data = load_yaml(manifest)
+    candidate_version = manifest_data.get("candidate_version") if isinstance(manifest_data, dict) else None
+    if not isinstance(candidate_version, str) or not candidate_version:
+        errors.append(issue("candidate_version_missing", "Protected-anchor manifest must declare candidate_version."))
+    elif core_meta.get("version") != candidate_version:
+        errors.append(issue("release_version_mismatch", "Framewright Core version must match the protected-anchor manifest candidate version.", expected=candidate_version, actual=core_meta.get("version")))
     if skill_meta.get("name") != "framewright" or not skill_meta.get("description"):
         errors.append(issue("skill_frontmatter_invalid", "Skill frontmatter name or description is invalid."))
     for profile, (profile_meta, _) in zip(profiles, loaded_profiles):
@@ -1625,7 +1667,6 @@ def validate_core(
         if len(re.findall(r"^```", text, re.MULTILINE)) % 2:
             errors.append(issue("markdown_fence_unbalanced", "Markdown fences are unbalanced.", file=name))
 
-    manifest_data = load_yaml(manifest)
     anchors = manifest_data.get("protected_anchors", []) if isinstance(manifest_data, dict) else []
     for anchor in anchors:
         if str(anchor) not in core_text and str(anchor) not in skill_text and not any(
