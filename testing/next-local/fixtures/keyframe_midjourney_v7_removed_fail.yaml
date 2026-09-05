@@ -1,0 +1,15 @@
+kind: keyframe_ir
+expected: fail
+expected_errors:
+  - keyframe_adapter_unregistered
+document:
+  keyframe_ir:
+    adapter_id: midjourney_v7
+    generation_strategy: shot_by_shot
+    active_shot_id: SHOT_02
+    blocks:
+      - role: shot_first_frame
+        supported_shot: SHOT_02
+        frozen_instant: the woman pauses with one wet hand on the brass handle
+        downstream_job: first frame for image-to-video
+        prompt: "The woman pauses with one wet hand on the brass handle --ar 16:9 --v 7"

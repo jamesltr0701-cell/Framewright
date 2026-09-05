@@ -2,6 +2,8 @@ kind: clean_master_edit
 expected: pass
 document:
   clean_master_edit:
+    adapter_id: chatgpt_image_2_edit
+    artifact_kind: storyboard
     original_master_id: KF_MASTER_01
     base_input_id: KF_MASTER_01
     attempt_authorized_by_user: true

@@ -1,4 +1,4 @@
-candidate_version: "4.1.0"
+candidate_version: "4.1.1"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -63,7 +63,7 @@ protected_anchors:
   - "edited_sequence_single_generation"
   - "shot_by_shot"
   - "Keyframe Eligibility Gate"
-  - "Midjourney V7"
+  - "Midjourney V8.2"
   - "Editing intent may accumulate; edited pixels may not accumulate."
   - "Never feed a rejected or previously edited candidate back as the next attempt's pixel source."
   - "There must be one persistence owner"
@@ -74,7 +74,7 @@ protected_anchors:
   - "A generated material unit is not required to equal one final edit shot."
   - "PROMPT MARKER | ASSET LOCATOR | RESPONSIBILITY"
   - "operational target, not a promise or a release claim"
-  - "Retain MJ Plate as an optional visual-discovery method"
+  - "Retain Shot Plate as an optional visual-discovery artifact"
   - "A Plate that is sufficient for the current job is not incomplete merely because no additional Keyframe was created."
   - "YAML state, derived traces, and validators support this path; they do not add user-facing routes or replace the Shot Spine."
   - "Do not create a separate recovery handoff, task capsule, checkpoint wrapper, or automatic summary file"

@@ -4,7 +4,7 @@ expected_errors: [prompt_ir_unresolved_material]
 document:
   video_prompt_ir:
     ir_schema_version: "1.1"
-    core_version: "4.1.0"
+    core_version: "4.1.1"
     target_model: seedance_2_0
     generation_unit: GU01
     generation_strategy: single_shot_continuous

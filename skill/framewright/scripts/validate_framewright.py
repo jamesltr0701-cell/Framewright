@@ -142,6 +142,26 @@ GENERATION_EDIT_USES = {
 }
 PROMPT_IR_SCHEMA_VERSION = "1.1"
 KEYFRAME_ROLES = {"look_anchor", "shot_first_frame", "endpoint_frame"}
+IMAGE_ARTIFACT_KINDS = {"shot_plate", "keyframe", "storyboard"}
+IMAGE_ADAPTER_ROUTES = {"base_create", "edit"}
+IMAGE_ADAPTER_ROLES = {"subordinate_image_prompt_adapter", "subordinate_image_edit_adapter"}
+EXPECTED_IMAGE_ADAPTERS = {
+    "midjourney_v8_2": {
+        "role": "subordinate_image_prompt_adapter",
+        "route": "base_create",
+        "artifact_kinds": {"shot_plate", "keyframe"},
+    },
+    "chatgpt_image_2": {
+        "role": "subordinate_image_prompt_adapter",
+        "route": "base_create",
+        "artifact_kinds": {"shot_plate", "keyframe", "storyboard"},
+    },
+    "chatgpt_image_2_edit": {
+        "role": "subordinate_image_edit_adapter",
+        "route": "edit",
+        "artifact_kinds": {"shot_plate", "keyframe", "storyboard"},
+    },
+}
 LOOK_FAMILIES = {
     "live_action_or_near_live_action",
     "stylized_3d",
@@ -273,17 +293,22 @@ def validate_image_registry_data(document: Any, registry_path: Path) -> list[dic
     targets = document.get("registered_targets")
     if not isinstance(targets, dict) or not targets:
         return [issue("image_adapter_targets_missing", "Image adapter registry has no registered targets.")]
-    if document.get("default_keyframe_target") != "midjourney_v7":
-        errors.append(issue("keyframe_default_target_invalid", "Midjourney V7 must remain the current default Keyframe target."))
-    if document.get("edit_target") != "chatgpt_image_2_edit":
-        errors.append(issue("keyframe_edit_target_invalid", "ChatGPT Image 2 must remain the registered Keyframe edit target."))
-    expected_roles = {
-        "midjourney_v7": "subordinate_keyframe_prompt_adapter",
-        "chatgpt_image_2_edit": "subordinate_keyframe_edit_adapter",
+    expected_defaults = {
+        "default_shot_plate_target": "midjourney_v8_2",
+        "default_keyframe_target": "midjourney_v8_2",
+        "default_storyboard_target": "chatgpt_image_2",
+        "default_shot_plate_edit_target": "chatgpt_image_2_edit",
+        "default_keyframe_edit_target": "chatgpt_image_2_edit",
+        "default_storyboard_edit_target": "chatgpt_image_2_edit",
     }
+    for field, expected in expected_defaults.items():
+        if document.get(field) != expected:
+            errors.append(issue("image_adapter_default_invalid", "Image adapter default does not match the Framewright 4.1.1 two-tool workflow.", field=field, expected=expected))
+    if set(targets) != set(EXPECTED_IMAGE_ADAPTERS):
+        errors.append(issue("image_adapter_target_set_invalid", "The active image registry must contain exactly Midjourney V8.2 create, ChatGPT Image 2 create, and ChatGPT Image 2 edit.", registered=sorted(targets)))
     ids: list[str] = []
     package_root = registry_path.resolve().parents[2]
-    for target, expected_role in expected_roles.items():
+    for target, expected_contract in EXPECTED_IMAGE_ADAPTERS.items():
         record = targets.get(target)
         if not isinstance(record, dict):
             errors.append(issue("image_adapter_record_missing", "Required image adapter record is missing.", target=target))
@@ -294,8 +319,15 @@ def validate_image_registry_data(document: Any, registry_path: Path) -> list[dic
             errors.append(issue("image_adapter_id_invalid", "Image adapter requires a non-empty adapter ID.", target=target))
         else:
             ids.append(adapter_id)
-        if record.get("profile_role") != expected_role:
+        role = record.get("profile_role")
+        route = record.get("route")
+        artifact_kinds = record.get("artifact_kinds")
+        if role not in IMAGE_ADAPTER_ROLES or role != expected_contract["role"]:
             errors.append(issue("image_adapter_role_invalid", "Image adapter profile role does not match its registered function.", target=target))
+        if route not in IMAGE_ADAPTER_ROUTES or route != expected_contract["route"]:
+            errors.append(issue("image_adapter_route_invalid", "Image adapter route does not match its registered function.", target=target))
+        if not isinstance(artifact_kinds, list) or set(artifact_kinds) != expected_contract["artifact_kinds"]:
+            errors.append(issue("image_adapter_artifact_kinds_invalid", "Image adapter artifact kinds do not match the approved workflow.", target=target))
         if not isinstance(profile, str) or not profile:
             errors.append(issue("image_adapter_profile_invalid", "Image adapter requires a profile path.", target=target))
         else:
@@ -1535,8 +1567,15 @@ def validate_keyframe_ir(document: Any) -> list[dict[str, Any]]:
     ir = document["keyframe_ir"]
     registry, registry_errors = load_image_adapter_registry()
     errors.extend(registry_errors)
-    if ir.get("adapter_id") != registry.get("default_keyframe_target"):
-        errors.append(issue("keyframe_default_adapter_mismatch", "Un-overridden Keyframe compilation must use the registered Midjourney V7 default."))
+    adapter_id = ir.get("adapter_id")
+    targets = registry.get("registered_targets", {})
+    record = targets.get(adapter_id) if isinstance(targets, dict) else None
+    if not isinstance(record, dict):
+        errors.append(issue("keyframe_adapter_unregistered", "Keyframe IR requires one registered image adapter.", adapter_id=adapter_id))
+    elif "keyframe" not in record.get("artifact_kinds", []):
+        errors.append(issue("image_adapter_artifact_kind_unsupported", "Selected adapter cannot create a Keyframe.", adapter_id=adapter_id))
+    elif adapter_id != registry.get("default_keyframe_target") and ir.get("target_selected_by_director") is not True:
+        errors.append(issue("keyframe_default_adapter_mismatch", "A non-default Keyframe creator requires explicit director selection."))
     strategy = ir.get("generation_strategy")
     blocks = ir.get("blocks")
     active_shot = ir.get("active_shot_id")
@@ -1557,11 +1596,8 @@ def validate_keyframe_ir(document: Any) -> list[dict[str, Any]]:
         prompt = str(block.get("prompt", ""))
         if re.search(r"\b(?:then|continues|begins to|ends up)\b", prompt, re.IGNORECASE):
             errors.append(issue("keyframe_temporal_sequence", "Keyframe prompt must depict one frozen instant.", index=index))
-        omni = block.get("omni_reference")
-        if isinstance(omni, dict):
-            refs = omni.get("references")
-            if not isinstance(refs, list) or len(refs) != 1 or omni.get("authority") not in {"identity", "form"}:
-                errors.append(issue("midjourney_omni_contract_invalid", "Midjourney V7 Omni Reference requires exactly one admitted identity or form reference.", index=index))
+        if any(token in prompt for token in ("--oref", "--ow", "--cref", "--cw")):
+            errors.append(issue("midjourney_v82_legacy_reference_parameter", "V8.2 Keyframe prompts may not contain V7-only Omni or legacy Character Reference parameters.", index=index))
     return errors
 
 
@@ -1570,6 +1606,10 @@ def validate_clean_master_edit(document: Any) -> list[dict[str, Any]]:
     if not isinstance(document, dict) or not isinstance(document.get("clean_master_edit"), dict):
         return [issue("clean_master_edit_root_missing", "Image edit trace must contain a clean_master_edit mapping.")]
     edit = document["clean_master_edit"]
+    if edit.get("adapter_id") != "chatgpt_image_2_edit":
+        errors.append(issue("image_edit_adapter_invalid", "ChatGPT Image 2 is the sole registered image editor."))
+    if edit.get("artifact_kind") not in IMAGE_ARTIFACT_KINDS:
+        errors.append(issue("image_edit_artifact_kind_invalid", "Image edit trace requires Storyboard, Shot Plate, or Keyframe artifact kind."))
     original = edit.get("original_master_id")
     if not original or edit.get("base_input_id") != original:
         errors.append(issue("image_edit_not_from_original", "Every Image 2 attempt must return to the immutable original master."))
@@ -1584,7 +1624,7 @@ def validate_clean_master_edit(document: Any) -> list[dict[str, Any]]:
     if isinstance(previous, list) and edit.get("base_input_id") in previous:
         errors.append(issue("image_edit_previous_candidate_reused", "A previous candidate is being reused as the edit base."))
     if edit.get("master_reset") is True and edit.get("master_reset_explicit_by_user") is not True:
-        errors.append(issue("image_edit_master_reset_unauthorized", "A Keyframe master reset requires explicit user instruction."))
+        errors.append(issue("image_edit_master_reset_unauthorized", "An image master reset requires explicit user instruction."))
     return errors
 
 
@@ -1651,7 +1691,7 @@ def validate_core(
             errors.append(issue("profile_frontmatter_invalid", "Runtime profile version or role is missing.", profile=str(profile)))
         if profile_meta.get("overflow_language_strategy") != "lossless_zh_payload":
             errors.append(issue("profile_overflow_language_strategy_missing", "Runtime profile must declare lossless Chinese payload re-serialization.", profile=str(profile)))
-    allowed_image_roles = {"subordinate_keyframe_prompt_adapter", "subordinate_keyframe_edit_adapter"}
+    allowed_image_roles = IMAGE_ADAPTER_ROLES
     for profile, (profile_meta, _) in zip(image_profiles, loaded_image_profiles):
         if not profile_meta.get("profile_version") or profile_meta.get("profile_role") not in allowed_image_roles:
             errors.append(issue("image_profile_frontmatter_invalid", "Image profile version or role is missing.", profile=str(profile)))
@@ -1707,6 +1747,28 @@ def validate_core(
                 supplied=sorted(supplied_image_profiles),
             )
         )
+    image_records_by_profile = {
+        str(record.get("profile")): record
+        for record in image_registry_data.get("registered_targets", {}).values()
+        if isinstance(record, dict) and record.get("profile")
+    }
+    for profile, (profile_meta, _) in zip(image_profiles, loaded_image_profiles):
+        record = image_records_by_profile.get(profile.name)
+        if not isinstance(record, dict):
+            continue
+        if (
+            profile_meta.get("adapter_id") != record.get("adapter_id")
+            or profile_meta.get("profile_role") != record.get("profile_role")
+            or profile_meta.get("route") != record.get("route")
+            or set(profile_meta.get("artifact_kinds", []) or []) != set(record.get("artifact_kinds", []) or [])
+        ):
+            errors.append(
+                issue(
+                    "image_profile_registry_contract_mismatch",
+                    "Image profile frontmatter must match its registered adapter ID, role, route, and artifact kinds.",
+                    profile=profile.name,
+                )
+            )
     return errors
 
 
@@ -1748,6 +1810,7 @@ def validate_video_prompt_path(
 def validate_keyframe_prompt_path(
     path: Path,
     adapter_id: str,
+    artifact_kind: str,
     registry: Path = DEFAULT_IMAGE_REGISTRY,
 ) -> list[dict[str, Any]]:
     registry_data, registry_errors = load_image_adapter_registry(registry)
@@ -1757,23 +1820,29 @@ def validate_keyframe_prompt_path(
     targets = registry_data.get("registered_targets", {})
     record = targets.get(adapter_id) if isinstance(targets, dict) else None
     if not isinstance(record, dict) or record.get("adapter_id") != adapter_id:
-        errors.append(issue("keyframe_adapter_unregistered", "Keyframe prompt requires one registered image adapter.", adapter_id=adapter_id))
+        errors.append(issue("image_adapter_unregistered", "Image prompt requires one registered image adapter.", adapter_id=adapter_id))
         return errors
+    if artifact_kind not in IMAGE_ARTIFACT_KINDS:
+        errors.append(issue("image_artifact_kind_invalid", "Image prompt requires one supported artifact kind.", artifact_kind=artifact_kind))
+    elif artifact_kind not in record.get("artifact_kinds", []):
+        errors.append(issue("image_adapter_artifact_kind_unsupported", "Selected image adapter does not support this artifact kind.", adapter_id=adapter_id, artifact_kind=artifact_kind))
 
     text = path.read_text(encoding="utf-8")
     if not text.strip():
-        errors.append(issue("keyframe_prompt_empty", "Keyframe prompt may not be empty."))
+        errors.append(issue("image_prompt_empty", "Image prompt may not be empty."))
         return errors
-    if adapter_id == "midjourney_v7":
-        if not re.search(r"(?:^|\s)--v\s+7(?:\s|$)", text):
-            errors.append(issue("midjourney_v7_parameter_missing", "Midjourney V7 Keyframe prompt must include --v 7."))
-        if re.search(r"\b(?:then|continues|begins to|ends up)\b", text, re.IGNORECASE):
-            errors.append(issue("keyframe_temporal_sequence", "Midjourney Keyframe prompt must depict one frozen instant."))
-        if len(re.findall(r"(?:^|\s)--oref(?:\s|$)", text)) > 1:
-            errors.append(issue("midjourney_omni_reference_count", "Midjourney V7 accepts at most one Omni Reference image."))
-        for raw_weight in re.findall(r"(?:^|\s)--ow\s+([0-9]+(?:\.[0-9]+)?)", text):
-            if float(raw_weight) >= 400:
-                errors.append(issue("midjourney_omni_weight_excessive", "Omni Reference weight must remain below 400 unless the director explicitly overrides it."))
+    if record.get("route") == "edit":
+        errors.append(issue("image_edit_prompt_requires_trace", "Image edit prompts require the clean-master edit validator rather than base-create prompt validation."))
+    if adapter_id == "midjourney_v8_2":
+        versions = re.findall(r"(?:^|\s)--v\s+([^\s]+)", text)
+        if versions != ["8.2"] or re.search(r"(?:^|\s)--version(?:\s|$)", text):
+            errors.append(issue("midjourney_v82_version_invalid", "Midjourney V8.2 prompts require exactly one --v 8.2 parameter."))
+        if re.search(r"(?:^|\s)--(?:oref|ow|cref|cw|edit)(?:\s|$)", text, re.IGNORECASE):
+            errors.append(issue("midjourney_v82_forbidden_parameter", "Midjourney V8.2 base-create prompts may not use V7-only references or the Edit Model route."))
+    if adapter_id == "chatgpt_image_2" and re.search(r"(?:^|\s)--(?:v|version|ar|edit|oref|ow|cref|cw|sref|sw|iw)(?:\s|$)", text, re.IGNORECASE):
+        errors.append(issue("chatgpt_image2_foreign_parameter", "ChatGPT Image 2 prompts may not contain Midjourney parameters."))
+    if artifact_kind in {"shot_plate", "keyframe"} and re.search(r"\b(?:then|continues|begins to|ends up)\b", text, re.IGNORECASE):
+        errors.append(issue("image_temporal_sequence", "Shot Plate and Keyframe prompts must depict one frozen instant."))
     return errors
 
 
@@ -1842,7 +1911,8 @@ def main() -> int:
 
     keyframe_prompt_parser = subparsers.add_parser("keyframe-prompt")
     keyframe_prompt_parser.add_argument("path", type=Path)
-    keyframe_prompt_parser.add_argument("--adapter-id", default="midjourney_v7")
+    keyframe_prompt_parser.add_argument("--adapter-id", default="midjourney_v8_2")
+    keyframe_prompt_parser.add_argument("--artifact-kind", choices=sorted(IMAGE_ARTIFACT_KINDS), default="keyframe")
     keyframe_prompt_parser.add_argument("--image-registry", type=Path, default=DEFAULT_IMAGE_REGISTRY)
 
     state_parser = subparsers.add_parser("state")
@@ -1885,7 +1955,7 @@ def main() -> int:
     if args.command == "keyframe-prompt":
         return emit(
             str(args.path),
-            validate_keyframe_prompt_path(args.path, args.adapter_id, args.image_registry),
+            validate_keyframe_prompt_path(args.path, args.adapter_id, args.artifact_kind, args.image_registry),
             args.json,
         )
     if args.command == "state":

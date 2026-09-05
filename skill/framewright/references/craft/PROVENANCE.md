@@ -1,6 +1,6 @@
 # Craft provenance and third-party notice
 
-Framewright 4.1.0 integrates selected practical ideas from the locally installed Seedance 2.0 Skill OS, metadata version 6.7.0, attributed to Iamemily2050 (@iamemily2050), repository https://github.com/Emily2040/seedance-2.0. The local source was reviewed on 2026-09-05; this does not identify or endorse the current upstream revision.
+Framewright 4.1.1 integrates selected practical ideas from the locally installed Seedance 2.0 Skill OS, metadata version 6.7.0, attributed to Iamemily2050 (@iamemily2050), repository https://github.com/Emily2040/seedance-2.0. The local source was reviewed on 2026-09-05; this does not identify or endorse the current upstream revision.
 
 Sources considered include camera, motion, characters, prompt, lighting, audio and troubleshoot skills, and their directing-engine and retake references. The four production references in this directory are rewritten and selected for Framewright's existing director authority, ownership, state, compression and authorization contracts. They are not copies of the external router, compiler or workflow and do not require that package at runtime.
 

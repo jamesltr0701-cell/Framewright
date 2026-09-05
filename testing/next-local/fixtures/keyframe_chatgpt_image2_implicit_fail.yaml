@@ -1,8 +1,10 @@
 kind: keyframe_ir
-expected: pass
+expected: fail
+expected_errors:
+  - keyframe_default_adapter_mismatch
 document:
   keyframe_ir:
-    adapter_id: midjourney_v7
+    adapter_id: chatgpt_image_2
     generation_strategy: shot_by_shot
     active_shot_id: SHOT_02
     blocks:
@@ -10,7 +12,4 @@ document:
         supported_shot: SHOT_02
         frozen_instant: the woman pauses with one wet hand on the brass handle
         downstream_job: first frame for image-to-video
-        prompt: "The woman pauses with one wet hand on the brass handle, medium close shot, spherical lens geometry, cold rain backlight --ar 16:9 --v 7"
-        omni_reference:
-          references: [CHARACTER_MASTER]
-          authority: identity
+        prompt: "A frozen medium-close image of the woman paused with one wet hand on the brass handle, cold rain backlight, landscape 16:9 composition."

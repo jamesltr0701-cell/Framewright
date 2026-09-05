@@ -5,7 +5,7 @@ expected_errors:
   - keyframe_temporal_sequence
 document:
   keyframe_ir:
-    adapter_id: midjourney_v7
+    adapter_id: midjourney_v8_2
     generation_strategy: shot_by_shot
     active_shot_id: SHOT_02
     blocks:
@@ -13,4 +13,4 @@ document:
         supported_shot: SHOT_03
         frozen_instant: the door is open
         downstream_job: first frame
-        prompt: "She reaches the door, then opens it --ar 16:9 --v 7"
+        prompt: "She reaches the door, then opens it --ar 16:9 --v 8.2"

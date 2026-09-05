@@ -13,7 +13,8 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/seedance_2_0.md" \
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/seedance_2_5.md" \
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/minimax_h3.md" \
-  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/midjourney_v7.md" \
+  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/midjourney_v8_2.md" \
+  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/chatgpt_image_2.md" \
   --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/chatgpt_image_2_edit.md" \
   --registry "$REPO_ROOT/skill/framewright/references/runtime_profiles/adapter_registry.yaml" \
   --image-registry "$REPO_ROOT/skill/framewright/references/keyframe_profiles/adapter_registry.yaml" \
@@ -21,8 +22,9 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
 "$PYTHON_BIN" "$VALIDATOR" regression "$SCRIPT_DIR/fixtures"
 
 PROMPT_PATH=$(mktemp /private/tmp/framewright-seedance20-adapter.XXXXXX)
-KEYFRAME_PROMPT_PATH=$(mktemp /private/tmp/framewright-midjourney-v7-adapter.XXXXXX)
-trap 'rm -f -- "$PROMPT_PATH" "$KEYFRAME_PROMPT_PATH"' EXIT HUP INT TERM
+KEYFRAME_PROMPT_PATH=$(mktemp /private/tmp/framewright-midjourney-v82-adapter.XXXXXX)
+STORYBOARD_PROMPT_PATH=$(mktemp /private/tmp/framewright-image2-storyboard-adapter.XXXXXX)
+trap 'rm -f -- "$PROMPT_PATH" "$KEYFRAME_PROMPT_PATH" "$STORYBOARD_PROMPT_PATH"' EXIT HUP INT TERM
 printf '%s\n' 'A woman crosses the room. Quiet ventilation and synchronized footsteps; no music.' > "$PROMPT_PATH"
 "$PYTHON_BIN" "$VALIDATOR" video-prompt "$PROMPT_PATH" \
   --target-model seedance_2_0 \
@@ -31,7 +33,14 @@ printf '%s\n' 'A woman crosses the room. Quiet ventilation and synchronized foot
   --profile-contract seedance_2_0 \
   --registry "$REPO_ROOT/skill/framewright/references/runtime_profiles/adapter_registry.yaml"
 
-printf '%s\n' 'A woman motionless at the rain-lit window, medium close-up, spherical 50mm perspective, quiet blue-grey dawn, wet glass reflections, restrained natural texture --ar 16:9 --v 7' > "$KEYFRAME_PROMPT_PATH"
+printf '%s\n' 'A woman motionless at the rain-lit window, medium close-up, spherical 50mm perspective, quiet blue-grey dawn, wet glass reflections, restrained natural texture --ar 16:9 --v 8.2' > "$KEYFRAME_PROMPT_PATH"
 "$PYTHON_BIN" "$VALIDATOR" keyframe-prompt "$KEYFRAME_PROMPT_PATH" \
-  --adapter-id midjourney_v7 \
+  --adapter-id midjourney_v8_2 \
+  --artifact-kind keyframe \
+  --image-registry "$REPO_ROOT/skill/framewright/references/keyframe_profiles/adapter_registry.yaml"
+
+printf '%s\n' 'Create one landscape 16:9 monochrome storyboard board with four equal landscape 16:9 panels, a readable exterior board title, uniform gutters, and one frozen blocking beat per panel.' > "$STORYBOARD_PROMPT_PATH"
+"$PYTHON_BIN" "$VALIDATOR" keyframe-prompt "$STORYBOARD_PROMPT_PATH" \
+  --adapter-id chatgpt_image_2 \
+  --artifact-kind storyboard \
   --image-registry "$REPO_ROOT/skill/framewright/references/keyframe_profiles/adapter_registry.yaml"

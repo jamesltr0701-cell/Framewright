@@ -6,6 +6,8 @@ expected_errors:
   - image_edit_previous_candidate_reused
 document:
   clean_master_edit:
+    adapter_id: chatgpt_image_2_edit
+    artifact_kind: keyframe
     original_master_id: KF_MASTER_01
     base_input_id: KF_CANDIDATE_01
     attempt_authorized_by_user: true

@@ -1,0 +1,14 @@
+kind: keyframe_ir
+expected: pass
+document:
+  keyframe_ir:
+    adapter_id: chatgpt_image_2
+    target_selected_by_director: true
+    generation_strategy: shot_by_shot
+    active_shot_id: SHOT_02
+    blocks:
+      - role: shot_first_frame
+        supported_shot: SHOT_02
+        frozen_instant: the woman pauses with one wet hand on the brass handle
+        downstream_job: first frame for image-to-video
+        prompt: "A frozen medium-close image of the woman paused with one wet hand on the brass handle, cold rain backlight, landscape 16:9 composition."

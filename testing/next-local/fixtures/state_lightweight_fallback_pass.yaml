@@ -3,7 +3,7 @@ expected: pass
 document:
   framewright_state:
     schema_version: "1.1"
-    core_version: "4.1.0"
+    core_version: "4.1.1"
     project_slug: lightweight_single_scope
     current_scope: scene_03
     active_stage: video_prompt
