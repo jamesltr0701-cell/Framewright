@@ -1,63 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
-  <title id="title">Framewright 4.1.1 workflow</title>
-  <desc id="desc">Approved director intent, production assets, and shot decisions enter the central Production Spine. The spine branches independently to Storyboard, Shot Plate, Keyframe, and Video Prompt. Video Prompt continues to a Target Adapter. One active stage runs at a time.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="760" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
+  <title id="title">Framewright workflow: production spine and active stages</title>
+  <desc id="desc">Approved director intent, production assets, and shot decisions form one Production Spine. From that approved state, choose one independent active stage: Storyboard, Shot Plate, Keyframe, or Video Prompt. Only Video Prompt proceeds to a Target Adapter.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
-      <path d="M0,0 L10,5 L0,10 z" fill="#191919"/>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L11 6 L1 11" fill="none" stroke="#25231F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
     </marker>
-    <pattern id="ticks" width="32" height="32" patternUnits="userSpaceOnUse">
-      <path d="M0 0h7M0 0v7" stroke="#8f8d88" stroke-width="1" opacity="0.16" fill="none"/>
+    <pattern id="inkWear" width="31" height="23" patternUnits="userSpaceOnUse">
+      <path d="M3 6l4-1M18 4l2 2M24 16l4-1M11 20l2-2" fill="none" stroke="#D9CEB5" stroke-width="1.1" opacity="0.48"/>
+      <circle cx="14" cy="11" r="1.1" fill="#D9CEB5" opacity="0.38"/>
+      <circle cx="28" cy="8" r="0.7" fill="#D9CEB5" opacity="0.38"/>
+    </pattern>
+    <pattern id="paperFibers" width="480" height="320" patternUnits="userSpaceOnUse">
+      <path d="M24 58c74-18 101 24 170 4s106 12 184-8" fill="none" stroke="#8D806A" stroke-width="0.65" opacity="0.14"/>
+      <path d="M-18 166c49 11 78-12 124 5s82 2 137-12 109 13 210-4" fill="none" stroke="#A29781" stroke-width="0.55" opacity="0.12"/>
+      <path d="M44 283c43-17 87 8 132-3s72-20 126-5 83 1 145-13" fill="none" stroke="#776D5C" stroke-width="0.45" opacity="0.10"/>
+      <path d="M376 10c-10 46 16 80-2 124s8 97-9 153" fill="none" stroke="#B4A890" stroke-width="0.45" opacity="0.09"/>
+      <circle cx="110" cy="99" r="1" fill="#6F6657" opacity="0.12"/>
+      <circle cx="294" cy="244" r="0.75" fill="#6F6657" opacity="0.10"/>
     </pattern>
   </defs>
-  <rect width="1600" height="760" fill="#f5f4ef"/>
-  <rect x="32" y="32" width="1536" height="696" fill="url(#ticks)" opacity="0.38"/>
-  <g fill="none" stroke="#191919" stroke-width="2">
-    <rect x="72" y="287" width="290" height="186" rx="2" fill="#f5f4ef"/>
-    <rect x="492" y="245" width="370" height="270" rx="2" fill="#eeece5" stroke-width="3"/>
-    <rect x="1018" y="92" width="295" height="104" rx="2" fill="#f5f4ef"/>
-    <rect x="1018" y="244" width="295" height="104" rx="2" fill="#f5f4ef"/>
-    <rect x="1018" y="396" width="295" height="104" rx="2" fill="#f5f4ef"/>
-    <rect x="1018" y="548" width="295" height="104" rx="2" fill="#f5f4ef"/>
-    <rect x="1362" y="548" width="180" height="104" rx="2" fill="#eeece5"/>
+
+  <rect width="1600" height="760" fill="#E9E3D3"/>
+  <rect width="1600" height="760" fill="url(#paperFibers)" opacity="0.76"/>
+
+  <g fill="none" stroke="#292722" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M46 48h28M60 34v28M1526 48h28M1540 34v28M46 712h28M60 698v28M1526 712h28M1540 698v28" stroke-width="1.5" opacity="0.82"/>
+    <path d="M996 82v486M996 82h18M996 568h18" stroke-width="1.6" opacity="0.88"/>
+    <path d="M1000 85v480" stroke-width="0.75" opacity="0.32"/>
   </g>
-  <g fill="none" stroke="#191919" stroke-width="2" marker-end="url(#arrow)">
-    <path d="M362 380H492"/>
-    <path d="M862 380H930V144H1018"/>
-    <path d="M930 296H1018"/>
-    <path d="M930 448H1018"/>
-    <path d="M862 380H930V600H1018"/>
-    <path d="M1313 600H1362"/>
+
+  <g fill="#25231F">
+    <text x="82" y="126" font-family="Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" letter-spacing="1.7">UPSTREAM AUTHORITY</text>
+    <text x="82" y="158" font-family="Arial Narrow, Avenir Next Condensed, Helvetica Neue, Arial, sans-serif" font-size="21" font-weight="800">APPROVED DIRECTOR INTENT</text>
+    <text x="82" y="188" font-family="Menlo, Monaco, Consolas, monospace" font-size="14" letter-spacing="0.8">ASSETS  /  SHOT DECISIONS  /  CONTINUITY</text>
+
+    <text x="80" y="338" font-family="Impact, Haettenschweiler, Arial Narrow, sans-serif" font-size="87" letter-spacing="-1.5">PRODUCTION</text>
+    <text x="80" y="430" font-family="Impact, Haettenschweiler, Arial Narrow, sans-serif" font-size="103" letter-spacing="-2.2">SPINE</text>
+    <text x="80" y="338" font-family="Impact, Haettenschweiler, Arial Narrow, sans-serif" font-size="87" letter-spacing="-1.5" fill="url(#inkWear)" opacity="0.45">PRODUCTION</text>
+    <text x="80" y="430" font-family="Impact, Haettenschweiler, Arial Narrow, sans-serif" font-size="103" letter-spacing="-2.2" fill="url(#inkWear)" opacity="0.45">SPINE</text>
+
+    <text x="84" y="484" font-family="Arial Narrow, Avenir Next Condensed, Helvetica Neue, Arial, sans-serif" font-size="19">approved scope · continuity · authority</text>
+    <text x="84" y="518" font-family="Arial Narrow, Avenir Next Condensed, Helvetica Neue, Arial, sans-serif" font-size="19">one approved production reading</text>
   </g>
-  <g fill="#191919" font-family="Arial, Helvetica, sans-serif">
-    <text x="92" y="323" font-size="15" font-weight="700" letter-spacing="2">UPSTREAM AUTHORITY</text>
-    <text x="92" y="365" font-size="23" font-weight="700">APPROVED DIRECTOR INTENT</text>
-    <text x="92" y="399" font-size="20">PRODUCTION ASSETS</text>
-    <text x="92" y="433" font-size="20">SHOT DECISIONS</text>
-    <text x="522" y="305" font-size="16" font-weight="700" letter-spacing="2">CENTRAL COMPILER STATE</text>
-    <text x="522" y="368" font-size="38" font-weight="700" letter-spacing="1">PRODUCTION SPINE</text>
-    <text x="522" y="412" font-size="19">approved scope · continuity · authority</text>
-    <text x="522" y="450" font-size="19">one current production reading</text>
-    <text x="1048" y="133" font-size="16" font-weight="700" letter-spacing="2">ACTIVE STAGE A</text>
-    <text x="1048" y="168" font-size="25" font-weight="700">STORYBOARD</text>
-    <text x="1048" y="285" font-size="16" font-weight="700" letter-spacing="2">ACTIVE STAGE B</text>
-    <text x="1048" y="320" font-size="25" font-weight="700">SHOT PLATE</text>
-    <text x="1048" y="437" font-size="16" font-weight="700" letter-spacing="2">ACTIVE STAGE C</text>
-    <text x="1048" y="472" font-size="25" font-weight="700">KEYFRAME</text>
-    <text x="1048" y="589" font-size="16" font-weight="700" letter-spacing="2">ACTIVE STAGE D</text>
-    <text x="1048" y="624" font-size="25" font-weight="700">VIDEO PROMPT</text>
-    <text x="1382" y="589" font-size="14" font-weight="700" letter-spacing="1.5">MODEL-FACING</text>
-    <text x="1382" y="624" font-size="22" font-weight="700">TARGET</text>
-    <text x="1382" y="647" font-size="22" font-weight="700">ADAPTER</text>
+
+  <g fill="none" stroke="#292722" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M82 550 C250 548 434 552 680 550" stroke-width="2.05"/>
+    <path d="M83 554 C268 551 450 556 677 554" stroke-width="0.75" opacity="0.33"/>
+    <path d="M82 544v14M679 544v14" stroke-width="1.1" opacity="0.82"/>
+    <path d="M681 394 C792 392 885 397 996 394" stroke-width="2.15" marker-end="url(#arrow)"/>
+    <path d="M683 398 C794 396 888 401 993 398" stroke-width="0.7" opacity="0.32"/>
   </g>
-  <g fill="none" stroke="#55534f" stroke-width="1.5">
-    <path d="M492 560H862"/>
-    <path d="M508 554v12M846 554v12"/>
+  <text x="84" y="584" fill="#5F594E" font-family="Menlo, Monaco, Consolas, monospace" font-size="15" letter-spacing="1.25">ONE ACTIVE STAGE AT A TIME</text>
+  <text x="1019" y="72" fill="#5F594E" font-family="Menlo, Monaco, Consolas, monospace" font-size="13" letter-spacing="1.2">CHOOSE ONE OUTPUT</text>
+
+  <g fill="none" stroke="#292722" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1036 100 L1276 98 L1278 278 L1034 276 Z" stroke-width="2.1"/>
+    <path d="M1040 105 L1272 104 L1273 272" stroke-width="0.8" opacity="0.42"/>
+    <path d="M1048 116 L1264 114 M1048 260 L1264 262" stroke-width="0.65" opacity="0.30"/>
+    <path d="M1048 116 L1264 262 M1264 114 L1048 260" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.30"/>
+    <path d="M1156 108v161M1042 188h228" stroke-width="0.65" stroke-dasharray="5 5" opacity="0.34"/>
+
+    <path d="M1320 100 L1560 101 L1558 278 L1318 276 Z" stroke-width="2.1"/>
+    <path d="M1324 105 L1556 107 L1554 272" stroke-width="0.8" opacity="0.42"/>
+    <path d="M1332 116 L1548 116 M1332 260 L1548 262" stroke-width="0.65" opacity="0.30"/>
+    <path d="M1332 116 L1548 262 M1548 116 L1332 260" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.30"/>
+    <path d="M1440 108v161M1326 188h228" stroke-width="0.65" stroke-dasharray="5 5" opacity="0.34"/>
+
+    <path d="M1036 370 L1277 369 L1276 550 L1034 548 Z" stroke-width="2.1"/>
+    <path d="M1040 375 L1273 374 L1272 544" stroke-width="0.8" opacity="0.42"/>
+    <path d="M1048 387 L1264 385 M1048 532 L1264 534" stroke-width="0.65" opacity="0.30"/>
+    <path d="M1048 387 L1264 534 M1264 385 L1048 532" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.30"/>
+    <path d="M1156 378v161M1042 460h228" stroke-width="0.65" stroke-dasharray="5 5" opacity="0.34"/>
+
+    <path d="M1320 370 L1560 371 L1558 550 L1318 548 Z" stroke-width="2.1"/>
+    <path d="M1324 375 L1556 377 L1554 544" stroke-width="0.8" opacity="0.42"/>
+    <path d="M1332 387 L1548 387 M1332 532 L1548 534" stroke-width="0.65" opacity="0.30"/>
+    <path d="M1332 387 L1548 534 M1548 387 L1332 532" stroke-width="0.9" stroke-dasharray="4 5" opacity="0.30"/>
+    <path d="M1440 378v161M1326 460h228" stroke-width="0.65" stroke-dasharray="5 5" opacity="0.34"/>
   </g>
-  <g fill="#55534f" font-family="Menlo, Monaco, Consolas, monospace" font-size="15" letter-spacing="1.4">
-    <text x="496" y="594">ONE ACTIVE STAGE AT A TIME</text>
-    <text x="72" y="696">Framewright compiles the approved decision state; it does not direct, batch, or auto-advance the stages.</text>
+
+  <g fill="#25231F">
+    <g font-family="Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700" letter-spacing="1.25">
+      <text x="1054" y="139">ACTIVE STAGE A</text>
+      <text x="1338" y="139">ACTIVE STAGE B</text>
+      <text x="1054" y="410">ACTIVE STAGE C</text>
+      <text x="1338" y="410">ACTIVE STAGE D</text>
+    </g>
+    <g font-family="Impact, Haettenschweiler, Arial Narrow, sans-serif" font-size="30" letter-spacing="-0.5">
+      <text x="1054" y="183">STORYBOARD</text>
+      <text x="1338" y="183">SHOT PLATE</text>
+      <text x="1054" y="454">KEYFRAME</text>
+      <text x="1338" y="454">VIDEO PROMPT</text>
+    </g>
   </g>
-  <g fill="none" stroke="#191919" stroke-width="1.5" opacity="0.75">
-    <path d="M48 48h24M60 36v24M1528 48h24M1540 36v24M48 712h24M60 700v24M1528 712h24M1540 700v24"/>
+
+  <g fill="none" stroke="#292722" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M1440 550 C1441 579 1439 603 1440 625 C1466 625 1495 626 1522 625" stroke-width="1.75" marker-end="url(#arrow)"/>
+    <path d="M1444 552 C1444 578 1442 600 1444 621" stroke-width="0.65" opacity="0.34"/>
+    <path d="M1335 630 L1526 629 L1524 682 L1334 681 Z" stroke-width="1.55"/>
+    <path d="M1339 634 L1522 634" stroke-width="0.65" opacity="0.38"/>
   </g>
+  <g fill="#25231F">
+    <text x="1350" y="651" font-family="Menlo, Monaco, Consolas, monospace" font-size="11" font-weight="700" letter-spacing="1.2">MODEL-FACING</text>
+    <text x="1350" y="674" font-family="Impact, Haettenschweiler, Arial Narrow, sans-serif" font-size="22" letter-spacing="-0.3">TARGET ADAPTER</text>
+  </g>
+
+  <text x="82" y="696" fill="#5F594E" font-family="Menlo, Monaco, Consolas, monospace" font-size="13" letter-spacing="0.95">FRAMEWRIGHT COMPILES THE APPROVED DECISION STATE. IT DOES NOT AUTO-ADVANCE.</text>
 </svg>
