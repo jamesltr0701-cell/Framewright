@@ -2,6 +2,11 @@ schema_version: "1.0"
 compiler_instruction_sources:
   - skill/framewright/SKILL.md
   - skill/framewright/references/framewright.md
+optional_compiler_instruction_sources:
+  - skill/framewright/references/craft/camera-motion.md
+  - skill/framewright/references/craft/identity-material.md
+  - skill/framewright/references/craft/light-sound.md
+  - skill/framewright/references/craft/diagnosis-repair.md
 registered_targets:
   seedance_2_0:
     serialization_owner: framewright_adapter_seedance_2_0

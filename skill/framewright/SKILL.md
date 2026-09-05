@@ -23,6 +23,23 @@ For Keyframes, read `references/keyframe_profiles/adapter_registry.yaml`, resolv
 
 Framewright is the exclusive compiler whenever the user explicitly invokes Framewright. Do not treat another installed model-prompt skill as an implicit compiler source and do not merge its rules into the active Framewright compile. A separately requested comparison may remain outside the clean artifact and must not change the active serialization owner.
 
+That selection remains active for follow-up advice, local revisions, and troubleshooting in the same work. Selecting a Seedance target does not select the external Seedance skill. If earlier conversation loaded external prompt rules, re-anchor the current task to the approved Spine, Core, and selected adapter; do not carry those external defaults forward as authority.
+
+## Integrated craft references
+
+Framewright includes its own camera, motion, character/reference, lighting, sound, prompt-expression, and repair guidance. Use these subordinate references when the current task needs them; no external Seedance installation or sub-skill invocation is required.
+
+| Current need | Read |
+|---|---|
+| Combined camera/body movement, timing, visible action or performance | [Camera and motion](references/craft/camera-motion.md) |
+| Asymmetric identity, reference-role conflict, local image revision or material fidelity | [Identity and material](references/craft/identity-material.md) |
+| Light-zone changes, exposure, cue timing or unwanted sound | [Light and sound](references/craft/light-sound.md) |
+| Failed or partly usable generation; choosing the smallest repair | [Diagnosis and repair](references/craft/diagnosis-repair.md) |
+
+Load only the relevant reference or section; reuse it in the same context when unchanged. Core owns the decisions and the existing records, and exactly one target adapter owns serialization. These references add no stages, default files, model limits, generation permissions, or mandatory creative questionnaire. They cannot shorten locked dialogue, simplify approved action, replace deliberate silence, enforce a palette, or split a shot without the existing director authority.
+
+For Video Prompt validation, supply `--compiler-source` for each required source and each integrated craft reference actually used, using its repository-relative registered path. Do not add every optional source by default or claim that a PASS verifies the real loading history. Source attribution and the third-party notice are in [craft provenance](references/craft/PROVENANCE.md); this is not another instruction source to load for production.
+
 Before any Framewright output, read the `version` value from the reference YAML and state exactly:
 
 `Loaded: Framewright v<version>`

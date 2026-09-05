@@ -2,10 +2,10 @@
 
 Framewright is a director-steered, asset-aware, intent-preserving cinematic compiler for AI filmmaking. It turns a director's approved scene intent, decision state, and production assets into structured storyboard, keyframe, and video-generation prompts.
 
-- Current core version: **4.0.0**
+- Current core version: **4.1.0**
 - Release status: **stable**
-- Desktop Framewright mirror: **4.0.0**
-- GitHub `main`: **4.0.0**
+- Desktop Framewright mirror: **4.1.0**
+- GitHub `main`: **4.1.0**
 - Global invocation: **`$framewright` only**
 
 Author: **Tairan Li**
@@ -16,12 +16,13 @@ Author: **Tairan Li**
 - [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md) — current authoritative Framewright specification
 - [`skill/framewright/references/runtime_profiles/`](skill/framewright/references/runtime_profiles/) — subordinate, target-versioned Video Prompt adapters
 - [`skill/framewright/references/keyframe_profiles/`](skill/framewright/references/keyframe_profiles/) — subordinate Midjourney V7 Keyframe and ChatGPT Image 2 edit adapters
+- [`skill/framewright/references/craft/`](skill/framewright/references/craft/) — integrated, on-demand camera/action, identity/material, light/sound and diagnosis guidance
 - [`versions/releases/`](versions/releases/) — immutable, version-numbered release snapshots
 - [`versions/iterations/`](versions/iterations/) — preserved development iterations
 - [`versions/beta/`](versions/beta/) — preserved historical beta experiments
 - [`docs/product-vision.md`](docs/product-vision.md) — clean-room product evaluation brief
 
-GitHub `main` is the source of truth for the synchronized stable release. Framewright 4.0.0 is the intended release across the local Source, Desktop mirror, and GitHub `main`.
+GitHub `main` is the source of truth for the synchronized stable release. Framewright 4.1.0 is the intended release across the local Source, Desktop mirror, and GitHub `main`.
 
 ## Install in Codex
 
@@ -29,11 +30,13 @@ Install the stable package from `https://github.com/jamesltr0701-cell/framewrigh
 
 After installation, invoke it explicitly with `$framewright`.
 
+Version 4.1.0 integrates selected practical craft and repair guidance into Framewright-owned, conditionally loaded references. The external Seedance 2.0 skill pack is not required. Core retains all director decisions; the selected target adapter retains serialization ownership. The release does not promote the separate local Midjourney V8.2 or ChatGPT Image 2 base-create candidates. Adapted reference material and its MIT notice are identified in [craft provenance](skill/framewright/references/craft/PROVENANCE.md).
+
 Framewright is configured for explicit invocation and one active stage at a time. Version 4.0.0 adds a once-per-unit Storyboard Preflight gate, branching live-action / 2D / VFX Look Development, provisional-to-committed Shot Spine review, and generation routing for continuous single shots, whole edited sequences, or one shot at a time. Keyframes default to a Midjourney V7 adapter; user-requested Image 2 edits always return to the immutable original master rather than stacking edited pixels. Target-specific Video Prompt behavior remains subordinate to Core: Seedance 2.0, Seedance 2.5, and MiniMax H3 each retain separate registered adapters. A resolved Storyboard stage still generates exactly one initial board image; automatic retries, variants, unrequested Keyframe generation, Video generation, ChatCut, and OpenMontage remain outside the default boundary.
 
 ## Repository policy
 
-This repository intentionally excludes films, image case studies, active projects, generated media, private working files, and third-party tools.
+This repository intentionally excludes films, image case studies, active projects, generated media, private working files, and third-party tools. Selected adapted knowledge may be included with explicit attribution and its applicable notice; the external tool or skill package is not bundled.
 
 ## Versioning policy
 
@@ -49,4 +52,4 @@ Every promoted Framewright patch or feature release preserves the previous versi
 
 Existing versioned snapshots are never overwritten or repurposed.
 
-Copyright © 2026 Tairan Li. All rights reserved. No license for reuse or redistribution is granted unless stated separately.
+Copyright © 2026 Tairan Li. All rights reserved. No license for reuse or redistribution is granted unless stated separately. Third-party portions remain subject to their notices, including [the MIT notice for adapted craft material](skill/framewright/references/craft/PROVENANCE.md).

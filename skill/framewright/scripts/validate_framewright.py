@@ -201,6 +201,9 @@ def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str,
     sources = document.get("compiler_instruction_sources")
     if not isinstance(sources, list) or not sources or any(not isinstance(value, str) or not value for value in sources):
         errors.append(issue("compiler_source_registry_invalid", "Registry compiler instruction sources must be non-empty scalar paths."))
+    optional_sources = document.get("optional_compiler_instruction_sources", [])
+    if not isinstance(optional_sources, list) or any(not isinstance(value, str) or not value for value in optional_sources):
+        errors.append(issue("optional_compiler_source_registry_invalid", "Optional compiler instruction sources must be a list of non-empty scalar paths."))
     targets = document.get("registered_targets")
     if not isinstance(targets, dict) or not targets:
         return errors + [issue("adapter_registry_targets_missing", "Adapter registry has no registered target mappings.")]
@@ -209,8 +212,9 @@ def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str,
     adapter_ids: list[str] = []
     package_root = registry_path.resolve().parents[2]
     repository_root = package_root.parents[1]
-    if isinstance(sources, list):
-        for source in sources:
+    all_sources = (sources if isinstance(sources, list) else []) + (optional_sources if isinstance(optional_sources, list) else [])
+    if all_sources:
+        for source in all_sources:
             if not isinstance(source, str) or not source:
                 continue
             resolved_source = (repository_root / source).resolve()
@@ -416,6 +420,9 @@ def validate_serialization_ownership(
         base_sources = registry.get("compiler_instruction_sources", []) if isinstance(registry, dict) else []
         required_sources = set(base_sources if isinstance(base_sources, list) else [])
         allowed_sources = set(required_sources)
+        optional_sources = registry.get("optional_compiler_instruction_sources", []) if isinstance(registry, dict) else []
+        if isinstance(optional_sources, list):
+            allowed_sources.update(value for value in optional_sources if isinstance(value, str))
         allowed_sources.add("skill/framewright/references/runtime_profiles/adapter_registry.yaml")
         profile = registered.get("profile") if isinstance(registered, dict) else None
         if isinstance(profile, str):
