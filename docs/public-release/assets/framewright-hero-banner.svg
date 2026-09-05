@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2048" height="768" viewBox="0 0 2048 768" role="img" aria-labelledby="title desc">
+  <title id="title">Framewright — director-steered cinematic compiler</title>
+  <desc id="desc">A black and off-white editorial production notebook cover with FRAMEWRIGHT typography and sparse storyboard contact-sheet geometry.</desc>
+  <image x="0" y="0" width="2048" height="768" preserveAspectRatio="xMidYMid slice" xlink:href="framewright-hero-background.png" href="framewright-hero-background.png"/>
+  <g fill="#111111">
+    <text x="142" y="342" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="700" letter-spacing="8">FRAMEWRIGHT</text>
+    <text x="150" y="410" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="600" letter-spacing="5">DIRECTOR-STEERED CINEMATIC COMPILER</text>
+    <text x="151" y="456" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" letter-spacing="2.5">STORYBOARD / KEYFRAME / VIDEO PROMPT</text>
+  </g>
+  <g fill="none" stroke="#252525" stroke-width="1.5" opacity="0.72">
+    <path d="M112 252h26M125 239v26M112 516h26M125 503v26"/>
+    <path d="M117 252h10M122 247v10M117 516h10M122 511v10" opacity="0.45"/>
+  </g>
+  <g fill="#4a4a4a" font-family="Menlo, Monaco, Consolas, monospace" font-size="13" letter-spacing="1.5" opacity="0.74">
+    <text x="145" y="520">DIRECTOR'S NOTEBOOK / 04.1.1</text>
+  </g>
+</svg>

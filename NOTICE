@@ -1,0 +1,43 @@
+Framewright 4.1.1
+Copyright © 2026 Tairan Li
+
+Created and maintained by Tairan Li.
+
+This NOTICE is a draft for human legal review and is not legal advice.
+
+Original Framewright material is proposed to be made available under the
+Apache License 2.0 with the Commons Clause License Condition v1.0, as set
+out in LICENSE. Framewright is source available and should not be described
+as OSI-approved "open source" software while this restriction applies.
+
+When redistributing the Framewright source or Skill, retain this project
+attribution and the applicable license and third-party notices. This
+software attribution requirement does not require Tairan Li to be credited
+in the final credits of a film, advertisement, or other creative work made
+with Framewright.
+
+Commons Clause License Condition v1.0
+
+The Software is provided to you by the Licensor under the License, as
+defined below, subject to the following condition.
+
+Without limiting other conditions in the License, the grant of rights under
+the License will not include, and the License does not grant to you, the
+right to Sell the Software.
+
+For purposes of the foregoing, "Sell" means practicing any or all of the
+rights granted to you under the License to provide to third parties, for a
+fee or other consideration (including without limitation fees for hosting
+or consulting/support services related to the Software), a product or
+service whose value derives, entirely or substantially, from the
+functionality of the Software. Any license notice or attribution required
+by the License must also include this Commons Clause License Condition
+notice.
+
+Software: Framewright 4.1.1
+License: Apache License 2.0
+Licensor: Tairan Li
+
+Certain adapted craft references are subject to the third-party MIT notice
+in THIRD_PARTY_NOTICES.md. That notice applies only to the identified
+adapted material and does not relicense unrelated Framewright material.
