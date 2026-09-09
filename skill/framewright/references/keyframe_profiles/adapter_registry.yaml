@@ -1,10 +1,10 @@
-registry_version: "2.0.0"
+registry_version: "2.1.0"
 default_shot_plate_target: midjourney_v8_2
 default_keyframe_target: midjourney_v8_2
-default_storyboard_target: chatgpt_image_2
-default_shot_plate_edit_target: chatgpt_image_2_edit
-default_keyframe_edit_target: chatgpt_image_2_edit
-default_storyboard_edit_target: chatgpt_image_2_edit
+default_storyboard_target: gpt_image_2_5
+default_shot_plate_edit_target: gpt_image_2_5_edit
+default_keyframe_edit_target: gpt_image_2_5_edit
+default_storyboard_edit_target: gpt_image_2_5_edit
 registered_targets:
   midjourney_v8_2:
     adapter_id: midjourney_v8_2
@@ -14,18 +14,18 @@ registered_targets:
     artifact_kinds:
       - shot_plate
       - keyframe
-  chatgpt_image_2:
-    adapter_id: chatgpt_image_2
-    profile: chatgpt_image_2.md
+  gpt_image_2_5:
+    adapter_id: gpt_image_2_5
+    profile: gpt_image_2_5.md
     profile_role: subordinate_image_prompt_adapter
     route: base_create
     artifact_kinds:
       - shot_plate
       - keyframe
       - storyboard
-  chatgpt_image_2_edit:
-    adapter_id: chatgpt_image_2_edit
-    profile: chatgpt_image_2_edit.md
+  gpt_image_2_5_edit:
+    adapter_id: gpt_image_2_5_edit
+    profile: gpt_image_2_5_edit.md
     profile_role: subordinate_image_edit_adapter
     route: edit
     artifact_kinds:

@@ -1,0 +1,16 @@
+kind: clean_master_edit
+expected: pass
+document:
+  clean_master_edit:
+    adapter_id: gpt_image_2_5_edit
+    artifact_kind: storyboard
+    original_master_id: BOARD_MASTER_01
+    base_input_id: BOARD_MASTER_01
+    attempt_authorized_by_user: true
+    automatic_retry: false
+    based_on_previous_candidate: false
+    cumulative_edit_spec:
+      - preserve all panel geometry and replace only the board title
+    previous_candidate_ids: []
+    candidate_output_id: BOARD_CANDIDATE_01
+    master_reset: false

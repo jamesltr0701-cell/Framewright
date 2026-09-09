@@ -1,4 +1,4 @@
-# Framewright 4.1.1 — Hero Banner Final Creative Brief
+# Framewright 4.1.2 — Hero Banner Final Creative Brief
 
 **Status:** Final direction for visual production
 

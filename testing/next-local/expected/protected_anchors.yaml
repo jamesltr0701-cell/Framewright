@@ -1,4 +1,4 @@
-candidate_version: "4.1.1"
+candidate_version: "4.1.2"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -64,6 +64,9 @@ protected_anchors:
   - "shot_by_shot"
   - "Keyframe Eligibility Gate"
   - "Midjourney V8.2"
+  - "GPT Image 2.5"
+  - "Sunburst"
+  - "Flare"
   - "Editing intent may accumulate; edited pixels may not accumulate."
   - "Never feed a rejected or previously edited candidate back as the next attempt's pixel source."
   - "There must be one persistence owner"

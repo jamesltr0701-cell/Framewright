@@ -1,10 +1,10 @@
-# Framewright 4.1.1 — Workflow Diagram Final Creative Brief
+# Framewright 4.1.2 — Workflow Diagram Final Creative Brief
 
 **Status:** Final direction for visual production
 
 ## Purpose
 
-Explain the 4.1.1 compiler relationship in one readable schematic. The
+Explain the 4.1.2 compiler relationship in one readable schematic. The
 diagram must teach the reader that one approved Production Spine can feed an
 independent active stage; it must not imply automatic batch generation or a
 mandatory Storyboard → Keyframe → Video sequence.

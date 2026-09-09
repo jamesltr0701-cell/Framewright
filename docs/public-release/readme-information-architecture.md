@@ -1,4 +1,4 @@
-# Framewright 4.1.1 — README Information Architecture
+# Framewright 4.1.2 — README Information Architecture
 
 **Status:** Approved public-release presentation structure
 
@@ -16,7 +16,7 @@ license detail.
    explicit with a two-column responsibility table.
 4. **How it works** — shows the Production Spine as the central compiler state
    with independent artifact branches and one active stage at a time.
-5. **Current model routes** — lists only the registered 4.1.1 image and video
+5. **Current model routes** — lists only the registered 4.1.2 image and video
    routes, with create/edit distinctions.
 6. **Quick Start** — gives a five-step first-use path without exposing the
    entire internal schema.
@@ -39,5 +39,5 @@ license detail.
 - Keep the director-authority boundary visible before any implementation detail.
 - Describe the workflow as branching and stage-independent; never as a
   mandatory Storyboard → Keyframe → Video funnel.
-- Preserve the exact 4.1.1 registered model routes and avoid implying support
+- Preserve the exact 4.1.2 registered model routes and avoid implying support
   for unregistered models.

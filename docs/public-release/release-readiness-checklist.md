@@ -1,6 +1,6 @@
-# Framewright 4.1.1 — Public Release Readiness Checklist
+# Framewright 4.1.2 — Public Release Readiness Checklist
 
-**Review date:** 2026-09-05
+**Review date:** 2026-09-09
 
 This checklist covers the GitHub presentation package. Items marked pending
 still require an explicit human decision or external production step.
@@ -14,7 +14,7 @@ still require an explicit human decision or external production step.
       boundary statement.
 - [x] Workflow explanation uses a branch structure, not a forced linear
       funnel.
-- [x] Current model routes match the Framewright 4.1.1 image and runtime
+- [x] Current model routes match the Framewright 4.1.2 image and runtime
       adapter registries.
 - [x] Quick Start stays short and stage-oriented.
 - [x] Personal-by-design language is present without turning into a disclaimer.
@@ -54,7 +54,7 @@ still require an explicit human decision or external production step.
 - [ ] Review the rendered GitHub README at desktop and narrow widths for
       Mermaid, table, link, and banner presentation.
 - [ ] Reconfirm the release commit, tag, and `main` branch version are all
-      `4.1.1` immediately before publication.
+      `4.1.2` immediately before publication.
 - [ ] After any manual change, rerun the repository checks and inspect the
       final diff for accidental internal paths, private assets, or unsupported
       model claims.

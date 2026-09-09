@@ -1,10 +1,9 @@
 kind: keyframe_ir
-expected: fail
-expected_errors:
-  - keyframe_default_adapter_mismatch
+expected: pass
 document:
   keyframe_ir:
-    adapter_id: chatgpt_image_2
+    adapter_id: gpt_image_2_5
+    target_selected_by_director: true
     generation_strategy: shot_by_shot
     active_shot_id: SHOT_02
     blocks:

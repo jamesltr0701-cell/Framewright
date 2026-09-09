@@ -151,12 +151,12 @@ EXPECTED_IMAGE_ADAPTERS = {
         "route": "base_create",
         "artifact_kinds": {"shot_plate", "keyframe"},
     },
-    "chatgpt_image_2": {
+    "gpt_image_2_5": {
         "role": "subordinate_image_prompt_adapter",
         "route": "base_create",
         "artifact_kinds": {"shot_plate", "keyframe", "storyboard"},
     },
-    "chatgpt_image_2_edit": {
+    "gpt_image_2_5_edit": {
         "role": "subordinate_image_edit_adapter",
         "route": "edit",
         "artifact_kinds": {"shot_plate", "keyframe", "storyboard"},
@@ -296,16 +296,16 @@ def validate_image_registry_data(document: Any, registry_path: Path) -> list[dic
     expected_defaults = {
         "default_shot_plate_target": "midjourney_v8_2",
         "default_keyframe_target": "midjourney_v8_2",
-        "default_storyboard_target": "chatgpt_image_2",
-        "default_shot_plate_edit_target": "chatgpt_image_2_edit",
-        "default_keyframe_edit_target": "chatgpt_image_2_edit",
-        "default_storyboard_edit_target": "chatgpt_image_2_edit",
+        "default_storyboard_target": "gpt_image_2_5",
+        "default_shot_plate_edit_target": "gpt_image_2_5_edit",
+        "default_keyframe_edit_target": "gpt_image_2_5_edit",
+        "default_storyboard_edit_target": "gpt_image_2_5_edit",
     }
     for field, expected in expected_defaults.items():
         if document.get(field) != expected:
-            errors.append(issue("image_adapter_default_invalid", "Image adapter default does not match the Framewright 4.1.1 two-tool workflow.", field=field, expected=expected))
+            errors.append(issue("image_adapter_default_invalid", "Image adapter default does not match the Framewright 4.1.2 two-tool workflow.", field=field, expected=expected))
     if set(targets) != set(EXPECTED_IMAGE_ADAPTERS):
-        errors.append(issue("image_adapter_target_set_invalid", "The active image registry must contain exactly Midjourney V8.2 create, ChatGPT Image 2 create, and ChatGPT Image 2 edit.", registered=sorted(targets)))
+        errors.append(issue("image_adapter_target_set_invalid", "The active image registry must contain exactly Midjourney V8.2 create, GPT Image 2.5 create, and GPT Image 2.5 edit.", registered=sorted(targets)))
     ids: list[str] = []
     package_root = registry_path.resolve().parents[2]
     for target, expected_contract in EXPECTED_IMAGE_ADAPTERS.items():
@@ -1606,20 +1606,20 @@ def validate_clean_master_edit(document: Any) -> list[dict[str, Any]]:
     if not isinstance(document, dict) or not isinstance(document.get("clean_master_edit"), dict):
         return [issue("clean_master_edit_root_missing", "Image edit trace must contain a clean_master_edit mapping.")]
     edit = document["clean_master_edit"]
-    if edit.get("adapter_id") != "chatgpt_image_2_edit":
-        errors.append(issue("image_edit_adapter_invalid", "ChatGPT Image 2 is the sole registered image editor."))
+    if edit.get("adapter_id") != "gpt_image_2_5_edit":
+        errors.append(issue("image_edit_adapter_invalid", "GPT Image 2.5 is the sole registered image editor."))
     if edit.get("artifact_kind") not in IMAGE_ARTIFACT_KINDS:
         errors.append(issue("image_edit_artifact_kind_invalid", "Image edit trace requires Storyboard, Shot Plate, or Keyframe artifact kind."))
     original = edit.get("original_master_id")
     if not original or edit.get("base_input_id") != original:
-        errors.append(issue("image_edit_not_from_original", "Every Image 2 attempt must return to the immutable original master."))
+        errors.append(issue("image_edit_not_from_original", "Every GPT Image 2.5 attempt must return to the immutable original master."))
     if edit.get("based_on_previous_candidate") is not False:
         errors.append(issue("image_edit_candidate_stacking", "An edited candidate may not become the next attempt's pixel input."))
     if edit.get("automatic_retry") is not False or edit.get("attempt_authorized_by_user") is not True:
-        errors.append(issue("image_edit_attempt_unauthorized", "Each Image 2 attempt requires one explicit user edit instruction and forbids automatic retry."))
+        errors.append(issue("image_edit_attempt_unauthorized", "Each GPT Image 2.5 attempt requires one explicit user edit instruction and forbids automatic retry."))
     spec = edit.get("cumulative_edit_spec")
     if not isinstance(spec, list) or not spec:
-        errors.append(issue("image_edit_spec_missing", "Image 2 attempt requires a non-empty cumulative semantic edit specification."))
+        errors.append(issue("image_edit_spec_missing", "GPT Image 2.5 attempt requires a non-empty cumulative semantic edit specification."))
     previous = edit.get("previous_candidate_ids", [])
     if isinstance(previous, list) and edit.get("base_input_id") in previous:
         errors.append(issue("image_edit_previous_candidate_reused", "A previous candidate is being reused as the edit base."))
@@ -1695,6 +1695,9 @@ def validate_core(
     for profile, (profile_meta, _) in zip(image_profiles, loaded_image_profiles):
         if not profile_meta.get("profile_version") or profile_meta.get("profile_role") not in allowed_image_roles:
             errors.append(issue("image_profile_frontmatter_invalid", "Image profile version or role is missing.", profile=str(profile)))
+        if profile_meta.get("adapter_id") in {"gpt_image_2_5", "gpt_image_2_5_edit"}:
+            if profile_meta.get("default_model_id") != "gpt-image-2.5-sunburst" or profile_meta.get("speed_model_id") != "gpt-image-2.5-flare":
+                errors.append(issue("gpt_image25_model_ids_invalid", "GPT Image 2.5 profiles must register Sunburst as the selectable fidelity default and Flare as the selectable speed option.", profile=str(profile)))
 
     documents = [("core", core_text), ("skill", skill_text)] + [
         (f"profile:{profile.name}", profile_text)
@@ -1839,8 +1842,8 @@ def validate_keyframe_prompt_path(
             errors.append(issue("midjourney_v82_version_invalid", "Midjourney V8.2 prompts require exactly one --v 8.2 parameter."))
         if re.search(r"(?:^|\s)--(?:oref|ow|cref|cw|edit)(?:\s|$)", text, re.IGNORECASE):
             errors.append(issue("midjourney_v82_forbidden_parameter", "Midjourney V8.2 base-create prompts may not use V7-only references or the Edit Model route."))
-    if adapter_id == "chatgpt_image_2" and re.search(r"(?:^|\s)--(?:v|version|ar|edit|oref|ow|cref|cw|sref|sw|iw)(?:\s|$)", text, re.IGNORECASE):
-        errors.append(issue("chatgpt_image2_foreign_parameter", "ChatGPT Image 2 prompts may not contain Midjourney parameters."))
+    if adapter_id == "gpt_image_2_5" and re.search(r"(?:^|\s)--(?:v|version|ar|edit|oref|ow|cref|cw|sref|sw|iw)(?:\s|$)", text, re.IGNORECASE):
+        errors.append(issue("gpt_image25_foreign_parameter", "GPT Image 2.5 prompts may not contain Midjourney parameters."))
     if artifact_kind in {"shot_plate", "keyframe"} and re.search(r"\b(?:then|continues|begins to|ends up)\b", text, re.IGNORECASE):
         errors.append(issue("image_temporal_sequence", "Shot Plate and Keyframe prompts must depict one frozen instant."))
     return errors

@@ -1,6 +1,6 @@
 # Third-party notices
 
-**Framewright 4.1.1 — draft for human legal review; not legal advice.**
+**Framewright 4.1.2 — draft for human legal review; not legal advice.**
 
 The following notice applies only to the substantially adapted craft
 references listed below. It does not relicense unrelated Framewright
@@ -8,7 +8,7 @@ source, the Framewright Skill as a whole, or any other project material.
 
 ## Seedance 2.0 Skill OS — adapted craft material
 
-Framewright 4.1.1 contains substantially adapted material in:
+Framewright 4.1.2 contains substantially adapted material in:
 
 - `skill/framewright/references/craft/camera-motion.md`
 - `skill/framewright/references/craft/identity-material.md`

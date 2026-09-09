@@ -14,8 +14,8 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/seedance_2_5.md" \
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/minimax_h3.md" \
   --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/midjourney_v8_2.md" \
-  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/chatgpt_image_2.md" \
-  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/chatgpt_image_2_edit.md" \
+  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/gpt_image_2_5.md" \
+  --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/gpt_image_2_5_edit.md" \
   --registry "$REPO_ROOT/skill/framewright/references/runtime_profiles/adapter_registry.yaml" \
   --image-registry "$REPO_ROOT/skill/framewright/references/keyframe_profiles/adapter_registry.yaml" \
   --manifest "$SCRIPT_DIR/expected/protected_anchors.yaml"
@@ -23,7 +23,7 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
 
 PROMPT_PATH=$(mktemp /private/tmp/framewright-seedance20-adapter.XXXXXX)
 KEYFRAME_PROMPT_PATH=$(mktemp /private/tmp/framewright-midjourney-v82-adapter.XXXXXX)
-STORYBOARD_PROMPT_PATH=$(mktemp /private/tmp/framewright-image2-storyboard-adapter.XXXXXX)
+STORYBOARD_PROMPT_PATH=$(mktemp /private/tmp/framewright-image25-storyboard-adapter.XXXXXX)
 trap 'rm -f -- "$PROMPT_PATH" "$KEYFRAME_PROMPT_PATH" "$STORYBOARD_PROMPT_PATH"' EXIT HUP INT TERM
 printf '%s\n' 'A woman crosses the room. Quiet ventilation and synchronized footsteps; no music.' > "$PROMPT_PATH"
 "$PYTHON_BIN" "$VALIDATOR" video-prompt "$PROMPT_PATH" \
@@ -41,6 +41,6 @@ printf '%s\n' 'A woman motionless at the rain-lit window, medium close-up, spher
 
 printf '%s\n' 'Create one landscape 16:9 monochrome storyboard board with four equal landscape 16:9 panels, a readable exterior board title, uniform gutters, and one frozen blocking beat per panel.' > "$STORYBOARD_PROMPT_PATH"
 "$PYTHON_BIN" "$VALIDATOR" keyframe-prompt "$STORYBOARD_PROMPT_PATH" \
-  --adapter-id chatgpt_image_2 \
+  --adapter-id gpt_image_2_5 \
   --artifact-kind storyboard \
   --image-registry "$REPO_ROOT/skill/framewright/references/keyframe_profiles/adapter_registry.yaml"

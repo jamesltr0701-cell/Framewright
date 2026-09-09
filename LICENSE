@@ -1,4 +1,4 @@
-FRAMEWRIGHT 4.1.1 LICENSE DRAFT
+FRAMEWRIGHT 4.1.2 LICENSE DRAFT
 
 Status: draft for human legal review. This document is not legal advice. Before public release, confirm the licensor identity, scope of covered material, treatment of contributions, and compatibility of the Apache License 2.0 with the Commons Clause License Condition v1.0.
 
@@ -200,7 +200,7 @@ functionality of the Software. Any license notice or attribution required
 by the License must also include this Commons Clause License Condition
 notice.
 
-Software: Framewright 4.1.1
+Software: Framewright 4.1.2
 License: Apache License 2.0
 Licensor: Tairan Li
 
