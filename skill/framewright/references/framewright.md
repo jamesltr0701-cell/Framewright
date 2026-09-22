@@ -899,6 +899,14 @@ Translate look choices into executable carriers:
 
 Do not rely on abstract labels such as `cinematic`, `premium`, `beautiful`, or `moody` without concrete carriers.
 
+For a Shot Plate or Keyframe whose photographic relationships matter, resolve only the active shot's necessary light and optical relations before image-adapter serialization. Reuse `look_development`, `spatial_geography`, `camera_logic`, the Committed Shot Spine, and the Material Registry; do not create another mandatory form or a second shot authority. The [light and sound](craft/light-sound.md) reference supplies the selective source/subject check; the [camera and motion](craft/camera-motion.md) reference supplies the selective viewpoint/framing/focus check. A straightforward shot with sufficient visual relationships needs no numeric lens specification.
+
+- Light: locate the motivated source relative to the world and subject, then infer the visible lit and shadowed surfaces from subject orientation and camera position. A reverse angle does not carry over screen-left/right lighting mechanically. Distinguish source output, ambient reflection, added fill, exposure response, and display black level; preserve any director-approved darkness or uniformity. Keep material/skin identity distinct from illumination color.
+- Optics: check intended shot size and aspect-ratio/crop convention against viewpoint, subject distance, focal-length convention, foreground/subject/background spacing, focus plane, and needed background readability. Viewpoint and object spacing determine perspective; focal length at a specified image format sets field of view. Changing only focal length and cropping from the same viewpoint does not change perspective. Depth of field is not implied by a long-focal-length label alone.
+- If director-locked constraints cannot coexist under the stated image-format or crop assumptions, identify the specific conflict and offer the fewest meaningful choices; do not silently change a lock or promise exact physical parameters. Correct a conflicting compiler-inferred number without re-opening the director's already approved visual intent. If format, crop, distance, or focus data are absent and not needed for the image, use observable spatial/focus relationships rather than invented precision. `21:9` alone does not specify sensor dimensions or anamorphic capture.
+
+Do not turn this into a universal side-light, high-contrast, shallow-focus, or photorealism requirement. Uniform top light, deep focus, stylized optics, soft but shaped light, and dark faces against bright backlight can all be intentional.
+
 ### 8.5.1 Style Survival and Surface Fidelity
 
 When explicit direction or admitted non-storyboard visual assets carry a distinctive final medium, edge behavior, material finish, texture, grain, wear, imperfection, handmade quality, or stylization boundary, preserve it in the video prompt through concise executable carriers.
@@ -1176,6 +1184,7 @@ Rules:
 - Attachment does not automatically grant full authority.
 - References never silently override explicit direction.
 - Image identity authority does not control source pose, camera, crop, or composition unless those properties are separately admitted.
+- Image identity authority also does not import its studio lighting, subject exposure, focus, or close-camera perspective. Admit composition/viewpoint, place, lighting, palette, material, and focus authority separately when needed; the division is a semantic instruction, not a guarantee that a generation tool isolates those image channels.
 - Video motion authority does not control identity, environment, or final style unless those properties are separately admitted.
 - Audio timbre authority does not control dialogue text, emotion, accent, or pacing unless those properties are separately admitted.
 - Authority may be scoped to one stage, shot, phase, or beat; it does not silently propagate outside that scope.
@@ -1806,6 +1815,7 @@ Semantic Trace is not a second editable source and is not saved by default. Run 
 - `Silent Invention Test`: unauthorized emotion, relationship, camera premise, world state, dialogue, or reference authority did not enter the artifact.
 - `Compression Survival Test`: compression preserved every active material intent carrier and its trace mapping.
 - `Cross-Stage Consistency Test`: Storyboard, Keyframes, and Video Prompt read the same approved scope without rewriting decision state or each other's authority.
+- `Photographic Relation Test` (when the active Shot Plate or Keyframe depends on it): the intended source-to-subject light, camera viewpoint and relative scale, crop/shot size, and focus layers are mutually compatible and survive reference binding and image-adapter serialization. Distinguish a hard director conflict from a correctable compiler inference; do not turn a missing nonessential number into a blocker.
 
 Repair a failed test in the smallest affected Spine field, view, or artifact clause before saving. Keep the trace and all diagnostic language out of the clean artifact.
 
@@ -1852,6 +1862,8 @@ Resolve `take_disposition` to exactly one of `accept`, `post_fix`, `local_edit`,
 The attempt budget is finite and explicit. `authorized_attempts`, `attempts_used`, and `attempts_remaining` are non-negative integers with `attempts_remaining = authorized_attempts - attempts_used`; `budget_unit` names what is counted, and `cost_known` records whether price or credit cost is confirmed. Unknown cost must remain visibly unknown and must not be converted into a fabricated estimate. No evidence record may imply unlimited attempts.
 
 Every disposition states an `exit_condition`, whether another attempt is authorized, and whether unaffected contracts were preserved. A retry requires `next_attempt_authorized: true`, positive remaining budget, exactly one non-empty `changed_variable`, and `unaffected_contracts_preserved: true`. A rewrite or split that changes a generation-unit boundary requires `boundary_change_requested: true` and `director_boundary_change_approved: true`. Evidence for `do_not_generate` must state why the generation loop ends.
+
+For an actual Shot Plate or Keyframe result, review the visible photographic relationships that mattered to this shot alongside identity, structure, and material: motivated source versus subject/background illumination; permitted dark or unreadable zones; skin/material response to the environment; viewpoint, crop, foreground-to-subject-to-background scale; focal plane and required background legibility. Compare the original and candidate at matched full-frame scale and useful crops. A local repair is not accepted when a protected relation drifts, even if the requested defect improves. Mark unobservable or ambiguous properties `uncertain`; do not infer actual lens, aperture, lux, or exposure stops from generated pixels or coded PNG/JPEG values. If a requirement was already present in the prompt but absent in the result, investigate reference conflict, surface behavior, or model execution instead of reflexively appending stronger adjectives. A prompt or validator PASS is never a pixel-level verdict.
 
 Classify a failure as one primary layer before repair:
 

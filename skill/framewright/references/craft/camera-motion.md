@@ -16,6 +16,14 @@ For a material move, separate the operator's position, lens direction, subject p
 
 Use this distinction only where it changes the shot. Stable framing needs no elaborate operator choreography. A deliberate loss of the subject or withheld contact can be the point of a shot; do not automatically correct it for legibility.
 
+## Check still-frame optical relationships when they matter
+
+For a Shot Plate or Keyframe with a locked compression, relative scale, crop, or focus hierarchy, first describe the viewpoint and foreground–subject–background spacing. At a fixed viewpoint, changing focal length and cropping cannot change perspective; to hold subject size while changing perspective, the camera position must change. Treat focal length as field-of-view guidance only after the image format or equivalence convention is understood. A wide aspect ratio is not itself a sensor size or anamorphic instruction.
+
+Check a numeric focal length and distance against the requested shot size before serialization. If the director locks incompatible values, explain the conditional geometry and request the smallest choice; if the number was only Framewright's inference, correct it while retaining the approved composition. Do not promise an exact field of view from an unspecified crop. Where numeric information is unnecessary, state the observable relation instead: how large the subject is, whether near and far objects converge in scale, and which surfaces remain inside frame.
+
+Focus is a layer plan, not a foreground/background binary. Identify the intended focus plane, useful sharpness on the subject, and how much foreground/background information remains recognizable. Background distance, focus distance, aperture, focal length, and format all matter; a long lens need not dissolve a nearby background. Distinguish near-camera perspective exaggeration, edge projection stretch, optical lens distortion, and generated geometry errors before asking for a fix. Blur cannot repair a wrong viewpoint or relative scale.
+
 ## Couple action to camera coverage
 
 For an interaction, identify the trigger, the action, what changes, and which parts the camera actually shows. Let concurrent actions remain concurrent when approved. Do not make a performer wait for the camera to arrive merely because the prompt lists camera clauses first.

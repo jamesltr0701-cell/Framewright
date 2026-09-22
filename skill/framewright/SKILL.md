@@ -35,9 +35,9 @@ Framewright includes its own camera, motion, character/reference, lighting, soun
 
 | Current need | Read |
 |---|---|
-| Combined camera/body movement, timing, visible action or performance | [Camera and motion](references/craft/camera-motion.md) |
+| Combined camera/body movement, timing, visible action or performance; material still-frame viewpoint, scale, crop or focus conflict | [Camera and motion](references/craft/camera-motion.md) |
 | Asymmetric identity, reference-role conflict, local image revision or material fidelity | [Identity and material](references/craft/identity-material.md) |
-| Light-zone changes, exposure, cue timing or unwanted sound | [Light and sound](references/craft/light-sound.md) |
+| Light-zone changes, material still-frame subject lighting or exposure, cue timing or unwanted sound | [Light and sound](references/craft/light-sound.md) |
 | Failed or partly usable generation; choosing the smallest repair | [Diagnosis and repair](references/craft/diagnosis-repair.md) |
 
 Load only the relevant reference or section; reuse it in the same context when unchanged. Core owns the decisions and the existing records, and exactly one target adapter owns serialization. These references add no stages, default files, model limits, generation permissions, or mandatory creative questionnaire. They cannot shorten locked dialogue, simplify approved action, replace deliberate silence, enforce a palette, or split a shot without the existing director authority.

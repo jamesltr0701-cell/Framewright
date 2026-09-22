@@ -39,6 +39,8 @@ For a Shot Plate or Keyframe, serialize one independently executable frozen-imag
 
 Organize complex prompts through readable labeled sections when useful. Define the intended result, subject, composition, visible action or frozen pose, style, light, material, and constraints concretely. For people, specify body framing, relative scale, gaze, contact, and object interaction. Put any exact required text in quotation marks, define its placement, forbid extra text, and verify legibility after generation.
 
+When Core locks a photographic relationship for a Shot Plate or Keyframe, serialize the camera viewpoint, subject and near/far scale, crop, required focus layers, and motivated source-to-subject illumination as observable results; include numeric lens or distance terms only if their convention and compatibility are resolved. Do not replace a deep-focus or evenly lit intention with default portrait blur or side light. Keep identity-source studio lighting, near-camera perspective, and focus outside its authority unless Core separately admits them. These instructions are semantic constraints, not independent image-channel controls.
+
 ## Generation references and source-role ledger
 
 Use only admitted generation references. Every admitted image keeps one stable Material Registry ID and one property-level authority role in the assistant-facing source-role ledger. Use the narrowest useful set, resolve conflicting roles before compilation, and withhold sources likely to control forbidden properties.

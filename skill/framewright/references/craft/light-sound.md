@@ -18,6 +18,10 @@ A fall from warm light into cold light may involve two continuously lit sources;
 
 Resolve source direction, contrast, shadow depth, reflective response, and atmosphere selectively. Strong backlight can coexist with an unreadable face if that is intended. Do not flatten shadows for generic clarity, add a rim light to every flat image, or soften contrast merely because an output feels overprocessed.
 
+For a light-sensitive Shot Plate or Keyframe, trace the active source through the shot's world positions: source location and spread, plausible occlusion or bounce, subject position and facing, then the camera-visible lit/shadow surfaces. A reverse view may swap screen sides without moving the lamp. Treat brighter source emission, added fill, exposure lift, and a raised black point as different changes; a bright practical or window need not illuminate the whole face, chest, and arms. Check only relevant zones (for example brow/eye socket, cheek/jaw, clothing, and background). Preserve an intentionally even top light or soft shaping when that is the approved design.
+
+Keep intrinsic skin/material color separate from the color cast of its environment. An identity reference may preserve face and design while its studio light and near-camera look are denied. Do not turn environmental green into a uniform green face, or a light-only correction into invented skin pores, mechanical seams, or clothing detail. Ratios and exposure-stop language may express a soft visual target, not a guarantee of physical light levels; coded pixels from an unknown display transform cannot establish on-set lux, key-to-fill, or actual stops.
+
 Warm/cool, hard/soft, high/low key, and saturated/muted appearances have contextual meanings. Do not assign them fixed emotions or require all shots in a sequence to share a grade. Preserve an approved change of medium, palette, or exposure as deliberately as continuity.
 
 ## Give sound a source, role, and boundary

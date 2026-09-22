@@ -36,6 +36,8 @@ Order the visible instruction when relevant as:
 
 Append `--v 8.2`. Resolve `--ar` from the intended video frame when known. Do not add `--edit`. Do not write video timing, dialogue delivery, camera paths, `then`, `continues`, or multi-beat motion into a still-image prompt.
 
+For a shot whose Core contract depends on photographic relations, express the approved viewpoint and relative near/subject/far scale before optional focal-length flavor, the intended focus plane and background readability before generic blur, and the motivated source-to-subject lit/shadow relation before mood adjectives. Preserve a director-approved even light or deep focus. Do not translate `21:9` into an invented sensor or anamorphic claim, or output a focal-length/distance combination Core has flagged as unresolved. The prompt remains a model-facing visual request, not a promise that V8.2 obeys physical optics.
+
 ## Image Prompt and Style Reference
 
 V8.2 base creation may use admitted Image Prompts and Style References when Core grants a clear property-level authority role.

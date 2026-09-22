@@ -51,6 +51,8 @@ Write one bounded request that distinguishes:
 
 Use direct language such as `change only [X]` and restate every preservation constraint that matters. Identify each input by number and purpose when multiple references are present. Do not add generic enhancement, beautification, sharpening, relighting, restyling, or cleanup unless requested. Do not silently regenerate the whole composition to solve a local edit. If a region must remain pixel-identical, stop and recommend compositing instead of claiming prompt-only editing can guarantee that result.
 
+For a local identity, prop, or material edit, protect the original viewpoint, crop, foreground/subject/background relative scale, focus plane and background readability, and source-to-subject lighting when those relationships are material to the shot. Do not sharpen a defocused asset merely to display its design or brighten a face merely to display identity. For a light-only correction, keep anatomy, skin microtexture, mechanical topology, clothing, and background exposure protected; for a focus-only correction, keep viewpoint and object scale protected. Review the actual candidate for collateral drift and report uncertainty where masks or depth controls are unavailable; prompt locks alone do not prove preservation. A materially wrong perspective calls for a newly authorized composition or controlled reconstruction, not a blur-only disguise.
+
 ## Attempt boundary
 
 Create at most one candidate per explicit user edit instruction. If the candidate fails review, stop. A later correction authorizes one fresh attempt from `original_master` with the revised cumulative specification. Never schedule an automatic retry loop.
