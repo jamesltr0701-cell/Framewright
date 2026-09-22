@@ -1,6 +1,6 @@
 # Light and sound through action — Framewright craft reference
 
-Use with Core §§8.5 and 8.12 when light changes, exposure, sound timing, or unwanted audio materially affects the shot. Preserve the approved look and sound contract; use the active model adapter for capability and syntax. This reference supplies execution distinctions, not a universal palette, emotion chart, audio workflow, or platform claim.
+Use with Core §§8.5 and 8.12 when light changes, still-frame subject lighting, exposure, sound timing, or unwanted audio materially affects the shot. Preserve the approved look and sound contract; use the active model adapter for capability and syntax. This reference supplies execution distinctions, not a universal palette, emotion chart, audio workflow, or platform claim.
 
 ## Explain the cause of a lighting change
 

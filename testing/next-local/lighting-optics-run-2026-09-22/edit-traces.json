@@ -1,0 +1,39 @@
+{
+  "authorization": "User authorized corrections and a few actual generated images on 2026-09-22; parent predeclared four base creates plus at most two independent scope edits.",
+  "original_master_locator": "media/plate_C.png",
+  "master_role": "synthetic R&D original, not a production Accepted asset",
+  "traces": [
+    {
+      "case": "subject_only",
+      "prompt": "candidate/B13.txt",
+      "clean_master_edit": {
+        "adapter_id": "gpt_image_2_5_edit",
+        "artifact_kind": "keyframe",
+        "original_master_id": "synthetic_plate_C_original",
+        "base_input_id": "synthetic_plate_C_original",
+        "based_on_previous_candidate": false,
+        "automatic_retry": false,
+        "attempt_authorized_by_user": true,
+        "cumulative_edit_spec": ["Weaken only the person's existing window-side illumination; preserve room/window brightness and all other protected design, camera and focus relationships."],
+        "previous_candidate_ids": [],
+        "master_reset": false
+      }
+    },
+    {
+      "case": "whole_scene",
+      "prompt": "candidate/B14.txt",
+      "clean_master_edit": {
+        "adapter_id": "gpt_image_2_5_edit",
+        "artifact_kind": "keyframe",
+        "original_master_id": "synthetic_plate_C_original",
+        "base_input_id": "synthetic_plate_C_original",
+        "based_on_previous_candidate": false,
+        "automatic_retry": false,
+        "attempt_authorized_by_user": true,
+        "cumulative_edit_spec": ["Darken and cool both the person and the room; preserve source positions, geometry, identity, design, underlying material texture, camera and focus relationships."],
+        "previous_candidate_ids": [],
+        "master_reset": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "date": "2026-09-22",
+  "tool": "image_gen.imagegen",
+  "implementation_model": "not_exposed",
+  "seed": "not_exposed",
+  "quality": "not_exposed",
+  "cost": "unknown",
+  "authorized_call_cap": 6,
+  "calls_completed": 6,
+  "failed_calls": 0,
+  "automatic_retries": 0,
+  "refs_excluded_for_base_creates": true,
+  "prompt_method": "verbatim content of saved prompt; no other prompt augmentation",
+  "images": [
+    {
+      "compiler": "control",
+      "case": "G1",
+      "prompt": "control/G1.txt",
+      "prompt_sha256": "3757d6d6438d3ce969fdb69ae88af356e0fc186605503c8b39889738e22db49a",
+      "local_output": "media/plate_B.png",
+      "dimensions": "1672x941",
+      "output_sha256": "6e6bd98e304eb6979874af898a8284c32e85bf90432852138233f13621162e44",
+      "original_tool_output": "/Users/jameslee/.codex/generated_images/019f9d6e-8ec8-79e1-9f5f-5d20cde367ab/exec-b77055bc-dfa2-4558-a0c9-516a83a6cd57.png",
+      "referenced_image_paths": []
+    },
+    {
+      "compiler": "candidate",
+      "case": "G1",
+      "prompt": "candidate/G1.txt",
+      "prompt_sha256": "b3ac9f1fb33c5e4d788f44cd4b973b4623912104073b12e19a26369038a85292",
+      "local_output": "media/plate_C.png",
+      "dimensions": "1672x941",
+      "output_sha256": "7dfb1ec6db8b47af1b27a4a784254c748249175a925744718e81811955db5c71",
+      "original_tool_output": "/Users/jameslee/.codex/generated_images/019f9d6e-8ec8-79e1-9f5f-5d20cde367ab/exec-9c6238d9-374d-4af8-b76a-5131bbaefd18.png",
+      "referenced_image_paths": []
+    },
+    {
+      "compiler": "control",
+      "case": "G2",
+      "prompt": "control/G2.txt",
+      "prompt_sha256": "54939995463505ecc0f56804150fcc9b900e29644dcc8e7b541b561ceb44fd70",
+      "local_output": "media/plate_D.png",
+      "dimensions": "1916x821",
+      "output_sha256": "4b878f428295406d177bfef90ec249009ca45200983c6305755ae1dfd5f2093f",
+      "original_tool_output": "/Users/jameslee/.codex/generated_images/019f9d6e-8ec8-79e1-9f5f-5d20cde367ab/exec-0872db35-7450-44fe-9f4c-6d530d94bd4f.png",
+      "referenced_image_paths": []
+    },
+    {
+      "compiler": "candidate",
+      "case": "G2",
+      "prompt": "candidate/G2.txt",
+      "prompt_sha256": "66d8d74384ccdcfbc713fd0923b3543ebe3e32e9399dd0f083aebf4481d39d88",
+      "local_output": "media/plate_A.png",
+      "dimensions": "1916x821",
+      "output_sha256": "e8521440dc395a015a3300852b3a44a32e4e65cb63c74f162db861de2a8825bb",
+      "original_tool_output": "/Users/jameslee/.codex/generated_images/019f9d6e-8ec8-79e1-9f5f-5d20cde367ab/exec-ffbef471-3e74-4c2b-bc06-3f7ba61eb114.png",
+      "referenced_image_paths": []
+    },
+    {
+      "compiler": "candidate",
+      "case": "B13",
+      "prompt": "candidate/B13.txt",
+      "prompt_sha256": "642802f01e493a21f83f927af58e33beff8046758b7ffa77d63b1f2038187220",
+      "local_output": "media/edit_subject.png",
+      "dimensions": "1672x941",
+      "output_sha256": "2d9541a4ebf1128c95335917d129c69f4cd37e3c86b3b2436fc996381ded2ad0",
+      "original_tool_output": "/Users/jameslee/.codex/generated_images/019f9d6e-8ec8-79e1-9f5f-5d20cde367ab/exec-c3a65f33-875a-4eb5-9df4-d171383ab7b5.png",
+      "referenced_image_paths": [
+        "media/plate_C.png"
+      ]
+    },
+    {
+      "compiler": "candidate",
+      "case": "B14",
+      "prompt": "candidate/B14.txt",
+      "prompt_sha256": "87ca18f65851522a7abd4748b44d12c11ade32123c6d17a53acda5e300f10320",
+      "local_output": "media/edit_whole.png",
+      "dimensions": "1672x941",
+      "output_sha256": "69591ecb20cf98068abb03ad1128c31dfe03f4305a7a1393ef4bb93bff873ceb",
+      "original_tool_output": "/Users/jameslee/.codex/generated_images/019f9d6e-8ec8-79e1-9f5f-5d20cde367ab/exec-3e96297f-ba8a-46fd-88c0-07792be59722.png",
+      "referenced_image_paths": [
+        "media/plate_C.png"
+      ]
+    }
+  ]
+}

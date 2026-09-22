@@ -1,0 +1,47 @@
+diff --git a/SKILL.md b/SKILL.md
+--- a/SKILL.md
++++ b/SKILL.md
+@@ -38,6 +38,8 @@ Use when several supplied assets must be stacked or recomposed into a new image.
+ 
+ Do not promise 100% fidelity for generative recomposition. Reserve **hard fidelity** for deterministic placement or verified masked operations. Call generative preservation **high fidelity** and disclose likely drift.
+ 
++For either branch, when a photographic edit could affect light or optics, name the protected viewpoint/crop, near-to-far scale, focus hierarchy, subject-versus-background illumination, and material response that actually matter before execution. Afterward, apply the photographic checks in [references/evaluation-rubric.md](references/evaluation-rubric.md); a local fix that drifts one of those protected relations is not an overall pass. Do not infer hard channel isolation from prompt wording or reference roles.
++
+ ## Proposal-first gate
+ 
+ Before any generation or edit, inspect the assets at full-frame and relevant detail scales, then return:
+diff --git a/references/editor-composer.md b/references/editor-composer.md
+--- a/references/editor-composer.md
++++ b/references/editor-composer.md
+@@ -17,6 +17,8 @@ Assign each source one or more explicit roles:
+ 
+ Do not let one source silently control a role assigned to another.
+ 
++For an existing-image narrow edit, identify the current image's protected photographic relationships before adding identity, place, or object references: viewpoint and crop, near/subject/far relative scale, focus plane and useful background readability, motivated source direction, subject-versus-background exposure, and material response. An identity anchor does not carry its studio light, close-camera perspective, or depth of field into the target unless those roles are expressly assigned. Role separation is a semantic instruction, not proof that the tool can isolate channels.
++
+ ## Fidelity classes
+ 
+ ### Hard fidelity
+@@ -82,6 +84,8 @@ Prefer deterministic placement over generative recreation. If the tool cannot pr
+ 
+ Evaluate each anchor independently and then evaluate the combined image for perspective, occlusion, contact, shadow, reflection, material, style, and atmospheric coherence. A visually attractive composite fails when a protected asset loses its identity, design, exact markings, or required material behavior.
+ 
++After a local prop, identity, light, or focus edit, compare the candidate with the immutable original at matched full-frame scale and relevant crops. Check that the repair did not unexpectedly shift crop or relative scale, sharpen a deliberately soft background, brighten a deliberately dark face, repaint skin microtexture or mechanical topology, or alter the source's lighting relationship. A focus-only change does not authorize a new viewpoint; a lighting-only change does not authorize new anatomy or material relief. If perspective itself is wrong, consider a separately approved recomposition or controlled rebuild rather than hiding it with blur. Without reliable depth or masks, describe generative relighting and blur as uncertain, not physically exact.
++
+ Do not mark an anchor as passed when its critical details are hidden, below useful inspection scale, or replaced by plausible-looking simplification.
+ 
+ ## Process package
+diff --git a/references/evaluation-rubric.md b/references/evaluation-rubric.md
+--- a/references/evaluation-rubric.md
++++ b/references/evaluation-rubric.md
+@@ -64,6 +64,10 @@ Pass when focus, blur, particles, haze, smoke, glow, reflections, transparency,
+ 
+ Fail when particles become generic haze, atmosphere expands or disappears, reflections break, masks halo, assets float, contact shadows are missing, or integration requires redrawing protected assets.
+ 
++For a photographic narrow edit, inspect the protected relationships relevant to that image: source position and subject/background illumination, permitted shadow or unreadable zones, skin/material color under the environment, viewpoint and near/far scale, crop, focus plane, and background detail level. A prop fix that sharpens the background or an identity fix that lifts facial fill fails preservation even if the named prop or face improves. Keep intrinsic surface color/texture separate from illumination; a light correction that invents pores, seams, or material relief is not a clean light correction. Preserve intentional even top light, deep focus, and non-realistic optics rather than imposing a generic cinematic look.
++
++Use `Uncertain` when comparison scale, source evidence, or tool control cannot support a verdict. Image histograms or encoded pixel samples may aid matched comparisons but do not reveal physical lux, on-set exposure stops, actual lens, or aperture. Prompt wording and a claimed lock are not evidence that protected pixels survived.
++
+ ### 10. Delivery honesty and traceability
+ 
+ Pass when outputs, roles, settings, accepted and rejected intermediates, limitations, and observed drift are accurately reported. A package is called editable only when it contains genuinely editable data.

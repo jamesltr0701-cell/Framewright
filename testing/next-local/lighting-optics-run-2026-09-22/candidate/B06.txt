@@ -1,0 +1,2 @@
+KEYFRAME_01
+Frame the complete 0.85 m vertical span from waist to head, with room to avoid cutting either boundary. Use a distant viewpoint for compressed depth and a field of view that retains this entire waist-up span. Near and far layers should feel close together without exaggerated foreground enlargement. Preserve the complete framing rather than forcing an incompatible focal length or camera distance.

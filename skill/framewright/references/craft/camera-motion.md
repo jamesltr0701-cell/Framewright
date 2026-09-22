@@ -1,6 +1,6 @@
 # Camera, action, and performance — Framewright craft reference
 
-Use with Core §§8.4, 8.6, and 8.11 when an approved move, interaction, or performance is difficult to express or has been misread. This is subordinate Framewright guidance, not another director mode or serializer. Resolve choices in the existing Production Spine; retain the selected model adapter's notation and limits. Read only the relevant sections.
+Use with Core §§8.4, 8.5, 8.6, and 8.11 when an approved move, interaction, or performance is difficult to express or has been misread, or a Shot Plate / Keyframe depends on viewpoint, relative scale, crop, or focus relationships. This is subordinate Framewright guidance, not another director mode or serializer. Resolve choices in the existing Production Spine; retain the selected model adapter's notation and limits. Read only the relevant sections.
 
 ## Distinguish the movements that look similar in words
 

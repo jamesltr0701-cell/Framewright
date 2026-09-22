@@ -1,0 +1,6 @@
+KEYFRAME_01
+One photorealistic landscape 16:9 frozen image. At eye level, frame one 45-year-old woman mechanic from the waist up. She has short black hair and wears a charcoal cotton work jacket. She stands motionless, three-quarter turned away from the camera, looking toward the large bright window behind her on screen right. Preserve this turned-away pose and the visible cheek contour. The dusty teal repair room and wooden workbench remain recognizable around her.
+
+The window is the only strong light source. Intense daylight from behind and screen right catches only a narrow window-facing edge of her cheek and shoulder. Most of the camera-visible face, chest, and jacket remain dim; faint reflected room light retains a little skin and cotton material information within those shadows without making them broadly bright. Keep the window much brighter than the woman and preserve the contrast between the bright opening, the narrow lit edge, and her dim surfaces. Do not lift the whole exposure or add frontal fill to brighten her. Natural photographic skin and cotton response, dusty teal room surfaces, and recognizable wooden workbench texture.
+
+No mist, no text, no other people, and no added lamps.

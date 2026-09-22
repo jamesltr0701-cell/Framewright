@@ -1,0 +1,2 @@
+KEYFRAME_01
+View the figure from well down the corridor, using a narrow field of view to keep the figure legible while the foreground and background intervals appear compressed. Keep the figure clearly separated by readable contours and sufficient focus, with corridor layers close together in apparent scale rather than exaggerated by a near-camera viewpoint. Preserve the corridor's recognizable spatial structure.

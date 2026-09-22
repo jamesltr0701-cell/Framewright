@@ -1,0 +1,2 @@
+KEYFRAME_01
+View a legible figure in a corridor from a distant camera position, using a long-lens framing that compresses the apparent separation of the figure and the corridor behind. Keep the figure's silhouette and relevant body detail readable against the surrounding space. Use a level camera and stable composition; choose focal length and framing distance together to preserve this compressed-depth relationship without crowding or accidentally cropping the figure.

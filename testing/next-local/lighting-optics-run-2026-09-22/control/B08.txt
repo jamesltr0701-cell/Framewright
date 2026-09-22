@@ -1,0 +1,2 @@
+KEYFRAME_01
+A long-lens portrait with the face as the clearest, most sharply focused plane. The wall stands one meter behind the face. Give the wall a gentler level of detail than the face while keeping its fixtures recognizable in shape and placement; avoid dissolving the wall fixtures into indistinct bokeh.

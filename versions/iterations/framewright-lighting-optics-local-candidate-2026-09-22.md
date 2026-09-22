@@ -2,6 +2,8 @@
 
 日期：2026-09-22。基线：v4.1.2，`main` 在实施前干净。本轮在未推送的 `codex/lighting-optics-iteration` 分支修改源码，不改 Core 版本号、不建 release snapshot、不更新 Desktop 或 GitHub。THE WEAVER 的 SHOT_SPINE、Prompt、媒体和状态均只读。未生成图片或视频。
 
+**后续状态更新（同日）**：导演在审计后授权修正并实际生图。本地候选已修正过严的背景曝光锁、补齐加载入口，并归档image-master可恢复补丁。已完成两个独立编译上下文、14组实际行为判断和6张测试图；[完整结果与证据](../../testing/next-local/lighting-optics-run-2026-09-22/RESULTS.md)。以下首轮记录保留历史语境；其“未生成/未验证”状态由后续结果替代。正式版本仍未发布。
+
 ## 缺口及归属
 
 | 历史现象 | 已有规则 | 本轮确认的缺口 / 归属 | 验证 |
@@ -20,7 +22,7 @@
 - Midjourney V8.2 和 GPT Image 2.5 base-create / edit adapter 只将 Core 已批准的关系转成模型面对的表述和保护项，不接管摄影设计；所有视频 adapter 未动。
 - 已安装的 `image-master` 副本本身不是 Git 仓库；在本次检查的 AI Filmmaking Studio 中未找到对应独立源码。本轮按现有安装入口窄修 `SKILL.md`、`references/editor-composer.md`、`references/evaluation-rubric.md`：两种工作分支都触发相关摄影保护检查，局部编辑后比较机位、尺度、焦点、光照及材质副作用。它没有成为 Framewright 的第二编译器。
 
-## 离线验证
+## 首轮离线走查（后续已补实际执行）
 
 `testing/next-local/lighting_optics_behavior_inputs.md` 保存 11 个不带标准答案的原始输入。逐例做规则路径走查，结果如下；这是人工规范走查，不是独立模型的盲测，也不是图像质量验证。
 
@@ -42,8 +44,8 @@
 
 ## 未完成的验证与发布边界
 
-视觉效果：**未验证**。旧候选图只能说明历史问题，不是此次改动的受控 A/B。无生成授权，未调用生成工具、未花费额度。若导演以后批准试验，先明确一个光照案例与一个光学案例的原始输入、每案数量、总预算和保护项，再控制模型、输入、尺寸及单一改动变量。
+视觉效果：首轮为**未验证**；后续导演授权后完成6张测试图，当前为**有限范围部分通过**。逆光基础生成两版均部分通过，光学可观察关系两版均通过，两种编辑范围均视觉通过。未证明新版整体优于旧版，参见上方后续报告。
 
-版本同步：**未开始，非已发布版本**。正式 v4.1.2 的本地 `main`、Desktop 与 GitHub 未因本候选而改动。若决定发布，再确定版本号和目标分支，验证三地内容与提交一致；不能把本地候选称为正式更新。image-master 为无 Git 的安装副本，本轮改动已在该副本生效，但没有独立源码/同步机制可验证，后续迁移或重新安装时应保存本次三份文件变更。
+版本同步：**未开始，非已发布版本**。正式 v4.1.2 的本地 `main`、Desktop 与 GitHub 未因本候选而改动。若决定发布，再确定版本号和目标分支，验证三地内容与提交一致；不能把本地候选称为正式更新。image-master 三份安装文件变更现已保存在同目录 `image-master-lighting-optics-2026-09-22.patch`，正反向dry-run通过；该补丁用于恢复与审阅，不是另一个Skill源码入口。
 
 摄影原理核对：Canon 的[焦段与视场](https://files.canon-europe.com/files/webcontent/rf-lens-world/knowledge/focus/index.html)及[景深](https://files.canon-europe.com/files/webcontent/rf-lens-world/knowledge/depth-of-field/index.html)文档支持基本关系；它们不是任何图像生成模型的能力保证。

@@ -1,0 +1,3 @@
+Camera A view: the window is on screen left. Window light illuminates the subject's anatomical right side, seen on the left side of the frontal view; the opposite side is relatively dimmer.
+
+Camera B view: the same window is on screen right. It still illuminates the subject's anatomical right side, now seen on the right side of the rear view; the opposite side is relatively dimmer. The subject maintains the same north-facing orientation.

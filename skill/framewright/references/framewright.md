@@ -646,9 +646,9 @@ The optional references below are native Framewright support for the existing op
 
 | Need | Reference | Existing owner |
 |---|---|---|
-| Camera/body coordination, action timing, performance expression | [Camera and motion](craft/camera-motion.md) | §§8.4, 8.6, 8.11 |
+| Camera/body coordination, action timing, performance expression; material still-frame viewpoint, scale, crop or focus conflict | [Camera and motion](craft/camera-motion.md) | §§8.4, 8.5, 8.6, 8.11 |
 | Identity, asymmetric anatomy, material roles and local revision | [Identity and material](craft/identity-material.md) | §§8.1, 8.5.1, 8.6, 9 |
-| Lighting causes, exposure and sound-event boundaries | [Light and sound](craft/light-sound.md) | §§8.5, 8.12 |
+| Lighting causes, material still-frame subject lighting or exposure, and sound-event boundaries | [Light and sound](craft/light-sound.md) | §§8.5, 8.12 |
 | Diagnose a failed or partially usable take | [Diagnosis and repair](craft/diagnosis-repair.md) | §16 |
 
 Core's director locks, intentional freedom, non-narrative exceptions, compression safety and authorization remain authoritative. The target adapter alone supplies runtime syntax and model-specific limits. These optional files are registered compiler instruction sources, not external model-prompt skills; report only those actually used. Do not silently reactivate old external skill instructions from conversation history when continuing Framewright work.

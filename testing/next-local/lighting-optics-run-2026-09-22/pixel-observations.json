@@ -1,0 +1,178 @@
+{
+  "method": "Matched pixel rectangles, mean encoded RGB (0-255), not physical exposure or lux. No registration or semantic segmentation; measurements supplement visual review only.",
+  "regions": {
+    "window": [
+      1300,
+      100,
+      1450,
+      250
+    ],
+    "left_wall": [
+      80,
+      400,
+      200,
+      550
+    ],
+    "workbench": [
+      1200,
+      780,
+      1500,
+      870
+    ],
+    "jacket": [
+      650,
+      550,
+      850,
+      750
+    ],
+    "face_neck": [
+      875,
+      200,
+      970,
+      360
+    ]
+  },
+  "images": {
+    "plate_C.png": {
+      "window": {
+        "mean_rgb": [
+          246.44,
+          246.94,
+          246.65
+        ],
+        "mean_channel_value": 246.68,
+        "mean_abs_rgb_difference_from_original": 0.0
+      },
+      "left_wall": {
+        "mean_rgb": [
+          54.35,
+          62.02,
+          61.78
+        ],
+        "mean_channel_value": 59.38,
+        "mean_abs_rgb_difference_from_original": 0.0
+      },
+      "workbench": {
+        "mean_rgb": [
+          77.51,
+          70.98,
+          64.54
+        ],
+        "mean_channel_value": 71.01,
+        "mean_abs_rgb_difference_from_original": 0.0
+      },
+      "jacket": {
+        "mean_rgb": [
+          18.52,
+          18.5,
+          18.27
+        ],
+        "mean_channel_value": 18.43,
+        "mean_abs_rgb_difference_from_original": 0.0
+      },
+      "face_neck": {
+        "mean_rgb": [
+          84.22,
+          70.39,
+          61.31
+        ],
+        "mean_channel_value": 71.97,
+        "mean_abs_rgb_difference_from_original": 0.0
+      }
+    },
+    "edit_subject.png": {
+      "window": {
+        "mean_rgb": [
+          246.51,
+          246.43,
+          246.53
+        ],
+        "mean_channel_value": 246.49,
+        "mean_abs_rgb_difference_from_original": 0.77
+      },
+      "left_wall": {
+        "mean_rgb": [
+          54.68,
+          62.21,
+          61.21
+        ],
+        "mean_channel_value": 59.37,
+        "mean_abs_rgb_difference_from_original": 2.22
+      },
+      "workbench": {
+        "mean_rgb": [
+          78.37,
+          71.31,
+          65.06
+        ],
+        "mean_channel_value": 71.58,
+        "mean_abs_rgb_difference_from_original": 2.7
+      },
+      "jacket": {
+        "mean_rgb": [
+          14.17,
+          14.09,
+          13.72
+        ],
+        "mean_channel_value": 13.99,
+        "mean_abs_rgb_difference_from_original": 4.47
+      },
+      "face_neck": {
+        "mean_rgb": [
+          50.79,
+          42.03,
+          35.93
+        ],
+        "mean_channel_value": 42.92,
+        "mean_abs_rgb_difference_from_original": 29.12
+      }
+    },
+    "edit_whole.png": {
+      "window": {
+        "mean_rgb": [
+          123.95,
+          148.53,
+          180.85
+        ],
+        "mean_channel_value": 151.11,
+        "mean_abs_rgb_difference_from_original": 95.57
+      },
+      "left_wall": {
+        "mean_rgb": [
+          22.07,
+          31.75,
+          38.0
+        ],
+        "mean_channel_value": 30.61,
+        "mean_abs_rgb_difference_from_original": 28.77
+      },
+      "workbench": {
+        "mean_rgb": [
+          26.38,
+          28.52,
+          32.3
+        ],
+        "mean_channel_value": 29.06,
+        "mean_abs_rgb_difference_from_original": 41.95
+      },
+      "jacket": {
+        "mean_rgb": [
+          7.16,
+          8.29,
+          10.01
+        ],
+        "mean_channel_value": 8.49,
+        "mean_abs_rgb_difference_from_original": 9.94
+      },
+      "face_neck": {
+        "mean_rgb": [
+          30.5,
+          30.07,
+          32.3
+        ],
+        "mean_channel_value": 30.96,
+        "mean_abs_rgb_difference_from_original": 41.02
+      }
+    }
+  }
+}

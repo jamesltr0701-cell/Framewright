@@ -1,0 +1,2 @@
+KEYFRAME_01
+Compressed-depth waist-up portrait from a distant camera position. Include the full 0.85 m vertical span from waist to crown, with space above the head. Use a suitably long lens and sufficient camera distance to fit the entire required span without cutting off the waist or head. Keep the distant-camera perspective and restrained depth expansion; do not enforce a fixed focal length or camera distance at the expense of the framing.
