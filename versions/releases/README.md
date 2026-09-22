@@ -2,7 +2,7 @@
 
 This directory stores immutable, version-numbered Framewright release snapshots.
 
-Current stable release: `framewright-v4.1.2.md`.
+Current stable release: `framewright-v4.1.3.md`.
 
 For every patch or feature release:
 

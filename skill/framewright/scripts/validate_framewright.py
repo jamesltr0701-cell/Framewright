@@ -303,7 +303,7 @@ def validate_image_registry_data(document: Any, registry_path: Path) -> list[dic
     }
     for field, expected in expected_defaults.items():
         if document.get(field) != expected:
-            errors.append(issue("image_adapter_default_invalid", "Image adapter default does not match the Framewright 4.1.2 two-tool workflow.", field=field, expected=expected))
+            errors.append(issue("image_adapter_default_invalid", "Image adapter default does not match the current two-tool workflow.", field=field, expected=expected))
     if set(targets) != set(EXPECTED_IMAGE_ADAPTERS):
         errors.append(issue("image_adapter_target_set_invalid", "The active image registry must contain exactly Midjourney V8.2 create, GPT Image 2.5 create, and GPT Image 2.5 edit.", registered=sorted(targets)))
     ids: list[str] = []

@@ -10,7 +10,7 @@ Framewright turns approved director intent, production assets, and shot decision
 
 Framewright is not a one-click filmmaking system and it is not an autonomous AI director. It is a production tool for translating a resolved creative direction into clear, model-facing artifacts.
 
-`v4.1.2` · Codex Skill · Source available
+`v4.1.3` · Codex Skill · Source available
 
 ## What is Framewright?
 
@@ -40,7 +40,7 @@ Completing one stage may inform a later stage, but it never starts that stage au
 
 ## Current model routes
 
-These are the registered Framewright 4.1.2 routes. A route is selected for the active artifact and operation; unlisted models are not implied to be supported.
+These are the registered Framewright 4.1.3 routes. A route is selected for the active artifact and operation; unlisted models are not implied to be supported.
 
 ### Image
 
@@ -105,7 +105,7 @@ After installation, invoke the Skill explicitly with `$framewright`.
 
 ## Versioning and development
 
-GitHub `main` is the source of truth for the synchronized stable release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching immutable 4.1.2 snapshot is [`versions/releases/framewright-v4.1.2.md`](versions/releases/framewright-v4.1.2.md).
+GitHub `main` is the source of truth for the synchronized stable release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching immutable 4.1.3 snapshot is [`versions/releases/framewright-v4.1.3.md`](versions/releases/framewright-v4.1.3.md).
 
 Promoted releases preserve older snapshots. Experimental candidates may remain isolated on local branches and do not become stable releases until separately approved. Desktop mirror and local-install synchronization are maintainer concerns; they do not change the public Skill interface.
 
