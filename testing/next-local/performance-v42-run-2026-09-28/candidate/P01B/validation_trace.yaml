@@ -1,0 +1,56 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in steady indoor light.
+
+
+  AUDIO
+
+  Soft room tone and faint clothing movement with visible shifts. No music, speech,
+  or human vocalization.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted held mid-close two-person frame keeps Lin and Mei legible together.
+
+
+  BEATS
+
+  Lin first finishes hearing Mei and holds still for the end of the thought. Lin''s
+  small nod is accompanied by a brief lowering of her eyelids. She then lifts her
+  head and reconnects her gaze with Mei. The complete sequence reads as sincere agreement
+  to stay in the plan. Mei stays present and follows Lin''s silent response. Hold
+  both women together without a cut.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P01B
+material_registries:
+- P01B
+performance_beats:
+- beat_id: agreement_detail
+  trigger: Lin first finishes hearing Mei and holds still for the end of the thought.
+  physical_carriers:
+  - shared_function: sincere agreement
+    relation: sequential
+    elements:
+    - nod with eyelid lowering
+    - head lift and gaze reconnection
+  release_or_aftermath: Lin and Mei remain mutually engaged.
+  shot_scale: mid-close
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Lin first finishes hearing Mei and holds still for the end of the thought.
+    response: Lin's small nod is accompanied by a brief lowering of her eyelids.
+    aftermath: She then lifts her head and reconnects her gaze with Mei.
+vocal_events: []
+silent_reaction_beats:
+- beat_id: agreement_detail
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

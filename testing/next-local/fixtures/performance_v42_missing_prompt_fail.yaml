@@ -1,0 +1,21 @@
+kind: compile_trace
+expected: fail
+expected_errors: [performance_prompt_span_missing]
+core_version: "4.2.0"
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: |-
+  She acts naturally and seems emotional.
+performance_beats:
+  - beat_id: cancellation
+    trigger: hears the cancellation
+    interpretation_or_delay: joy lingers as the news registers
+    physical_carriers: [gaze loses its fixed point]
+    release_or_aftermath: smile gradually leaves
+    shot_scale: medium_close
+    carrier_legible: true
+    prompt_evidence:
+      trigger: hears the cancellation
+      transition: joy lingers as the news registers
+      response: gaze loses its fixed point
+      aftermath: smile gradually leaves

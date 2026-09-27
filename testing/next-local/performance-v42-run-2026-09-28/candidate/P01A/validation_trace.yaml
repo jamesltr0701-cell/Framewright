@@ -1,0 +1,53 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in steady indoor light.
+
+
+  AUDIO
+
+  Soft room tone and faint clothing movement with visible shifts. No music, speech,
+  or human vocalization.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted held mid-close two-person frame keeps Lin and Mei legible together.
+
+
+  BEATS
+
+  Mei has just finished her practical explanation and stays attentive. Lin receives
+  the last thought with her gaze on Mei. Lin lets a small nod form as her shoulders
+  ease. She meets Mei''s eyes again and remains in the plan, a quiet, genuine agreement.
+  Mei follows Lin''s silent response with a natural shift of attention. Hold the shared
+  decision without a cut.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P01A
+material_registries:
+- P01A
+performance_beats:
+- beat_id: agreement
+  trigger: Mei has just finished her practical explanation and stays attentive.
+  physical_carriers:
+  - Lin lets a small nod form as her shoulders ease.
+  release_or_aftermath: Lin remains in the plan and Mei receives her response.
+  shot_scale: mid-close
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Mei has just finished her practical explanation and stays attentive.
+    response: Lin lets a small nod form as her shoulders ease.
+    aftermath: She meets Mei's eyes again and remains in the plan, a quiet, genuine
+      agreement.
+vocal_events: []
+silent_reaction_beats:
+- beat_id: agreement
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

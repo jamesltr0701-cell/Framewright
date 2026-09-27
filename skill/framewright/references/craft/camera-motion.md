@@ -1,6 +1,6 @@
 # Camera, action, and performance — Framewright craft reference
 
-Use with Core §§8.4, 8.5, 8.6, and 8.11 when an approved move, interaction, or performance is difficult to express or has been misread, or a Shot Plate / Keyframe depends on viewpoint, relative scale, crop, or focus relationships. This is subordinate Framewright guidance, not another director mode or serializer. Resolve choices in the existing Production Spine; retain the selected model adapter's notation and limits. Read only the relevant sections.
+Use with Core §§8.4, 8.5, 8.6, and 8.11 for ordinary dialogue, listening, material emotional change, an approved move or interaction, or a Shot Plate / Keyframe with viewpoint, relative scale, crop, or focus relationships. This is subordinate Framewright guidance, not another director mode or serializer. Resolve choices in the existing Production Spine; retain the selected model adapter's notation and limits. Read only the relevant sections.
 
 ## Distinguish the movements that look similar in words
 
@@ -38,13 +38,19 @@ An ongoing world action may outlast the main subject's endpoint: rain can contin
 
 Begin with the director's intended experience or delegated performance decision. Select a few observable carriers at the shot's scale: gaze that starts or stops tracking, a change in breath, shoulder preparation before a reach, delayed release of a held object, or a listener's timing. These are options, not required emotional signs.
 
+For a genuine agreement in a close frame, the listener may hold eye contact through the final words, nod with an eyelid movement, then return their gaze as the shoulders ease. Preserve the reception-to-response sequence if chosen, but never stamp that combination onto every agreement. At wider scale, a stopped walk and changed body orientation may carry the same meaning better than eyelids. A delayed realization can leave a smile for a fraction of a beat while gaze recognizes the new fact, before breath and mouth settle; `happy then sad` loses the process. A runner who stops to answer may still be recovering breath as the answer begins. These are possible scene-specific decisions, not mandatory beats.
+
+Let an in-frame listener continue their own task or receive the speaker's words; do not give every ensemble member the same nod. A deliberately rigid ritual may stay rigid. A bare location shot needs no performer. If the director locks a subtle close-view action in a distant shot, surface the conflict; if Framewright chose it, use an equivalent readable carrier without changing the meaning.
+
+When head or body movement physically affects loose hair, soft cloth, or a strap, keep a small causal lag and settle only if it matters at the frame scale. No room wind means no continuous wind-driven hair. A strand covering sight or a caught sleeve can motivate one adjustment if the relevant hand is free and the result persists; a blindfolded repair worker with both hands occupied should not be made to brush hair away. A wet clump and a rigid shell do not move like dry loose hair or fabric.
+
 When subtext matters, a mismatch between speech and action can be useful; it need not be manufactured in every exchange. Stillness, withheld response, repeated ritual, and non-narrative motion remain valid. Do not demand that every action advance the plot or every scene contain a value reversal.
 
 For multiple people, name who initiates, who responds, and who remains in their current state. Simultaneous or large actions are allowed when directed. Do not freeze supporting performers, require continuous blinking, or prohibit walking and object handling merely to fit a stability recipe.
 
 ## Translate and compress without redesigning
 
-Keep approved combined camera behavior, causal steps, relative timing, and performance carriers through compression. Remove repeated explanation before removing any authored action. If the selected model cannot plausibly execute the combination, state the specific conflict and offer the smallest alternatives; changing the shot or generation-unit boundary remains the director's choice.
+Keep approved combined camera behavior, causal steps, relative timing, emotional transitions, performance carriers, and residual bodily state through compression. Remove repeated explanation before removing any authored action. If the selected model cannot plausibly execute the combination, state the specific conflict and offer the smallest alternatives; changing the shot or generation-unit boundary remains the director's choice.
 
 Useful wording ties an observable relationship to an event: a camera rolls as the body drops; a hand continues undoing a fastening as the lens rises; focus reaches the foreground only after a distant movement has been registered. It does not rely on camera jargon or a universal subject-action-camera formula.
 

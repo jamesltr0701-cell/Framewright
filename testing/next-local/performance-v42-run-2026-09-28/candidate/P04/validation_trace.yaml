@@ -1,0 +1,68 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in steady indoor light.
+
+
+  AUDIO
+
+  Soft room tone and faint clothing movement with visible shifts. No music. Only Lin''s
+  two specified vocal events; no other words or human vocalization.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted held mid-close shot keeps Lin and Mei in their shared camera relationship.
+
+
+  BEATS
+
+  Mei finishes explaining and stays attentive. Lin takes in the final point and gives
+  one quiet “Mm.” as acknowledgement. After that brief sound, Lin meets Mei''s gaze
+  and says exactly “We can try tomorrow.” Her shoulders ease as the sincere agreement
+  settles. Mei receives the reply without interrupting. Hold their shared resolve
+  without a cut.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P04
+material_registries:
+- P04
+performance_beats:
+- beat_id: brief_response
+  trigger: Mei finishes explaining and stays attentive.
+  physical_carriers:
+  - Lin takes in the final point before her reply.
+  exact_dialogue: We can try tomorrow.
+  dialogue_delivery: quiet, sincere
+  release_or_aftermath: Mei receives reply.
+  shot_scale: mid-close
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Mei finishes explaining and stays attentive.
+    response: Lin takes in the final point and gives one quiet “Mm.” as acknowledgement.
+    aftermath: Her shoulders ease as the sincere agreement settles. Mei receives the
+      reply without interrupting.
+vocal_events:
+- event_id: lin_ack
+  event_type: authorized_short_response
+  authorization_source: user_scope
+  speaker: Lin
+  exact_text: Mm.
+  language: en
+  beat: brief_response
+  allowed_count: 1
+  prompt_evidence: Lin takes in the final point and gives one quiet “Mm.” as acknowledgement.
+- event_id: lin_line
+  event_type: locked_dialogue
+  speaker: Lin
+  exact_text: We can try tomorrow.
+  language: en
+  beat: brief_response
+  allowed_count: 1
+  prompt_evidence: Lin meets Mei's gaze and says exactly “We can try tomorrow.”
+silent_reaction_beats: []

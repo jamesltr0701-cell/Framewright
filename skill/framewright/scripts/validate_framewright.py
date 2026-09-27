@@ -112,6 +112,8 @@ H3_ROUTES = {"t2va", "i2va", "fl2va", "l2va", "ref2va"}
 H3_API_ROLES = {"first_frame", "last_frame", "reference_image", "reference_video", "reference_audio"}
 H3_VISIBLE_RELATIONSHIPS = {"fully_preserved", "partially_preserved", "attribute_transfer", "weak_reference"}
 H3_AUDIO_RELATIONSHIPS = {"fully_copy", "partially_copy", "reference", "weak_reference"}
+VOCAL_EVENT_TYPES = {"locked_dialogue", "authorized_short_response", "authorized_nonlexical"}
+VOCAL_AUTH_SOURCES = {"user_scope", "production_preference", "user_preference"}
 DRAMATIC_LENSES = {
     "turn_or_progression",
     "objective_obstacle_tactic",
@@ -589,6 +591,27 @@ def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
             errors.append(issue("prompt_ir_reference_authority_duplicated", "Prompt IR duplicates properties between Keyframe and separate runtime references.", values=sorted(duplicated)))
     if prompt_ir.get("edit_use_relationship") is not None and prompt_ir.get("edit_use_relationship") not in GENERATION_EDIT_USES:
         errors.append(issue("prompt_ir_edit_use_invalid", "Prompt IR requires one supported generated-material editorial relationship."))
+
+    performance = prompt_ir.get("performance_contract")
+    if isinstance(performance, dict):
+        beats = performance.get("beats", [])
+        if not isinstance(beats, list) or any(not isinstance(beat, dict) or not beat.get("beat_id") for beat in beats):
+            errors.append(issue("prompt_ir_performance_invalid", "Structured performance contract needs identified beats."))
+    sound = prompt_ir.get("sound_contract")
+    if isinstance(sound, dict):
+        events = sound.get("vocal_events", [])
+        if not isinstance(events, list):
+            errors.append(issue("prompt_ir_vocal_events_invalid", "Structured sound contract needs a vocal-event list."))
+        else:
+            for event in events:
+                if not isinstance(event, dict):
+                    errors.append(issue("prompt_ir_vocal_event_invalid", "A vocal event must be a mapping."))
+                    continue
+                event_type = event.get("event_type", "locked_dialogue")
+                if event_type not in VOCAL_EVENT_TYPES or (event_type != "locked_dialogue" and event.get("authorization_source") not in VOCAL_AUTH_SOURCES):
+                    errors.append(issue("prompt_ir_vocal_event_unauthorized", "An added vocal event must declare a supported type and authorization source."))
+                if event_type == "authorized_nonlexical" and (not event.get("nonlexical_description") or event.get("exact_text")):
+                    errors.append(issue("prompt_ir_nonlexical_invalid", "A nonlexical event needs a description and no dialogue text."))
 
     scopes: dict[str, set[Any]] = {}
     for key in ("completed_beats", "current_beats", "reserved_future_beats"):
@@ -1288,15 +1311,37 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
             if purpose == "reveal_or_payoff" and endpoint.get("readability_hold") is not True:
                 errors.append(issue("payoff_hold_missing", "Reveal or payoff endpoint requires a readability hold."))
 
+    core_version = data.get("core_version")
+    version_match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", core_version) if isinstance(core_version, str) else None
+    current_performance_contract = version_match is not None and tuple(map(int, version_match.groups())) >= (4, 2, 0)
     for beat in data.get("performance_beats", []) or []:
         if not isinstance(beat, dict):
             errors.append(issue("performance_beat_invalid", "Performance beat must be a mapping."))
             continue
         carriers = beat.get("physical_carriers", []) or []
-        if not 1 <= len(carriers) <= 3:
+        if not isinstance(carriers, list):
+            errors.append(issue("performance_carriers_invalid", "Performance carriers must be a list.", beat_id=beat.get("beat_id")))
+            carriers = []
+        if beat.get("material", True) is not False and not 1 <= len(carriers) <= 3:
             errors.append(
-                issue("performance_carrier_density", "A material performance beat must keep one to three carriers.", beat_id=beat.get("beat_id"), count=len(carriers))
+                issue("performance_carrier_density", "A material performance beat must keep one to three coordinated carrier groups.", beat_id=beat.get("beat_id"), count=len(carriers))
             )
+        for carrier in carriers:
+            if isinstance(carrier, str) and carrier.strip():
+                continue
+            if not isinstance(carrier, dict):
+                errors.append(issue("performance_carrier_invalid", "A carrier must be a nonempty string or coordinated group.", beat_id=beat.get("beat_id")))
+                continue
+            elements = carrier.get("elements")
+            if (
+                not carrier.get("shared_function")
+                or carrier.get("relation") not in {"sequential", "concurrent"}
+                or not isinstance(elements, list)
+                or not 1 <= len(elements) <= 5
+                or any(not isinstance(value, str) or not value.strip() for value in elements)
+                or len(set(elements)) != len(elements)
+            ):
+                errors.append(issue("performance_group_unbounded", "A coordinated carrier group needs one function, one temporal relation, and one to five distinct concrete elements.", beat_id=beat.get("beat_id")))
         if beat.get("shot_scale") and beat.get("carrier_legible") is not True:
             errors.append(issue("shot_scale_illegible", "A selected carrier is not legible at the committed shot scale.", beat_id=beat.get("beat_id")))
         if beat.get("exact_dialogue"):
@@ -1306,6 +1351,30 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
             )
             if not embodied:
                 errors.append(issue("embodied_dialogue_missing", "Material dialogue has no executable performance causality.", beat_id=beat.get("beat_id")))
+        if current_performance_contract and beat.get("material", True) is not False and isinstance(prompt, str):
+            evidence = beat.get("prompt_evidence")
+            required_roles = ["trigger"]
+            if beat.get("interpretation_or_delay"):
+                required_roles.append("transition")
+            required_roles.append("response")
+            if beat.get("release_or_aftermath") or beat.get("next_state"):
+                required_roles.append("aftermath")
+            if beat.get("secondary_motion"):
+                required_roles.append("secondary_motion")
+            if not isinstance(evidence, dict):
+                errors.append(issue("performance_prompt_evidence_missing", "Material performance requires actual final-text evidence.", beat_id=beat.get("beat_id")))
+            else:
+                positions = []
+                for role in required_roles:
+                    span = evidence.get(role)
+                    if not isinstance(span, str) or not span.strip() or span not in prompt:
+                        errors.append(issue("performance_prompt_span_missing", "A protected performance relation is absent from the final prompt.", beat_id=beat.get("beat_id"), role=role))
+                    else:
+                        positions.append((role, prompt.index(span)))
+                if len({position for _, position in positions}) != len(positions):
+                    errors.append(issue("performance_prompt_spans_collapsed", "Distinct performance roles cannot all be claimed from one undifferentiated span.", beat_id=beat.get("beat_id")))
+                if beat.get("timing_relation", "sequential") == "sequential" and positions != sorted(positions, key=lambda item: item[1]):
+                    errors.append(issue("performance_prompt_order_changed", "The final prompt changed the protected performance order.", beat_id=beat.get("beat_id")))
 
     feasibility = data.get("feasibility")
     if isinstance(feasibility, dict):
@@ -1388,16 +1457,41 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         if not event_id or event_id in seen_events:
             errors.append(issue("vocal_event_duplicate", "Vocal event IDs must be unique.", event_id=event_id))
         seen_events.add(event_id)
-        for key in ("speaker", "exact_text", "language", "beat", "allowed_count"):
+        event_type = event.get("event_type", "locked_dialogue")
+        if event_type not in VOCAL_EVENT_TYPES:
+            errors.append(issue("vocal_event_type_invalid", "Vocal event type is unsupported.", event_id=event_id))
+        required = ("speaker", "beat", "allowed_count")
+        if event_type != "authorized_nonlexical":
+            required += ("exact_text", "language")
+        else:
+            required += ("nonlexical_description",)
+        for key in required:
             if event.get(key) in (None, ""):
                 errors.append(issue("vocal_event_incomplete", "Vocal event is missing ownership data.", event_id=event_id, key=key))
-        exact_text = str(event.get("exact_text", ""))
+        if event_type != "locked_dialogue" and event.get("authorization_source") not in VOCAL_AUTH_SOURCES:
+            errors.append(issue("vocal_event_unauthorized", "An added vocal event needs a specific scope grant or recorded preference.", event_id=event_id))
+        if event_type == "authorized_nonlexical" and event.get("exact_text"):
+            errors.append(issue("nonlexical_event_has_words", "A nonlexical event must use a sound description rather than exact dialogue text.", event_id=event_id))
+        exact_text = event.get("nonlexical_description") if event_type == "authorized_nonlexical" else event.get("exact_text")
         allowed = event.get("allowed_count")
-        if exact_text and isinstance(allowed, int) and prompt_text.count(exact_text) != allowed:
-            errors.append(issue("vocal_event_count_mismatch", "Exact vocal text count differs from its approved event count.", event_id=event_id, expected=allowed, actual=prompt_text.count(exact_text)))
+        if not isinstance(allowed, int) or isinstance(allowed, bool) or allowed < 1:
+            errors.append(issue("vocal_event_count_invalid", "A vocal event needs a positive integer count.", event_id=event_id))
+        elif isinstance(exact_text, str) and exact_text and prompt_text.count(exact_text) != allowed:
+            errors.append(issue("vocal_event_count_mismatch", "Vocal content count differs from its approved event count.", event_id=event_id, expected=allowed, actual=prompt_text.count(exact_text)))
+        if current_performance_contract and isinstance(prompt, str):
+            span = event.get("prompt_evidence")
+            if not isinstance(span, str) or span not in prompt or not all(value in span for value in (str(event.get("speaker", "")), str(exact_text or ""))):
+                errors.append(issue("vocal_event_prompt_evidence_missing", "Final-text vocal evidence must identify the speaker and exact event content.", event_id=event_id))
     for reaction in data.get("silent_reaction_beats", []) or []:
-        if isinstance(reaction, dict) and (reaction.get("speech") or reaction.get("subtitle_or_visible_text")):
-            errors.append(issue("silence_ownership_violation", "A silent reaction acquired speech or visible text.", beat_id=reaction.get("beat_id")))
+        if not isinstance(reaction, dict):
+            continue
+        mode = reaction.get("mode", "strict_no_vocal")
+        if mode not in {"strict_no_vocal", "no_dialogue"}:
+            errors.append(issue("silence_mode_invalid", "Silent reaction mode is unsupported.", beat_id=reaction.get("beat_id")))
+        matching = [event for event in vocal_events if isinstance(event, dict) and event.get("beat") == reaction.get("beat_id")]
+        forbidden = mode == "strict_no_vocal" and matching or mode == "no_dialogue" and any(event.get("event_type", "locked_dialogue") != "authorized_nonlexical" for event in matching)
+        if reaction.get("speech") or reaction.get("subtitle_or_visible_text") or forbidden:
+            errors.append(issue("silence_ownership_violation", "A silent reaction acquired unauthorized voice, speech, or visible text.", beat_id=reaction.get("beat_id")))
 
     state = data.get("state")
     if state is not None:
@@ -1784,6 +1878,7 @@ def validate_video_prompt_path(
     compiler_sources: list[str] | None,
     registry: Path = DEFAULT_REGISTRY,
     character_limit: int = 10_000,
+    trace_path: Path | None = None,
 ) -> list[dict[str, Any]]:
     registry_data, registry_errors = load_adapter_registry(registry)
     errors = list(registry_errors)
@@ -1807,6 +1902,16 @@ def validate_video_prompt_path(
     text = path.read_text(encoding="utf-8")
     errors.extend(validate_prompt_text(text, character_limit))
     errors.extend(validate_serialization_ownership(data, text, registry))
+    if trace_path is not None:
+        trace = load_yaml(trace_path)
+        trace_version = trace.get("core_version") if isinstance(trace, dict) else None
+        current_core_path = Path(__file__).resolve().parent.parent / "references" / "framewright.md"
+        current_core_version = frontmatter(current_core_path)[0].get("version")
+        version_match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)", trace_version) if isinstance(trace_version, str) else None
+        if version_match is None or tuple(map(int, version_match.groups())) < (4, 2, 0) or trace_version != current_core_version or trace.get("prompt") != text:
+            errors.append(issue("video_trace_mismatch", "A v4.2+ compile trace must carry the exact final prompt text and a v4.2+ Core version."))
+        else:
+            errors.extend(validate_compile_trace(trace))
     return errors
 
 
@@ -1911,6 +2016,7 @@ def main() -> int:
     video_prompt_parser.add_argument("--compiler-source", action="append")
     video_prompt_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     video_prompt_parser.add_argument("--character-limit", type=int, default=10_000)
+    video_prompt_parser.add_argument("--trace", type=Path, help="Optional current-scope compile trace for final-text performance and vocal checks.")
 
     keyframe_prompt_parser = subparsers.add_parser("keyframe-prompt")
     keyframe_prompt_parser.add_argument("path", type=Path)
@@ -1952,6 +2058,7 @@ def main() -> int:
                 args.compiler_source,
                 args.registry,
                 args.character_limit,
+                args.trace,
             ),
             args.json,
         )

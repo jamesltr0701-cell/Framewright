@@ -1,0 +1,22 @@
+kind: compile_trace
+expected: fail
+expected_errors: [silence_ownership_violation]
+core_version: "4.2.0"
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: Lin says “Mm.” while listening.
+vocal_events:
+  - event_id: ack
+    event_type: authorized_short_response
+    authorization_source: user_scope
+    speaker: Lin
+    exact_text: Mm.
+    language: English
+    beat: no_words
+    allowed_count: 1
+    prompt_evidence: Lin says “Mm.”
+silent_reaction_beats:
+  - beat_id: no_words
+    mode: no_dialogue
+    speech: ""
+    subtitle_or_visible_text: ""

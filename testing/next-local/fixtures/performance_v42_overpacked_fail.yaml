@@ -1,0 +1,11 @@
+kind: compile_trace
+expected: fail
+expected_errors: [performance_group_unbounded]
+director_modes: [apprentice]
+conversation_mode_declared: true
+performance_beats:
+  - beat_id: overpacked
+    physical_carriers:
+      - shared_function: make it vivid
+        relation: sequential
+        elements: [blink, nod, scratch, turn, pace, laugh, crouch, wave]

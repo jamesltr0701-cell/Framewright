@@ -1,0 +1,37 @@
+kind: compile_trace
+expected: pass
+core_version: "4.2.0"
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: |-
+  Lin listens, then Lin gives one quiet “嗯” before saying “We can try tomorrow.” Her exact sentence is unchanged. Later, Lin releases one soft laugh as the tension leaves; the listener remains silent. Room tone and footsteps; no music.
+vocal_events:
+  - event_id: acknowledgement
+    event_type: authorized_short_response
+    authorization_source: user_preference
+    speaker: Lin
+    exact_text: 嗯
+    language: Chinese
+    beat: agreement
+    allowed_count: 1
+    prompt_evidence: Lin gives one quiet “嗯”
+  - event_id: locked_sentence
+    speaker: Lin
+    exact_text: We can try tomorrow.
+    language: English
+    beat: agreement
+    allowed_count: 1
+    prompt_evidence: Lin gives one quiet “嗯” before saying “We can try tomorrow.”
+  - event_id: soft_laugh
+    event_type: authorized_nonlexical
+    authorization_source: user_preference
+    speaker: Lin
+    nonlexical_description: one soft laugh
+    beat: relief
+    allowed_count: 1
+    prompt_evidence: Lin releases one soft laugh
+silent_reaction_beats:
+  - beat_id: listener
+    mode: strict_no_vocal
+    speech: ""
+    subtitle_or_visible_text: ""

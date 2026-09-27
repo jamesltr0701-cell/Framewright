@@ -1,0 +1,62 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in steady indoor light.
+
+
+  AUDIO
+
+  Quiet room tone and faint clothing movement synchronized with Lin''s shift. No music,
+  words, or human vocalization of any kind: no sighs, hums, laughter, or whispers.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted held medium shot keeps Lin in frame and gives her posture room
+  to read.
+
+
+  BEATS
+
+  Lin listens to a difficult but nonthreatening account from someone just off camera;
+  the account is unheard in this shot. She keeps her attention on that person, then
+  her gaze briefly settles as she takes in one difficult point. A small change in
+  her weight and a slower return of her gaze reveal an internal response without a
+  dramatic reversal. She remains in frame, attentive and quietly affected. Hold this
+  listening state without a cut.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P03
+material_registries:
+- P03
+performance_beats:
+- beat_id: silent_listening
+  trigger: Lin listens to a difficult but nonthreatening account from someone just
+    off camera; the account is unheard in this shot.
+  physical_carriers:
+  - shared_function: quiet internal response
+    relation: sequential
+    elements:
+    - gaze briefly settles
+    - small weight change and slower gaze return
+  release_or_aftermath: Lin remains attentive.
+  shot_scale: medium
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Lin listens to a difficult but nonthreatening account from someone just
+      off camera; the account is unheard in this shot.
+    response: She keeps her attention on that person, then her gaze briefly settles
+      as she takes in one difficult point.
+    aftermath: A small change in her weight and a slower return of her gaze reveal
+      an internal response without a dramatic reversal.
+vocal_events: []
+silent_reaction_beats:
+- beat_id: silent_listening
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

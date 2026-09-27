@@ -28,7 +28,9 @@ Warm/cool, hard/soft, high/low key, and saturated/muted appearances have context
 
 Start from Core's approved environmental bed, synchronized practical/action sound, exact authorized speech, and no-music default. Select the layers actually needed; do not fill an audio template for its own sake.
 
-For a meaningful cue, identify who or what produces it, the event it accompanies, and whether it continues. A material impact, fabric movement, footstep, and breath are different sources. A silent eyelid movement does not acquire a servo merely because the character has mechanical body parts. Do not add vocalizations, whispered words, musical stings, or synthetic effects to make a moment feel complete.
+For a meaningful cue, identify who or what produces it, the event it accompanies, and whether it continues. A material impact, fabric movement, footstep, and breath are different sources. A silent eyelid movement does not acquire a servo merely because the character has mechanical body parts. Add a brief interjection or nonlexical vocal sound only when the current grant or recorded preference permits it and its meaning is already established. Otherwise do not add vocalizations, whispered words, musical stings, or synthetic effects to make a moment feel complete.
+
+Keep each approved addition as a speaker-owned event with a specific word or nonlexical description, trigger, and count; do not hand the model a general license to improvise. Refine delivery of locked text without changing its words. `No dialogue` may still permit a separately authorized breath or laugh when the director means no words; `strict_no_vocal` and legacy unqualified silent reactions permit none. Current silence instructions override a general vocal preference.
 
 Where multiple characters speak, preserve exact text and speaker assignment. If mouth motion, head turns, camera movement, or overlapping sound may be unreliable on the chosen target, describe the conflict and offer options. Do not automatically shorten a locked line, remove movement, or split the scene. A lip-sync heuristic is not permission to redesign the performance.
 

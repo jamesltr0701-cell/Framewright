@@ -1,0 +1,16 @@
+kind: compile_trace
+expected: fail
+expected_errors: [vocal_event_unauthorized]
+core_version: "4.2.0"
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: Lin gives one quiet “嗯” as she agrees.
+vocal_events:
+  - event_id: invented_ack
+    event_type: authorized_short_response
+    speaker: Lin
+    exact_text: 嗯
+    language: Chinese
+    beat: agreement
+    allowed_count: 1
+    prompt_evidence: Lin gives one quiet “嗯”

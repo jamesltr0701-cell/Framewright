@@ -1,0 +1,74 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in steady indoor light.
+
+
+  AUDIO
+
+  Soft room tone, Lin''s audible post-run breathing, and slight clothing movement
+  with her arrival. No music. Mei''s one specified line is the only speech; Lin makes
+  no vocal sound.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted medium-close shot holds Lin and Mei in one stable camera relationship
+  as Lin comes beside Mei.
+
+
+  BEATS
+
+  Lin enters still a little breathless after a run, expecting good news, and keeps
+  a small hopeful smile. Mei tells her exactly “The meeting is over.” Lin hears her;
+  the hopeful smile stays for a brief beat while her gaze begins to understand. Then
+  the smile withdraws. Lin starts to shape a reply with her mouth, but closes it before
+  any sound. She remains beside Mei rather than leaving, still breathing more quickly
+  than at rest. Mei receives her silence without interrupting. Hold their shared space
+  and Lin''s unsettled breath without a cut.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P10
+material_registries:
+- P10
+performance_beats:
+- beat_id: meeting_over
+  trigger: Mei tells her exactly “The meeting is over.”
+  interpretation_or_delay: Hopeful smile lingers before understanding.
+  physical_carriers:
+  - shared_function: hope to restrained silence
+    relation: sequential
+    elements:
+    - smile lingers as gaze understands
+    - smile withdraws
+    - mouth starts reply then closes silently
+  release_or_aftermath: Lin stays beside Mei with post-run breathing.
+  shot_scale: medium-close
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Mei tells her exactly “The meeting is over.”
+    transition: the hopeful smile stays for a brief beat while her gaze begins to
+      understand.
+    response: Then the smile withdraws. Lin starts to shape a reply with her mouth,
+      but closes it before any sound.
+    aftermath: She remains beside Mei rather than leaving, still breathing more quickly
+      than at rest. Mei receives her silence without interrupting.
+vocal_events:
+- event_id: mei_line
+  event_type: locked_dialogue
+  speaker: Mei
+  exact_text: The meeting is over.
+  language: en
+  beat: meeting_over
+  allowed_count: 1
+  prompt_evidence: Mei tells her exactly “The meeting is over.”
+silent_reaction_beats:
+- beat_id: lin_silent_reply
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

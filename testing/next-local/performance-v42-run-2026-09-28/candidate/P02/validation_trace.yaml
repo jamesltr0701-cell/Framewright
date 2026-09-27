@@ -1,0 +1,72 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in steady indoor light.
+
+
+  AUDIO
+
+  Soft room tone and slight clothing movement with the visible shift. No music. Only
+  the one specified line; no other speech or human vocalization.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted medium-close shot holds Lin with Mei present in the same camera
+  relationship.
+
+
+  BEATS
+
+  Lin carries genuine excitement about tomorrow, with a small bright expression still
+  on her face. Mei says exactly “The plan is cancelled.” Lin hears Mei. For a brief
+  beat her earlier smile remains while her gaze registers the meaning; understanding
+  arrives after the words. Her smile subsides and her posture draws slightly inward
+  as she contains the disappointment, still beside Mei. She does not turn the feeling
+  against Mei. Mei stays present, notices the withdrawal, and gives Lin room to remain
+  there. Hold the unresolved, restrained response without a cut.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P02
+material_registries:
+- P02
+performance_beats:
+- beat_id: cancellation
+  trigger: Mei says exactly “The plan is cancelled.”
+  interpretation_or_delay: Earlier joy briefly survives before understanding.
+  physical_carriers:
+  - shared_function: restrained disappointment
+    relation: sequential
+    elements:
+    - smile lingers while gaze registers meaning
+    - smile subsides and posture draws inward
+  release_or_aftermath: Lin remains beside Mei; Mei receives the response.
+  shot_scale: medium-close
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Mei says exactly “The plan is cancelled.”
+    transition: For a brief beat her earlier smile remains while her gaze registers
+      the meaning; understanding arrives after the words.
+    response: Her smile subsides and her posture draws slightly inward as she contains
+      the disappointment, still beside Mei.
+    aftermath: Mei stays present, notices the withdrawal, and gives Lin room to remain
+      there.
+vocal_events:
+- event_id: mei_line
+  event_type: locked_dialogue
+  speaker: Mei
+  exact_text: The plan is cancelled.
+  language: en
+  beat: cancellation
+  allowed_count: 1
+  prompt_evidence: Mei says exactly “The plan is cancelled.”
+silent_reaction_beats:
+- beat_id: lin_reaction
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

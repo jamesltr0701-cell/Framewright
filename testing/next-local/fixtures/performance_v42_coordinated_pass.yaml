@@ -1,0 +1,23 @@
+kind: compile_trace
+expected: pass
+core_version: "4.2.0"
+director_modes: [apprentice]
+conversation_mode_declared: true
+prompt: |-
+  After she hears the last sentence, she lets its meaning settle; her nod, brief eyelid dip, and returned gaze form one accepting response. Her shoulders ease while she keeps facing the speaker.
+performance_beats:
+  - beat_id: agree
+    trigger: hears the last sentence
+    interpretation_or_delay: lets its meaning settle
+    physical_carriers:
+      - shared_function: receiving and agreeing
+        relation: sequential
+        elements: [nod, brief eyelid dip, returned gaze]
+    release_or_aftermath: shoulders ease while she stays engaged
+    shot_scale: medium_close
+    carrier_legible: true
+    prompt_evidence:
+      trigger: After she hears the last sentence
+      transition: she lets its meaning settle
+      response: her nod, brief eyelid dip, and returned gaze
+      aftermath: Her shoulders ease while she keeps facing the speaker

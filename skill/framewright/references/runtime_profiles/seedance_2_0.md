@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.0 Runtime Profile"
-profile_version: "2.2.0"
+profile_version: "2.3.0"
 profile_role: "subordinate_video_prompt_adapter"
 target_model: "seedance_2_0"
 evidence_scope: "model_execution_heuristics_not_platform_guarantees"
@@ -56,10 +56,10 @@ Map every surrogate assistant-facing to one stable Material Registry record and 
 
 ## 5. Seedance Execution Grammar
 
-- Use one legible focal action path with cause, consequence, and terminal state.
+- Use one legible focal action or performance process with cause, consequence, and terminal state. A listener's changing understanding may be the focal objective.
 - Use one primary camera idea with start, path, speed, subject relationship, and landing frame.
 - Give fragile faces, hands, products, logos, text, or lip-sync more stable framing and less simultaneous competition.
-- Keep dialogue speaker-owned and physically playable. Do not claim supported languages, lip-sync reliability, or surface audio behavior unless verified for the active route.
+- Keep dialogue and any authorized brief vocal addition speaker-owned, exactly worded or described, counted, and physically playable. Do not claim supported languages, lip-sync reliability, or surface audio behavior unless verified for the active route.
 - Prefer ambience plus a small number of synchronized diegetic cues; music remains absent unless requested.
 - For VFX, state source, material, path, object interaction, light interaction, dissipation, and endpoint only when materially visible.
 - Prefer a positive observable state over stacked negatives. Retain a negative only when it prevents a realistic current failure.
@@ -111,7 +111,7 @@ BEATS
 NEGATIVE
 ```
 
-Use paragraph blocks. For an edited sequence, each beat states visible action, relevant object state, performance pressure, camera relationship, and any local transition exception; hard cuts are the shared default. For a continuous take, each phase states visible action, relevant object state, camera relationship, continuous path, framing, subject placement, and no-cut continuity without resetting camera, geography, identity, object state, or optics.
+Use paragraph blocks. For an edited sequence, each beat states visible action, relevant object state, material performance process, camera relationship, and any local transition exception; hard cuts are the shared default. For a continuous take, each phase states visible action, relevant object state, camera relationship, continuous path, framing, subject placement, and no-cut continuity without resetting camera, geography, identity, object state, or optics. Keep an approved stimulus, emotional transition, listener response, physical or vocal event, and residual state in their causal order when they matter. Show a hair or fabric response only when motivated; a character's intentional adjustment retains its motive and resulting state.
 
 When a fuller execution contract is required, the allowed alternate block order is:
 
@@ -131,7 +131,7 @@ Use only one schema. Native material surrogates such as `@Image 1`, `@Video 1`, 
 
 ## 9. Compression and Validation
 
-Remove hollow boosters, repeated adjectives, duplicated authority, repeated camera explanation, repeated continuity, then secondary atmosphere. Preserve identity and count, active source roles, actual opening state, current action, camera causality, dialogue ownership, sound cues, terminal state, endpoint execution, continuity, completed-beat exclusions, and reserved-future exclusions.
+Remove hollow boosters, repeated adjectives, duplicated authority, repeated camera explanation, repeated continuity, then secondary atmosphere. Preserve identity and count, active source roles, actual opening state, current action, material performance cause and transition and aftermath, exact dialogue and authorized short vocal event count, camera causality, sound cues, terminal state, endpoint execution, continuity, completed-beat exclusions, and reserved-future exclusions. Do not replace the process with `natural acting` or generic motion.
 
 The final clean prompt contains executable direction only and stays within the active character limit. Put capability uncertainty, surface setup, evidence labels, fidelity allocation, overload warnings, reference map, and residual risk in the Run Card.
 

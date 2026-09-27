@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright MiniMax H3 Runtime Profile"
-profile_version: "0.2.0-local"
+profile_version: "0.3.0-local"
 target_model: "MiniMax H3"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 15
@@ -180,7 +180,7 @@ non_diegetic_music: N/A
 
 For `i2va`, prepend the first-frame alignment instruction. For `fl2va`, prepend the first- and last-frame alignment instruction. For `l2va`, prepend the last-frame alignment instruction. The instruction owns endpoint placement only; it does not grant the endpoint image global authority over unassigned motion, camera, or intermediate states.
 
-`integrated_multimodal_description` carries the timeline's visual style, composition, subjects, environment, actions, reactions, camera, dialogue, singing, and synchronized diegetic sound. `overall_soundscape` summarizes ambience, physical action sounds, and non-verbal human sound without repeating dialogue. `non_diegetic_music` describes audience-only score or uses `N/A` under Framewright's default no-music rule.
+`integrated_multimodal_description` carries the timeline's visual style, composition, subjects, environment, actions, reactions, camera, dialogue, singing, and synchronized diegetic sound. Keep material performance as a local cause, response, transition, and residual state rather than a global emotion adjective. `overall_soundscape` summarizes ambience, physical action sounds, and non-verbal human sound without repeating a counted vocal event. `non_diegetic_music` describes audience-only score or uses `N/A` under Framewright's default no-music rule.
 
 ### 6.2 Full-Reference Mode: Ref2VA
 
@@ -216,12 +216,12 @@ For H3 multi-shot serialization:
 
 These cut points are H3 serialization required by the selected runtime technique. They do not create, delete, or reorder Core shots. If more than one materially different timing allocation is plausible, ask the director rather than silently choosing one. Exact timestamps guide H3 pacing and are not a promise of frame-accurate editing or beat adherence.
 
-When dialogue or singing is explicitly approved:
+When dialogue, singing, or a limited brief vocal event is authorized for this scope:
 
 - assign stable speaker IDs `(S1)`, `(S2)`, and so on in actual vocal-event order;
 - write exact content as `<d>[Language] approved text</d>`;
 - keep identifying action, delivery, and speaker outside the `<d>` block;
-- preserve exact approved words and punctuation; never invent dialogue from an audio reference;
+- preserve exact approved words and punctuation, or one specific approved nonlexical event with its source and count; never invent dialogue from an audio reference;
 - when an audio asset supplies only timbre, rhythm, emotion, or delivery, do not carry its original words into the target video.
 
 ## 8. Sound Contract
@@ -233,7 +233,7 @@ overall_soundscape: [scene-appropriate ambience and synchronized practical/actio
 non_diegetic_music: N/A
 ```
 
-Do not omit the `non_diegetic_music` field and do not let genre, montage rhythm, dramatic intensity, an audio reference, or an H3 example activate music. Dialogue, narration, singing, copied audio, and visible text remain inactive unless explicitly requested or admitted.
+Do not omit the `non_diegetic_music` field and do not let genre, montage rhythm, dramatic intensity, an audio reference, or an H3 example activate music. Dialogue, narration, singing, copied audio, and visible text remain inactive unless explicitly requested or admitted; a recorded limited brief-vocal preference may authorize only its narrow additions. Strict or legacy silent beats receive no human voice.
 
 When an audio asset is active, distinguish:
 
@@ -242,7 +242,7 @@ When an audio asset is active, distinguish:
 - ambience/SFX from audience-only music;
 - synchronized source-video audio from an ordinary video attachment.
 
-Put shot-local dialogue and synchronized sound inside the current shot. Put the overall ambience and physical sound summary in `overall_soundscape`. Put only audience-only music in `non_diegetic_music`; use `N/A` when absent.
+Put shot-local dialogue and each authorized counted vocal sound inside its current shot. Put the overall ambience and physical sound summary in `overall_soundscape` without duplicating the counted sound. Put only audience-only music in `non_diegetic_music`; use `N/A` when absent. Preserve a material performance stimulus, transition, coordinated bodily response, and aftermath through compact and Chinese overflow serialization; do not reduce them to `natural acting`.
 
 ### 8.1 Lossless Chinese Overflow Payload
 

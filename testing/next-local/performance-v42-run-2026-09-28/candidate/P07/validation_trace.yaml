@@ -1,0 +1,63 @@
+core_version: 4.2.0
+prompt: 'VISUAL STYLE
+
+  Naturalistic live action in a still indoor room. Her long, loose dark hair keeps
+  its color, length, hairline, and loose style.
+
+
+  AUDIO
+
+  Quiet room tone with a soft rustle synchronized to the head turn. No music, dialogue,
+  or human vocalization.
+
+
+  CAMERA EXECUTION
+
+  One uninterrupted steady medium shot keeps her head, shoulders, and hair silhouette
+  visible.
+
+
+  BEATS
+
+  An offscreen friend draws the woman''s attention. She turns her head once toward
+  the friend while her body stays largely at rest. The long loose hair follows with
+  a slight weighted lag in broad clumps, briefly changing the outline around her shoulders.
+  As the turn ends, the clumps settle by gravity against her shoulders; she does not
+  touch or brush her hair. Hold the new facing direction without a cut. The room remains
+  still, with no wind.'
+character_limit: 10000
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P07
+material_registries:
+- P07
+performance_beats:
+- beat_id: head_turn
+  trigger: An offscreen friend draws the woman's attention.
+  physical_carriers:
+  - shared_function: single head turn and causal hair follow-through
+    relation: sequential
+    elements:
+    - one head turn
+    - weighted clump lag
+    - gravity settling
+  release_or_aftermath: Face stays toward friend with hair settled.
+  shot_scale: medium
+  carrier_legible: true
+  prompt_evidence:
+    trigger: An offscreen friend draws the woman's attention.
+    response: She turns her head once toward the friend while her body stays largely
+      at rest.
+    aftermath: The long loose hair follows with a slight weighted lag in broad clumps,
+      briefly changing the outline around her shoulders. As the turn ends, the clumps
+      settle by gravity against her shoulders; she does not touch or brush her hair.
+vocal_events: []
+silent_reaction_beats:
+- beat_id: head_turn
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

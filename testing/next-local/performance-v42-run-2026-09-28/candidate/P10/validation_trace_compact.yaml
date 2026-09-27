@@ -1,0 +1,53 @@
+core_version: 4.2.0
+prompt: One uninterrupted medium-close shot in steady indoor light. Lin enters beside
+  Mei, still a little breathless from a run and expecting good news. Mei says exactly
+  “The meeting is over.” Lin keeps a small hopeful smile briefly while her gaze begins
+  to understand; then the smile withdraws. She starts to form a reply, closes her
+  mouth without sound, and stays beside Mei, still breathing faster than at rest.
+  Mei receives her silence. Hold the shared space. Room tone, Lin's post-run breathing,
+  and movement sounds synced to visible action; no music or added voice.
+character_limit: 600
+active_stages:
+- video_prompt
+director_modes:
+- apprentice
+conversation_mode_declared: true
+production_spines:
+- P10
+material_registries:
+- P10
+performance_beats:
+- beat_id: meeting_over_compact
+  trigger: Mei says exactly “The meeting is over.”
+  interpretation_or_delay: Hopeful smile lingers before understanding.
+  physical_carriers:
+  - shared_function: hope to restrained silence
+    relation: sequential
+    elements:
+    - smile lingers as gaze understands
+    - smile withdraws
+    - reply starts then closes without sound
+  release_or_aftermath: Lin stays beside Mei with post-run breathing.
+  shot_scale: medium-close
+  carrier_legible: true
+  prompt_evidence:
+    trigger: Mei says exactly “The meeting is over.”
+    transition: Lin keeps a small hopeful smile briefly while her gaze begins to understand;
+    response: then the smile withdraws. She starts to form a reply, closes her mouth
+      without sound,
+    aftermath: and stays beside Mei, still breathing faster than at rest. Mei receives
+      her silence.
+vocal_events:
+- event_id: mei_line
+  event_type: locked_dialogue
+  speaker: Mei
+  exact_text: The meeting is over.
+  language: en
+  beat: meeting_over_compact
+  allowed_count: 1
+  prompt_evidence: Mei says exactly “The meeting is over.”
+silent_reaction_beats:
+- beat_id: lin_silent_reply
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false

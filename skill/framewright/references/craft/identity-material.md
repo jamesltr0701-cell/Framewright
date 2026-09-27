@@ -6,6 +6,8 @@ Use with Core §§8.1, 8.5.1, 8.6, and 9 when identity, asymmetric anatomy, mixe
 
 Separate persistent identity from current pose, wardrobe state, camera angle, location, light, and style. A selected generated frame can show the accepted transient state without replacing canonical identity. A face reference need not control a mechanical torso; a spatial Plate need not control the final character; a motion donor need not contribute its actor or room.
 
+For hair and worn material, preserve persistent identity such as color, length, hairline, tying, garment shape, and material. A loose strand's current position, a damp clump touching skin, a strap temporarily slipped off the shoulder, or a hem still settling is transient shot state. Carry a meaningful adjustment into the next shot without redesigning the source identity. Follow the actual material and cause; do not add wind, soft-cloth movement to rigid armor, or individual-strand clarity that the shot cannot show.
+
 For asymmetric subjects, write anatomical left/right explicitly where needed and separately state screen placement. Confirm which side is visible after a turn. For a cropped limb or close-up, name its owner, the relevant structure, contact point, and relative scale. Do not infer an unseen side by mirroring a visible side unless the source actually establishes symmetry.
 
 When references disagree, resolve the property conflict using the approved sources rather than averaging them. Exclude unrelated details from transfer. More references are not automatically better: follow Core's runtime admission decision and the selected adapter's actual capabilities.

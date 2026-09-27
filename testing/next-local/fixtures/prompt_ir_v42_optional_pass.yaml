@@ -1,0 +1,50 @@
+kind: prompt_ir
+expected: pass
+document:
+  video_prompt_ir:
+    ir_schema_version: "1.1"
+    core_version: "4.2.0"
+    target_model: seedance_2_0
+    generation_unit: GU01
+    generation_strategy: single_shot_continuous
+    prompt_scope_shots: [SHOT_01]
+    reference_allocation: {keyframe_carried_properties: [], separate_reference_properties: []}
+    directing_intention: let the listener's genuine agreement become visible
+    scene_grammar: conversational_scene
+    final_look: quiet natural interior
+    active_references: []
+    start_state: Lin listens to Mei
+    end_state: Lin has agreed and stays engaged
+    endpoint_purpose: resolve
+    visible_actions: [Lin receives the final sentence and nods]
+    shot_or_phase_plan: [one uninterrupted medium close shot]
+    camera_contract: steady medium close framing
+    performance_contract:
+      beats:
+        - beat_id: agreement
+          trigger: Mei finishes her explanation
+          interpretation_or_delay: Lin lets the meaning settle
+          physical_carriers: [nod and returned gaze]
+          release_or_aftermath: shoulders ease without breaking contact
+    sound_contract:
+      ambience: quiet room tone
+      music: no_music
+      vocal_events:
+        - event_id: acknowledgement
+          event_type: authorized_short_response
+          authorization_source: user_scope
+          speaker: Lin
+          exact_text: 嗯
+          language: Chinese
+          beat: agreement
+          allowed_count: 1
+    continuity_locks: [Lin remains facing Mei]
+    completed_beats: []
+    current_beats: [agreement]
+    reserved_future_beats: []
+    hard_constraints: [do not change Mei's wording]
+    intentional_freedom: [small breathing rhythm]
+    semantic_anchor_ids: [hearing, acknowledgement, agreement]
+    protected_literals: []
+    unresolved_material_decisions: []
+    adapter_input_status: approved

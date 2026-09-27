@@ -1,4 +1,4 @@
-candidate_version: "4.1.3"
+candidate_version: "4.2.0"
 baseline_version: "3.5.0"
 baseline_commit: "35e529c2fcef3c03c9b19569f138db997d9f84ce"
 protected_anchors:
@@ -8,6 +8,10 @@ protected_anchors:
   - "APPRENTICE MODE"
   - "SCREENWRITER MODE"
   - "The Intent Ledger belongs to the Production Spine."
+  - "A director's established emotional meaning may be expressed through delegated low-risk performance choices"
+  - "A material beat usually needs one to three coordinated carrier groups, not one to three verbs."
+  - "An added event needs a traceable scope grant or current preference source"
+  - "Performance Process Survival Test"
   - "The Material Registry is the sole editable source of truth"
   - "Every panel is an identical landscape `16:9` rectangle."
   - "one generation unit / one board"

@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.4.0"
+profile_version: "1.5.0"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -397,9 +397,9 @@ When the user has not made an explicit sound request, inherit core Framewright u
 - generate synchronized diegetic, practical, and action sound effects;
 - do not generate music.
 
-Only an explicit request activates audio-reference, audio-edit, dialogue, subtitle, ambience, SFX, or music policy for the requested scope. These policies never change director mode, scene grammar, active stage, or generation-unit boundaries.
+Only an applicable explicit request or recorded production/user grant activates its permitted audio-reference, audio-edit, vocal, subtitle, ambience, SFX, or music policy for the requested scope. A limited brief-vocal grant does not authorize other audio changes. These policies never change director mode, scene grammar, active stage, or generation-unit boundaries.
 
-When explicit sound control is active, resolve one adapter-local policy without changing the core route:
+When explicit sound control or a recorded limited-vocal grant is active, resolve one adapter-local policy without changing the core route:
 
 ```yaml
 seedance_audio_policy:
@@ -413,21 +413,24 @@ seedance_audio_policy:
   subtitle_or_visible_text: none | preserve | generate_locked_text | replace | remove
   vocal_events:
     - event_id:
+      event_type: locked_dialogue | authorized_short_response | authorized_nonlexical
+      authorization_source:  # added events only; internal, never emitted into the clean prompt
       speaker:
       exact_text:
+      nonlexical_description:
       language:
       delivery_authority:
       beat:
       allowed_count:
-  silent_reaction_beats:
+  silent_reaction_beats:  # legacy silence is strict; new beats may distinguish no_dialogue from strict_no_vocal
 ```
 
 Rules:
 
 - Do not activate this policy merely because audio material is attached; the user's requested scope controls it.
 - Keep dialogue text, speaker, language, and any locked delivery exact. Timbre authority does not grant new wording, emotion, accent, or pacing.
-- Give every approved vocal event one speaker, exact text, language, beat, and allowed count. Use a native mention as speaker only when its identity is unambiguous and actively bound.
-- Serialize a silent reaction as nonverbal performance only. Do not add a whisper, repeated name, extra speech, subtitle, or visible text to fill silence.
+- Give every approved vocal event one speaker, beat, positive count, and exact text with language or a specific nonlexical sound. A new short event needs a current scope grant or recorded preference; serialize the selected event once at its trigger, never as an open invitation to improvise. Use a native mention as speaker only when its identity is unambiguous and actively bound.
+- Serialize strict and legacy silent reactions without human vocal events. A `no_dialogue` reaction may carry only the separately authorized nonlexical sound. Do not add a whisper, repeated name, extra speech, subtitle, or visible text to fill silence.
 - Map an admitted audio reference with `@Audio n` only to its allowed properties and active beats.
 - In Smart Edit, source-video audio remains part of the sole editing master unless the explicit edit scope says preserve, remove, or replace a named component.
 - State the environmental bed once. Keep synchronized action SFX in the beat that visibly causes them.
@@ -471,7 +474,7 @@ When critical typography, formulas, signage, subtitle layout, or frame-accurate 
 
 ### 9.3 Compactness Qualification
 
-Retain the 10,000-character hard ceiling. Passing it is necessary, not sufficient: record character count, active-material count, stage count, and preserved semantic anchors for representative routes; reject duplicated instructions, inactive blocks, assistant-facing leakage, and low-value headings. Compression must preserve identity, state, boundary, reference authority, camera causality, dialogue ownership, and explicit negatives.
+Retain the 10,000-character hard ceiling. Passing it is necessary, not sufficient: record character count, active-material count, stage count, and preserved semantic anchors for representative routes; reject duplicated instructions, inactive blocks, assistant-facing leakage, and low-value headings. Compression must preserve identity, state, boundary, reference authority, camera causality, material performance stimulus-to-aftermath, exact dialogue and authorized vocal-event count, and explicit negatives.
 
 When a complete clean English candidate still exceeds the ceiling, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Re-express every natural-language schema value in concise Chinese from the approved Prompt IR. Preserve task headings, `@Image N` / `@Video N` / `@Audio N`, special audio or subtitle symbols, proper names marked exact, exact approved dialogue or visible text, numbers, and route literals byte-for-byte. Use the Chinese candidate only when semantic anchors and protected literals match and the complete prompt fits. If it still exceeds the ceiling, resume Core Compression Safety without silently changing structure or reference authority.
 
@@ -489,8 +492,8 @@ Before serialization, verify route prerequisites and target-surface support:
 - Seamless transition has a trigger, camera path, arrival state, and audio bridge.
 - Storyboard control has explicit runtime admission and limited structural authority.
 - Every admitted reference passed the core conditioning-risk gate; any strategy that changes a director-requested attachment has explicit approval.
-- Audio, dialogue, and subtitle control has an explicit requested scope.
-- Explicit vocal control has unique event ownership and silent-reaction boundaries.
+- Audio and subtitle control has an explicit requested scope; dialogue is locked by the director or a narrowly authorized brief-vocal grant as defined by Core.
+- Explicit or recorded limited vocal control has unique event ownership, exact event count, and strict or scoped silent-reaction boundaries.
 
 If a required material or assignment is missing, ask one compact Intake question. Do not switch routes silently. If the route is valid but execution remains dense, return to the core Generation-Unit Feasibility Gate; never auto-split or auto-merge.
 
