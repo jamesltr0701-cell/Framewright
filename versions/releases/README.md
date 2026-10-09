@@ -2,7 +2,8 @@
 
 This directory stores immutable, version-numbered Framewright release snapshots.
 
-Current stable release: `framewright-v4.2.0.md`.
+Current release for director trial: `framewright-v4.2.1.md`.
+Rollback release: `framewright-v4.2.0.md`; the complete Skill is preserved by Git tag `v4.2.0`.
 
 For every patch or feature release:
 

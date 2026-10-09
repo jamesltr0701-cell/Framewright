@@ -1,0 +1,52 @@
+{
+  "core_version": "4.2.1",
+  "scope": "prompt-only independent forward tests",
+  "test_surface": "hypothetical long_video capability explicitly supplied; no real surface verified",
+  "results": [
+    {
+      "case": "R0",
+      "prompt_sha256": "7b6a318caa065c61e0099b5121a6c0efad26d794ebc7301bdc826cb50e396cef",
+      "status": "PASS",
+      "validation": "ownership + exact final prompt + source review + vocal presentation",
+      "characters": 605
+    },
+    {
+      "case": "R1",
+      "prompt_sha256": "274b419f367ee4fa12d6b8b30245bb07ffd49432ba1837701c49b310d98b20a0",
+      "status": "PASS",
+      "validation": "ownership + exact final prompt + source review + vocal presentation",
+      "characters": 613
+    },
+    {
+      "case": "R2",
+      "prompt_sha256": "a1c6856690789c904409e456cc37b6c94ce9fe8ed401f858b6e535dc8b045ff4",
+      "status": "PASS",
+      "validation": "ownership + exact final prompt + source review + vocal presentation",
+      "characters": 631
+    },
+    {
+      "case": "V",
+      "prompt_sha256": "38698c77d67df355cad9367a63799866ba6316a3211717276e6f8d53ad8fbe52",
+      "status": "PASS",
+      "validation": "ownership + exact final prompt + source review + vocal presentation",
+      "characters": 1008
+    },
+    {
+      "case": "O",
+      "prompt_sha256": "e538f83279d61f88eb0bf50f8e0ee2afc791566a3b018da853e00295fcd64a3d",
+      "status": "PASS",
+      "validation": "ownership + exact final prompt + source review + vocal presentation",
+      "characters": 1205
+    }
+  ],
+  "revision_check": {
+    "R1": "Only S2 changed; S1 and S3 preserved.",
+    "R2": "Only S3 changed; S1 and revised S2 preserved."
+  },
+  "normalization": "Only source locator paths were made repository-relative in published traces. Prompt bytes unchanged. Original run logs retained locally.",
+  "initial_issues": [
+    "Harness initially lacked a supported text-only route assumption; runners stopped until explicit hypothetical long_video capability was supplied.",
+    "Voice run initially omitted ownership fields from its trace; validation rejected it, fields were corrected, final prompt text unchanged."
+  ],
+  "limits": "One sample per scope; no proof of general revision stability, timing feasibility or generated-video quality."
+}

@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "4.2.0"
+version: "4.2.1"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -853,6 +853,8 @@ Every adjacent inferred camera change or deliberate repetition needs an internal
 
 For every user-requested, strongly implied, or compiler-added production-critical move, commit the camera inside the relevant beat: start position or frame, path or combined behavior, landing position or frame, spatial direction, visible evidence of movement, and action-based motivation. Broad labels such as `dynamic camera`, `tracking`, or `orbit` are insufficient when the execution changes story clarity, geography, action proof, or continuity.
 
+When progression or repetition across returns to a subject matters, compare the return with that subject's previous appearance, not merely the adjacent reverse shot. Resolve the previous landing frame, the return's starting frame, and any new landing frame inside existing `camera_logic`, shot relationships, and the IR `camera_contract`. State whether the return continues, holds, or resets that relationship, and why. A requested cumulative approach must not silently restart at the original distance; `continue the movement` alone is insufficient when the framing relationship remains unspecified. Evaluate each subject separately: one may tighten while the other holds. Do not impose symmetrical tightening, compulsory movement, numerical lens values, or a progression on deliberately repeated framing. Preserve AUTEUR locks; resolve only delegated execution detail.
+
 When subjective camera, embodied handheld observation, running, impact, instability, or attention transfer is production-critical, derive the relevant detail inside `camera_logic`:
 
 ```yaml
@@ -1078,6 +1080,10 @@ Translate every material abstract performance intent into observable evidence. E
 
 For each material beat, reason from the current aim and bodily state through the received stimulus, interpretation or hesitation, outward response, feedback, and residual state. This is a selective reasoning path, not a form to fill or a requirement that every shot contain a reversal. Old emotion may remain briefly while a new understanding first changes gaze or timing, then breath, mouth, or posture. Speech and body can overlap or lag each other. Listening is an active performance task when the listener is in frame. Stillness, numbness, ritual repetition, stylized motion, and deliberately withheld response can be the intended result.
 
+Before choosing carriers for a material state change, determine from the source whether the audience must see the transition, an intentional ellipsis omits it, or the response is withheld. Two different endpoints alone establish neither a mandatory gradual transition nor an intentional ellipsis. When established meaning and delegated execution support a visible bridge, resolve it within the existing shot and performance fields; when the missing interpretation would change motive or dramatic meaning, preserve the ambiguity and apply Adaptive Questioning. Do not retrofit later director corrections into an earlier request. A locked cut can carry ellipsis, but a cut alone does not prove that the preceding shot must omit all transition.
+
+Bind local instructions to their subject and shot or phase before resolving apparent contradictions. `Already no longer smiling here` governs that later state; it does not by itself prohibit a preceding transition. Conversely, an explicit instruction to omit the change must not become an excuse to animate it elsewhere. Record the scope in the existing Intent Ledger and derive it into Semantic Trace only when needed; do not create a gesture checklist or a new user form.
+
 Within an established emotional meaning and relationship, Framewright may actively devise the bodily expression as a `delegated_decision` or source-grounded `compiler_inference` in the existing Intent Ledger. This includes a coordinated acceptance reaction, breath still recovering after a run, or a hesitation before a known reply. Give the director a brief Intent Delta, not approval requests for every low-risk detail. Do not infer hidden hostility, deceit, romance, trauma, a changed decision, or any other new dramatic meaning. Respect locked minimalism and intentional freedom. Ask only when the missing meaning would change the scene.
 
 When a performance beat is material, derive it inside the existing `performance_progression` field:
@@ -1147,6 +1153,10 @@ silent_reaction_beats:
 ```
 
 Each event has one speaker, beat, positive integer count, and either exact words with language or a specific nonlexical description. An added event needs a traceable scope grant or current preference source and is serialized once at its approved point; an open-ended “add natural reactions” instruction must not be passed to the model. Refining the delivery, breath, volume, or pause of existing text never changes its words. Legacy events without `event_type` remain locked dialogue. `silent_reaction_beats` distinguishes `no_dialogue` (only specifically authorized nonlexical sound, if any) from `strict_no_vocal` (no human vocal event); legacy unqualified silent beats retain the stricter protection. Neither silence mode authorizes subtitles or visible text. This structure remains inactive without authorized speech or vocal control and never changes the default ambience, SFX, or no-music policy.
+
+Preserve a directed voice's relationship to the image, not just its words and speaker. A shot of a person's face does not turn their voiceover into visible speech; an off-screen reply does not require a cut to its speaker. Distinguish in-scene on-screen speech, an in-scene off-screen voice, and voiceover using the actual direction and context, not the word `offscreen` alone. Preserve explicitly directed action-before-speech, overlap, and sentence-ending cues without inventing numeric timing. Resolve a material ambiguity only when those readings would change the intended scene.
+
+When this relationship is explicit or materially resolved, extend that existing vocal event with `presentation: {placement: on_screen | off_screen | voiceover, lip_sync: required | forbidden | not_visible}`. A visible in-scene speaker may require synchronized lips; an off-screen speaker has no visible mouth; voiceover must not acquire synchronized visible speech. Occluded mouths may remain `not_visible`. In a temporary trace, also put `shot_id` and an exact `span` inside `presentation`, locating speaker, event content, and presentation wording together in the corresponding `prompt_shots` block from §16.1. For repeated content, use a list of these records, one per approved occurrence; a repeated line's global count alone cannot locate it. These optional fields do not change the default sound policy or require a new user form. Semantic review verifies what the wording means; the validator checks permitted combinations and shot-local evidence. Existing events without this extension remain valid.
 
 State the environmental bed once in `AUDIO`. Place action-synchronized sound cues inside the beat they control. Preserve both during compression.
 
@@ -1824,7 +1834,19 @@ semantic_trace:
     preservation_status:
 ```
 
-Semantic Trace is not a second editable source and is not saved by default. Run these compact meta-tests:
+Semantic Trace is not a second editable source and is not saved by default.
+
+First review the current original direction, effective revisions, and admitted material descriptions against the Spine, without using the draft prompt or a filled trace as the checklist. Resolve material performance transitions, camera returns, and locally scoped constraints with their source and scope. Then review the actual serialized prompt against those source-derived obligations. Repair the smallest missing relation; never manufacture a requirement from a historical approved answer. This source-to-plan pass and the plan-to-text pass are separate: checking populated fields alone cannot discover an obligation omitted during planning.
+
+For Video Prompt scopes involving those relations, use `video-prompt --source-review --trace <temporary-trace>` after serialization and compression. Derive `source_review_required: true`, `prompt_shots` (shot/phase ID -> exact, unique, non-overlapping final-text block), and the following optional extensions to existing `semantic_trace` entries. These are temporary diagnostics, not new IR keys, editable state, or clean-prompt content:
+
+- `source_locator`, `source_excerpt`, `source_scope` (shot/phase IDs), and the existing `affected_shots_or_phases`: quote the effective instruction and bind its scope; the affected set must stay inside it. For a supported inference, cite its actual source and explain the inference in `rationale`, rather than inventing a director quote.
+- `requirement_type` and `treatment`: `performance_transition` uses `visible_transition`, `ellipsis`, or `withheld`; `camera_return` uses `continue`, `hold`, or `reset`; `scoped_constraint` and `reference_state` use `preserve`. The treatment records the source-grounded semantic decision, not an automated aesthetic judgment.
+- `rationale`, `preservation_status: preserved`, and `model_facing_carrier`: a list of `{shot_id, role, span}` records quoting exact text within the indicated block. A visible transition needs distinct ordered `baseline`, `transition`, and `result` evidence; ellipsis or withheld response needs `baseline` and `result`, without imposing a transition. A camera return needs `previous_frame` and `return_start`; a continuing move also needs `return_end`. A scoped constraint or reference state needs `constraint` evidence. Use only affected shots; these roles stay internal.
+
+The validator checks structure, scope membership, localized text evidence, and protected order. It cannot verify the authenticity or completeness of supplied source excerpts, decide whether ellipsis is artistically correct, or detect every semantic contradiction. The source review remains the compiler's responsibility. Legacy traces remain readable; the new command flag requires this source review for the current applicable compile even if the trace forgot to request it.
+
+Run these compact meta-tests:
 
 - `Intent Coverage Test`: every active material director lock has an appropriate carrier, and its rationale still holds through structure and execution.
 - `Observable Intent Test`: every material abstract intent is translated into visible, audible, spatial, or temporal evidence rather than left as an orphan adjective.

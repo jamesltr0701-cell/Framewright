@@ -10,7 +10,7 @@ Framewright turns approved director intent, production assets, and shot decision
 
 Framewright is not a one-click filmmaking system and it is not an autonomous AI director. It is a production tool for translating a resolved creative direction into clear, model-facing artifacts.
 
-`v4.2.0` · Codex Skill · Source available
+`v4.2.1` · Codex Skill · Source available · Director trial
 
 ## What is Framewright?
 
@@ -19,6 +19,8 @@ Most prompt workflows begin with syntax. Framewright begins with a director's ap
 It organizes intent, assets, shot decisions, continuity, and reference authority into a recoverable Production Spine. From that shared state, it compiles one active stage at a time into a storyboard, Shot Plate, Keyframe, or video-generation prompt. The output is structured enough to use in production while leaving room for the filmmaker's judgment.
 
 In v4.2, material performance keeps its trigger, visible emotional process, and aftermath through prompt compilation. Framewright can devise low-risk bodily detail within approved character meaning, and can add a specific brief vocal response when the director has granted that scope. The release validates prompt behavior; it does not claim a measured improvement in generated video quality.
+
+The v4.2.1 patch strengthens source-to-prompt checks for scoped performance changes and camera returns, preserves directed voice placement and lip synchronization, and supports validation from a standalone Skill installation. It is enabled for director use and evaluation; v4.2.0 remains the rollback release. Prompt checks do not establish generated-video quality or long-term reliability.
 
 ## You direct. Framewright compiles.
 
@@ -42,7 +44,7 @@ Completing one stage may inform a later stage, but it never starts that stage au
 
 ## Current model routes
 
-These are the registered Framewright 4.2.0 routes. A route is selected for the active artifact and operation; unlisted models are not implied to be supported.
+These are the registered Framewright 4.2.1 routes. A route is selected for the active artifact and operation; unlisted models are not implied to be supported.
 
 ### Image
 
@@ -89,7 +91,7 @@ Use it as-is, study its logic, or adapt its defaults, adapters, and heuristics t
 
 ## Installation
 
-Install the stable Skill from the [`skill/framewright/`](skill/framewright/) directory, or from the [Framewright `main` branch on GitHub](https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright).
+Install the current Skill from the [`skill/framewright/`](skill/framewright/) directory, or from the [Framewright `main` branch on GitHub](https://github.com/jamesltr0701-cell/framewright/tree/main/skill/framewright).
 
 After installation, invoke the Skill explicitly with `$framewright`.
 
@@ -107,7 +109,7 @@ After installation, invoke the Skill explicitly with `$framewright`.
 
 ## Versioning and development
 
-GitHub `main` is the source of truth for the synchronized stable release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching immutable 4.2.0 snapshot is [`versions/releases/framewright-v4.2.0.md`](versions/releases/framewright-v4.2.0.md).
+GitHub `main` is the source of truth for the synchronized current release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching immutable 4.2.1 snapshot is [`versions/releases/framewright-v4.2.1.md`](versions/releases/framewright-v4.2.1.md). The `v4.2.0` tag preserves the complete earlier Skill for rollback, including its adapters and validator.
 
 Promoted releases preserve older snapshots. Experimental candidates may remain isolated on local branches and do not become stable releases until separately approved. Desktop mirror and local-install synchronization are maintainer concerns; they do not change the public Skill interface.
 

@@ -1,0 +1,13 @@
+GENERATION GOAL
+A 12-second, 16:9 live-action scene with natural room illumination, exactly two fixed-camera shots and one hard cut.
+
+STAGE PLAN
+Shot 1: Locked camera, chest-up close-up of 许 seated on screen-left, his face in three-quarter view; only 许 is visible. 乔, entirely off-screen within the scene, says in Chinese, once: “门开着。” 乔 has no visible mouth in this shot. 许 listens with his mouth closed; only after 乔 finishes the complete line does 许 raise his eyes toward the door, keeping his mouth closed. Stay on 许 through this reaction, his gaze now directed toward the door; do not cut to 乔.
+
+Shot 2: Hard cut to 许, still seated on screen-left, now framed from the shoulders up at a slightly high angle, with his face in three-quarter view and his gaze toward the door. The camera stays locked; 许 remains the only visible person and 乔 stays off-screen. 许 speaks in the scene, in Chinese, once: “我知道。” His visible lips synchronize with the complete line. Finish on this framing after the reply, without another gesture or vocal event.
+
+AUDIO
+Indoor room tone and the two specified dialogue events only.
+
+NEGATIVE
+No additional voices or sounds, music, or subtitles. 乔 never appears in either shot.

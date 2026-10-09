@@ -1,0 +1,183 @@
+core_version: 4.2.1
+director_modes:
+- auteur
+conversation_mode_declared: true
+active_stages:
+- video_prompt
+source_review_required: true
+prompt: 'GENERATION GOAL
+
+  A 12-second, 16:9 live-action scene with natural room illumination, exactly two
+  fixed-camera shots and one hard cut.
+
+
+  STAGE PLAN
+
+  Shot 1: Locked camera, chest-up close-up of 周 in three-quarter facial view, standing
+  in an otherwise empty classroom and looking out of the window. Over his visible
+  face, 周''s remembered voice is heard as voiceover, in Chinese, once: “那时我还不知道。”
+  His lips remain closed throughout this shot; the voiceover has no visible speaking
+  or synchronized mouth movement. Hold this view through the end of the voiceover.
+
+
+  Shot 2: Hard cut to a locked medium shot of 安 at the classroom doorway, her face
+  in three-quarter view. 安 speaks in the scene, in Chinese, once: “走吧。” Her visible
+  lips synchronize with the complete line. Remain on her at the doorway as the line
+  ends, with no added gesture or speech.
+
+
+  AUDIO
+
+  Natural classroom room tone continues beneath the two specified vocal events.
+
+
+  NEGATIVE
+
+  No additional dialogue, human vocalizations or sighs, music, or subtitles.
+
+  '
+prompt_shots:
+  S1: 'Shot 1: Locked camera, chest-up close-up of 周 in three-quarter facial view,
+    standing in an otherwise empty classroom and looking out of the window. Over his
+    visible face, 周''s remembered voice is heard as voiceover, in Chinese, once: “那时我还不知道。”
+    His lips remain closed throughout this shot; the voiceover has no visible speaking
+    or synchronized mouth movement. Hold this view through the end of the voiceover.'
+  S2: 'Shot 2: Hard cut to a locked medium shot of 安 at the classroom doorway, her
+    face in three-quarter view. 安 speaks in the scene, in Chinese, once: “走吧。” Her
+    visible lips synchronize with the complete line. Remain on her at the doorway
+    as the line ends, with no added gesture or speech.'
+vocal_events:
+- event_id: V_voiceover
+  event_type: locked_dialogue
+  speaker: 周
+  exact_text: 那时我还不知道。
+  language: Chinese
+  beat: V_recollection
+  allowed_count: 1
+  prompt_evidence: 'Over his visible face, 周''s remembered voice is heard as voiceover,
+    in Chinese, once: “那时我还不知道。” His lips remain closed throughout this shot; the
+    voiceover has no visible speaking or synchronized mouth movement.'
+  presentation:
+    placement: voiceover
+    lip_sync: forbidden
+    shot_id: S1
+    span: 'Over his visible face, 周''s remembered voice is heard as voiceover, in
+      Chinese, once: “那时我还不知道。” His lips remain closed throughout this shot; the voiceover
+      has no visible speaking or synchronized mouth movement.'
+- event_id: V_live
+  event_type: locked_dialogue
+  speaker: 安
+  exact_text: 走吧。
+  language: Chinese
+  beat: V_live_reply
+  allowed_count: 1
+  prompt_evidence: '安 speaks in the scene, in Chinese, once: “走吧。” Her visible lips
+    synchronize with the complete line.'
+  presentation:
+    placement: on_screen
+    lip_sync: required
+    shot_id: S2
+    span: '安 speaks in the scene, in Chinese, once: “走吧。” Her visible lips synchronize
+      with the complete line.'
+semantic_trace:
+- intent_id: V_voice_presentation
+  source_locator: testing/next-local/v421_behavior_requests.md#V
+  source_excerpt: 听到周的回忆旁白“那时我还不知道。”，这是他的声音，但不是他在镜头里开口。
+  source_scope: &id001
+  - S1
+  affected_shots_or_phases: *id001
+  requirement_type: scoped_constraint
+  treatment: preserve
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: constraint
+    span: 'Over his visible face, 周''s remembered voice is heard as voiceover, in
+      Chinese, once: “那时我还不知道。” His lips remain closed throughout this shot; the voiceover
+      has no visible speaking or synchronized mouth movement.'
+- intent_id: V_lips_closed
+  source_locator: testing/next-local/v421_behavior_requests.md#V
+  source_excerpt: 嘴唇保持闭合。
+  source_scope: &id002
+  - S1
+  affected_shots_or_phases: *id002
+  requirement_type: scoped_constraint
+  treatment: preserve
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: constraint
+    span: His lips remain closed throughout this shot; the voiceover has no visible
+      speaking or synchronized mouth movement.
+- intent_id: V_live_sync
+  source_locator: testing/next-local/v421_behavior_requests.md#V
+  source_excerpt: 第二镜：门口，安的3/4脸中景，她现场说“走吧。”，口型同步。
+  source_scope: &id003
+  - S2
+  affected_shots_or_phases: *id003
+  requirement_type: scoped_constraint
+  treatment: preserve
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S2
+    role: constraint
+    span: 'Shot 2: Hard cut to a locked medium shot of 安 at the classroom doorway,
+      her face in three-quarter view. 安 speaks in the scene, in Chinese, once: “走吧。”
+      Her visible lips synchronize with the complete line. Remain on her at the doorway
+      as the line ends, with no added gesture or speech.'
+source_to_plan_review:
+- Zhou stands looking out of window; three-quarter face chest-up; lips closed throughout
+  shot 1.
+- His exact memory voiceover does not become in-scene visible speech.
+- Hard cut to An at doorway; three-quarter medium shot; exact live line with lip synchronization.
+- Two locked vocal occurrences only, natural classroom room tone, no sighs/music/subtitles;
+  fixed camera.
+seedance25:
+  route: long_video
+  parameter_contract:
+    duration:
+      provenance: user_settable
+      resolved_value: 12
+    aspect_ratio:
+      provenance: user_settable
+      resolved_value: '16:9'
+  materials:
+    image_count: 0
+    video_count: 0
+    audio_count: 0
+  stages:
+  - entry_state: Zhou stands looking outside, lips closed
+    principal_change: Memory voiceover is heard to completion over the unchanged visible
+      closed mouth
+    end_state: Zhou remains looking outside, lips closed; narration complete
+  - entry_state: Hard-cut arrival at An in doorway
+    principal_change: An says her one locked line in-scene with visible lip synchronization
+    end_state: An remains at doorway after line
+  numeric_timing:
+    active: false
+  target_surface: hypothetical fixture only
+compile_choices:
+  generation_strategy: edited_sequence_single_generation
+  control_profiles:
+  - dialogue_control
+  storyboard_preflight: proceed_without_storyboard
+  endpoint_purpose: resolve
+  runtime_references: []
+  stage_count: 2
+  serialization_owner: framewright_adapter_seedance_2_5
+target_model: seedance_2_5
+serialization_owner: framewright_adapter_seedance_2_5
+adapter_id: seedance_2_5
+adapter_profile_contract: seedance_2_5
+compiler_instruction_sources:
+- skill/framewright/SKILL.md
+- skill/framewright/references/framewright.md
+- skill/framewright/references/runtime_profiles/seedance_2_5.md
+- skill/framewright/references/craft/camera-motion.md
+- skill/framewright/references/craft/light-sound.md

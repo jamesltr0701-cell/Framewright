@@ -1,0 +1,257 @@
+core_version: 4.2.1
+director_modes:
+- auteur
+conversation_mode_declared: true
+active_stages:
+- video_prompt
+source_review_required: true
+prompt: 'GENERATION GOAL
+
+  A 12-second, 16:9 live-action scene with natural room illumination, exactly two
+  fixed-camera shots and one hard cut.
+
+
+  STAGE PLAN
+
+  Shot 1: Locked camera, chest-up close-up of 许 seated on screen-left, his face in
+  three-quarter view; only 许 is visible. 乔, entirely off-screen within the scene,
+  says in Chinese, once: “门开着。” 乔 has no visible mouth in this shot. 许 listens with
+  his mouth closed; only after 乔 finishes the complete line does 许 raise his eyes
+  toward the door, keeping his mouth closed. Stay on 许 through this reaction, his
+  gaze now directed toward the door; do not cut to 乔.
+
+
+  Shot 2: Hard cut to 许, still seated on screen-left, now framed from the shoulders
+  up at a slightly high angle, with his face in three-quarter view and his gaze toward
+  the door. The camera stays locked; 许 remains the only visible person and 乔 stays
+  off-screen. 许 speaks in the scene, in Chinese, once: “我知道。” His visible lips synchronize
+  with the complete line. Finish on this framing after the reply, without another
+  gesture or vocal event.
+
+
+  AUDIO
+
+  Indoor room tone and the two specified dialogue events only.
+
+
+  NEGATIVE
+
+  No additional voices or sounds, music, or subtitles. 乔 never appears in either shot.
+
+  '
+prompt_shots:
+  S1: 'Shot 1: Locked camera, chest-up close-up of 许 seated on screen-left, his face
+    in three-quarter view; only 许 is visible. 乔, entirely off-screen within the scene,
+    says in Chinese, once: “门开着。” 乔 has no visible mouth in this shot. 许 listens with
+    his mouth closed; only after 乔 finishes the complete line does 许 raise his eyes
+    toward the door, keeping his mouth closed. Stay on 许 through this reaction, his
+    gaze now directed toward the door; do not cut to 乔.'
+  S2: 'Shot 2: Hard cut to 许, still seated on screen-left, now framed from the shoulders
+    up at a slightly high angle, with his face in three-quarter view and his gaze
+    toward the door. The camera stays locked; 许 remains the only visible person and
+    乔 stays off-screen. 许 speaks in the scene, in Chinese, once: “我知道。” His visible
+    lips synchronize with the complete line. Finish on this framing after the reply,
+    without another gesture or vocal event.'
+vocal_events:
+- event_id: O_offscreen
+  event_type: locked_dialogue
+  speaker: 乔
+  exact_text: 门开着。
+  language: Chinese
+  beat: O_offscreen_line
+  allowed_count: 1
+  prompt_evidence: '乔, entirely off-screen within the scene, says in Chinese, once:
+    “门开着。” 乔 has no visible mouth in this shot.'
+  presentation:
+    placement: off_screen
+    lip_sync: not_visible
+    shot_id: S1
+    span: '乔, entirely off-screen within the scene, says in Chinese, once: “门开着。”
+      乔 has no visible mouth in this shot.'
+- event_id: O_live
+  event_type: locked_dialogue
+  speaker: 许
+  exact_text: 我知道。
+  language: Chinese
+  beat: O_reply
+  allowed_count: 1
+  prompt_evidence: '许 speaks in the scene, in Chinese, once: “我知道。” His visible lips
+    synchronize with the complete line.'
+  presentation:
+    placement: on_screen
+    lip_sync: required
+    shot_id: S2
+    span: '许 speaks in the scene, in Chinese, once: “我知道。” His visible lips synchronize
+      with the complete line.'
+semantic_trace:
+- intent_id: O_voice_presentation
+  source_locator: testing/next-local/v421_behavior_requests.md#O
+  source_excerpt: 画外的乔说“门开着。”
+  source_scope: &id001
+  - S1
+  affected_shots_or_phases: *id001
+  requirement_type: scoped_constraint
+  treatment: preserve
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: constraint
+    span: '乔, entirely off-screen within the scene, says in Chinese, once: “门开着。”
+      乔 has no visible mouth in this shot.'
+- intent_id: O_listening_delay
+  source_locator: testing/next-local/v421_behavior_requests.md#O
+  source_excerpt: 许保持闭嘴，听完后才朝门的方向抬眼；不要切去找乔。
+  source_scope: &id002
+  - S1
+  affected_shots_or_phases: *id002
+  requirement_type: performance_transition
+  treatment: visible_transition
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: baseline
+    span: 许 listens with his mouth closed;
+  - shot_id: S1
+    role: transition
+    span: only after 乔 finishes the complete line does 许 raise his eyes toward the
+      door, keeping his mouth closed.
+  - shot_id: S1
+    role: result
+    span: Stay on 许 through this reaction, his gaze now directed toward the door;
+      do not cut to 乔.
+- intent_id: O_hidden_speaker
+  source_locator: testing/next-local/v421_behavior_requests.md#O
+  source_excerpt: 乔全段不入画。
+  source_scope: &id003
+  - S1
+  - S2
+  affected_shots_or_phases: *id003
+  requirement_type: scoped_constraint
+  treatment: preserve
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: constraint
+    span: only 许 is visible.
+  - shot_id: S2
+    role: constraint
+    span: 许 remains the only visible person and 乔 stays off-screen.
+- intent_id: O_camera_reset
+  source_locator: testing/next-local/v421_behavior_requests.md#O
+  source_excerpt: 第一镜只拍许的3/4脸胸上近景，他坐在画左。第二镜仍拍许，改成略俯的肩上景别
+  source_scope: &id004
+  - S1
+  - S2
+  affected_shots_or_phases: *id004
+  requirement_type: camera_return
+  treatment: reset
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: previous_frame
+    span: Locked camera, chest-up close-up of 许 seated on screen-left, his face in
+      three-quarter view;
+  - shot_id: S2
+    role: return_start
+    span: Hard cut to 许, still seated on screen-left, now framed from the shoulders
+      up at a slightly high angle, with his face in three-quarter view and his gaze
+      toward the door.
+- intent_id: O_live_sync
+  source_locator: testing/next-local/v421_behavior_requests.md#O
+  source_excerpt: 他现场说“我知道。”，口型同步。
+  source_scope: &id005
+  - S2
+  affected_shots_or_phases: *id005
+  requirement_type: scoped_constraint
+  treatment: preserve
+  rationale: Preserve the directed shot-local relationship without extending it to
+    another shot.
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S2
+    role: constraint
+    span: '许 speaks in the scene, in Chinese, once: “我知道。” His visible lips synchronize
+      with the complete line.'
+source_to_plan_review:
+- Shot 1 Xu alone, three-quarter chest-up, seated screen-left; Qiao speaks offscreen.
+- Xu keeps mouth closed, raises eyes toward door only after hearing complete line;
+  no cut to Qiao.
+- Shot 2 Xu remains subject, slightly high angle shoulders-up framing, exact live
+  synchronized reply.
+- Qiao never enters picture; two vocal occurrences and room tone only; two hard-cut
+  shots, fixed camera.
+performance_beats:
+- beat_id: O_listener_reaction
+  material: true
+  physical_carriers:
+  - Only after complete off-screen line, raise gaze toward the door while mouth remains
+    closed.
+  shot_scale: chest-up close-up
+  carrier_legible: true
+  trigger: Off-screen line completes
+  interpretation_or_delay: Only after hearing the complete line
+  release_or_aftermath: Gaze remains directed toward door
+  prompt_evidence:
+    trigger: '乔, entirely off-screen within the scene, says in Chinese, once: “门开着。”
+      乔 has no visible mouth in this shot.'
+    transition: 许 listens with his mouth closed;
+    response: only after 乔 finishes the complete line does 许 raise his eyes toward
+      the door, keeping his mouth closed.
+    aftermath: Stay on 许 through this reaction, his gaze now directed toward the door;
+      do not cut to 乔.
+silent_reaction_beats:
+- beat_id: O_listener_reaction
+  mode: strict_no_vocal
+  speech: false
+  subtitle_or_visible_text: false
+seedance25:
+  route: long_video
+  parameter_contract:
+    duration:
+      provenance: user_settable
+      resolved_value: 12
+    aspect_ratio:
+      provenance: user_settable
+      resolved_value: '16:9'
+  materials:
+    image_count: 0
+    video_count: 0
+    audio_count: 0
+  stages:
+  - entry_state: Xu seated screen-left, closed mouth; Qiao offscreen
+    principal_change: Xu receives complete offscreen line, then raises eyes toward
+      door
+    end_state: Xu gazes toward door with closed mouth; Qiao unseen
+  - entry_state: Hard-cut shoulders-up slightly high angle of seated Xu
+    principal_change: Xu speaks his one locked reply in-scene with synchronized lips
+    end_state: Xu remains seated in final framing after reply; Qiao unseen
+  numeric_timing:
+    active: false
+  target_surface: hypothetical fixture only
+compile_choices:
+  generation_strategy: edited_sequence_single_generation
+  control_profiles:
+  - dialogue_control
+  storyboard_preflight: proceed_without_storyboard
+  endpoint_purpose: resolve
+  runtime_references: []
+  stage_count: 2
+  serialization_owner: framewright_adapter_seedance_2_5
+target_model: seedance_2_5
+serialization_owner: framewright_adapter_seedance_2_5
+adapter_id: seedance_2_5
+adapter_profile_contract: seedance_2_5
+compiler_instruction_sources:
+- skill/framewright/SKILL.md
+- skill/framewright/references/framewright.md
+- skill/framewright/references/runtime_profiles/seedance_2_5.md
+- skill/framewright/references/craft/camera-motion.md
+- skill/framewright/references/craft/light-sound.md

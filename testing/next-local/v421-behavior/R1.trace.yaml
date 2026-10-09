@@ -1,0 +1,259 @@
+core_version: 4.2.1
+artifact_stage: video_prompt
+target_model: seedance_2_5
+serialization_owner: framewright_adapter_seedance_2_5
+adapter_id: seedance_2_5
+adapter_profile_contract: seedance_2_5
+compiler_instruction_sources:
+- skill/framewright/SKILL.md
+- skill/framewright/references/framewright.md
+- skill/framewright/references/runtime_profiles/seedance_2_5.md
+- skill/framewright/references/craft/camera-motion.md
+- skill/framewright/references/craft/light-sound.md
+director_modes:
+- auteur
+conversation_mode_declared: true
+active_stages:
+- video_prompt
+production_spines:
+- R
+material_registries:
+- R-empty
+prompt: 'GENERATION GOAL
+
+  20秒，16:9，厨房内三镜硬切。实拍观感，人物与厨房材质自然；镜头内全部固定机位，无推进。林坐在画左，梅站在画右；不操作道具。
+
+
+  STAGE PLAN
+
+  第一镜：固定机位，只拍坐在画左的林，3/4脸、胸上近景；画面保持这一景别和角度。林保持一点笑，现场说中文{你还会来吗？}，可见口型与这句对白同步。林说完后闭嘴，梅在画外右侧回答中文{会。}；她不入画。回答时林保持那一点笑，安静听着，不开口或出声，镜头留在林身上，不切去找梅。
+
+
+  第二镜：硬切到站在画右的梅，固定机位、3/4脸、腰上中景，略仰。梅起初朝林；梅现场开始说中文{下周见。}的同时，开始轻轻向窗边偏头，转头贯穿这句话，口型始终同步；在句尾头部停住，保持偏向窗边的朝向，再硬切。
+
+
+  第三镜：硬切回林，开镜就是第一镜同样的胸上近景、坐姿、3/4脸角度及画左位置；固定机位保持到结束。切回时仍带第一镜的一点笑，嘴角轻轻放松，然后保持放松后的表情直到结束。林全镜闭嘴，不说话、不出声，不增加其他动作。
+
+
+  CONTINUITY + END STATE
+
+  三镜保持人物身份、衣着和厨房空间一致，林始终坐着，梅始终站着，双方空间位置不交换。末镜保留完整的表情停留，不再追加镜头。
+
+
+  AUDIO
+
+  全段只有上述三次中文对白，各说一次，以及连续的厨房室内底声。
+
+
+  NEGATIVE
+
+  无音乐、额外人声、叹气或笑声，无字幕；不添加道具动作、推镜或转场叠化。
+
+  '
+prompt_shots:
+  S1: 第一镜：固定机位，只拍坐在画左的林，3/4脸、胸上近景；画面保持这一景别和角度。林保持一点笑，现场说中文{你还会来吗？}，可见口型与这句对白同步。林说完后闭嘴，梅在画外右侧回答中文{会。}；她不入画。回答时林保持那一点笑，安静听着，不开口或出声，镜头留在林身上，不切去找梅。
+  S2: 第二镜：硬切到站在画右的梅，固定机位、3/4脸、腰上中景，略仰。梅起初朝林；梅现场开始说中文{下周见。}的同时，开始轻轻向窗边偏头，转头贯穿这句话，口型始终同步；在句尾头部停住，保持偏向窗边的朝向，再硬切。
+  S3: 第三镜：硬切回林，开镜就是第一镜同样的胸上近景、坐姿、3/4脸角度及画左位置；固定机位保持到结束。切回时仍带第一镜的一点笑，嘴角轻轻放松，然后保持放松后的表情直到结束。林全镜闭嘴，不说话、不出声，不增加其他动作。
+source_review_required: true
+semantic_trace:
+- intent_id: camera_return
+  requirement_type: camera_return
+  treatment: hold
+  source_locator: testing/next-local/v421_behavior_requests.md#R0
+  source_excerpt: 第三镜：回林，和第一镜同样的胸上景别、坐姿、角度。
+  source_scope: &id001
+  - S1
+  - S3
+  affected_shots_or_phases: *id001
+  rationale: 第三镜重复第一镜机位关系；不能推进或重新设计角度。
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: previous_frame
+    span: 固定机位，只拍坐在画左的林，3/4脸、胸上近景；画面保持这一景别和角度。
+  - shot_id: S3
+    role: return_start
+    span: 开镜就是第一镜同样的胸上近景、坐姿、3/4脸角度及画左位置；固定机位保持到结束。
+- intent_id: lin_smile
+  requirement_type: scoped_constraint
+  treatment: preserve
+  source_locator: testing/next-local/v421_behavior_requests.md#R0
+  source_excerpt: 第一镜：林胸上近景，保持一点笑。
+  source_scope: &id002
+  - S1
+  affected_shots_or_phases: *id002
+  rationale: 第一镜笑意保持，不提前应用后续请求。
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: constraint
+    span: 林保持一点笑
+- intent_id: offscreen_reply
+  requirement_type: scoped_constraint
+  treatment: preserve
+  source_locator: testing/next-local/v421_behavior_requests.md#R0
+  source_excerpt: 林说“你还会来吗？”；梅在画外答“会。”，林安静听着。不切去找梅。
+  source_scope: &id003
+  - S1
+  affected_shots_or_phases: *id003
+  rationale: 在林的画面上保留梅的画外回答与林的安静接收。
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S1
+    role: constraint
+    span: 林说完后闭嘴，梅在画外右侧回答中文{会。}；她不入画。回答时林保持那一点笑，安静听着，不开口或出声，镜头留在林身上，不切去找梅。
+- intent_id: mei_timing
+  requirement_type: performance_transition
+  treatment: visible_transition
+  source_locator: testing/next-local/v421_behavior_requests.md#R1
+  source_excerpt: 只改第二镜的偏头时机：梅开始说“下周见。”的同时开始偏头，在句尾停住。其余保持上一版批准的安排。
+  source_scope: &id004
+  - S2
+  affected_shots_or_phases: *id004
+  rationale: 只更新第二镜说话与偏头的并行时机；偏头在句尾停止。
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S2
+    role: baseline
+    span: 梅起初朝林
+  - shot_id: S2
+    role: transition
+    span: 梅现场开始说中文{下周见。}的同时，开始轻轻向窗边偏头，转头贯穿这句话，口型始终同步；
+  - shot_id: S2
+    role: result
+    span: 在句尾头部停住，保持偏向窗边的朝向
+- intent_id: lin_release
+  requirement_type: performance_transition
+  treatment: visible_transition
+  source_locator: testing/next-local/v421_behavior_requests.md#R0
+  source_excerpt: 林嘴角轻轻放松，保持到结束，不补台词或其他动作。
+  source_scope: &id005
+  - S3
+  affected_shots_or_phases: *id005
+  rationale: 轻轻放松是第三镜可见过程，保留放松后的终态，不推断悲伤或失望。
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S3
+    role: baseline
+    span: 切回时仍带第一镜的一点笑
+  - shot_id: S3
+    role: transition
+    span: 嘴角轻轻放松
+  - shot_id: S3
+    role: result
+    span: 然后保持放松后的表情直到结束。
+- intent_id: local_minimalism
+  requirement_type: scoped_constraint
+  treatment: preserve
+  source_locator: testing/next-local/v421_behavior_requests.md#R0
+  source_excerpt: 林嘴角轻轻放松，保持到结束，不补台词或其他动作。
+  source_scope: &id006
+  - S3
+  affected_shots_or_phases: *id006
+  rationale: 只限制第三镜无追加动作，不能反向禁止第二镜偏头。
+  preservation_status: preserved
+  model_facing_carrier:
+  - shot_id: S3
+    role: constraint
+    span: 林全镜闭嘴，不说话、不出声，不增加其他动作。
+vocal_events:
+- event_id: E1
+  event_type: locked_dialogue
+  speaker: 林
+  exact_text: 你还会来吗？
+  language: 中文
+  beat: E1
+  allowed_count: 1
+  prompt_evidence: 林保持一点笑，现场说中文{你还会来吗？}，可见口型与这句对白同步。
+  presentation:
+    placement: on_screen
+    lip_sync: required
+    shot_id: S1
+    span: 林保持一点笑，现场说中文{你还会来吗？}，可见口型与这句对白同步。
+- event_id: E2
+  event_type: locked_dialogue
+  speaker: 梅
+  exact_text: 会。
+  language: 中文
+  beat: E2
+  allowed_count: 1
+  prompt_evidence: 梅在画外右侧回答中文{会。}；她不入画。
+  presentation:
+    placement: off_screen
+    lip_sync: not_visible
+    shot_id: S1
+    span: 梅在画外右侧回答中文{会。}；她不入画。
+- event_id: E3
+  event_type: locked_dialogue
+  speaker: 梅
+  exact_text: 下周见。
+  language: 中文
+  beat: E3
+  allowed_count: 1
+  prompt_evidence: 梅现场开始说中文{下周见。}的同时，开始轻轻向窗边偏头，转头贯穿这句话，口型始终同步；
+  presentation:
+    placement: on_screen
+    lip_sync: required
+    shot_id: S2
+    span: 梅现场开始说中文{下周见。}的同时，开始轻轻向窗边偏头，转头贯穿这句话，口型始终同步；
+silent_reaction_beats:
+- beat_id: S1-listener
+  speaker: 林
+  mode: strict_no_vocal
+- beat_id: S3-hold
+  speaker: 林
+  mode: strict_no_vocal
+endpoint_contract:
+  purpose: resolve
+  observable_end_state: 林嘴角放松后保持到结束
+seedance25:
+  route: long_video
+  parameter_contract:
+    duration:
+      provenance: user_settable
+      resolved_value: 20
+    aspect_ratio:
+      provenance: user_settable
+      resolved_value: '16:9'
+  materials:
+    image_count: 0
+    video_count: 0
+    audio_count: 0
+  numeric_timing:
+    active: false
+  stages:
+  - entry_state: 林带一点笑
+    principal_change: 问话后听画外回答
+    end_state: 林带一点笑安静听着
+  - entry_state: 梅朝林
+    principal_change: 边说边偏头
+    end_state: 句尾停住朝向窗边
+  - entry_state: 回到带一点笑的林
+    principal_change: 嘴角轻轻放松
+    end_state: 放松后保持
+harness_assumption: Hypothetical fixture surface supports text-only long_video. No
+  real provider verification.
+performance_beats:
+- beat_id: Mei-turn
+  physical_carriers:
+  - 对白与偏头同时起，在句尾停住
+  shot_scale: waist-up
+  carrier_legible: true
+  exact_dialogue: 下周见。
+  dialogue_delivery: 转头中口型同步
+  release_or_aftermath: 句尾停住后保持
+  prompt_evidence:
+    trigger: 梅现场开始说中文{下周见。}的同时
+    response: 开始轻轻向窗边偏头，转头贯穿这句话
+    aftermath: 在句尾头部停住，保持偏向窗边的朝向
+  timing_relation: concurrent
+- beat_id: Lin-release
+  physical_carriers:
+  - 嘴角由轻笑轻轻放松后保持
+  shot_scale: chest-up
+  carrier_legible: true
+  release_or_aftermath: 放松后保持
+  prompt_evidence:
+    trigger: 切回时仍带第一镜的一点笑
+    response: 嘴角轻轻放松
+    aftermath: 然后保持放松后的表情直到结束。

@@ -20,6 +20,7 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
   --image-registry "$REPO_ROOT/skill/framewright/references/keyframe_profiles/adapter_registry.yaml" \
   --manifest "$SCRIPT_DIR/expected/protected_anchors.yaml"
 "$PYTHON_BIN" "$VALIDATOR" regression "$SCRIPT_DIR/fixtures"
+PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_source_review.py"
 
 PROMPT_PATH=$(mktemp /private/tmp/framewright-seedance20-adapter.XXXXXX)
 KEYFRAME_PROMPT_PATH=$(mktemp /private/tmp/framewright-midjourney-v82-adapter.XXXXXX)

@@ -238,13 +238,18 @@ def validate_registry_data(document: Any, registry_path: Path) -> list[dict[str,
     owners: list[str] = []
     adapter_ids: list[str] = []
     package_root = registry_path.resolve().parents[2]
-    repository_root = package_root.parents[1]
     all_sources = (sources if isinstance(sources, list) else []) + (optional_sources if isinstance(optional_sources, list) else [])
     if all_sources:
         for source in all_sources:
             if not isinstance(source, str) or not source:
                 continue
-            resolved_source = (repository_root / source).resolve()
+            source_path = Path(source)
+            try:
+                package_relative = source_path.relative_to("skill/framewright")
+            except ValueError:
+                errors.append(issue("compiler_source_registry_path_invalid", "Registered sources must use the Framewright package prefix.", source=source))
+                continue
+            resolved_source = (package_root / package_relative).resolve()
             if (resolved_source != package_root and package_root not in resolved_source.parents) or not resolved_source.is_file():
                 errors.append(issue("compiler_source_registry_path_invalid", "Registered compiler instruction source is missing or outside the Framewright package.", source=source))
     for target_model, record in targets.items():
@@ -1172,9 +1177,130 @@ def validate_minimax_h3(data: Any, prompt: str) -> list[dict[str, Any]]:
     return errors
 
 
+def validate_source_review(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Check supplied source obligations against shot-local final text, not artistic meaning."""
+    entries = data.get("semantic_trace")
+    required = data.get("source_review_required") is True
+    if not required and not (
+        isinstance(entries, list)
+        and any(isinstance(entry, dict) and "requirement_type" in entry for entry in entries)
+    ):
+        return []  # Historical traces retain their original contract.
+    errors: list[dict[str, Any]] = []
+    if not isinstance(entries, list) or not entries:
+        return [issue("source_review_missing", "Source review needs source-derived semantic trace entries.")]
+    entries = [entry for entry in entries if not isinstance(entry, dict) or "requirement_type" in entry]
+    if not entries:
+        return [issue("source_review_missing", "Source review has no scoped source obligations.")]
+    prompt = data.get("prompt")
+    shots = data.get("prompt_shots")
+    if not isinstance(prompt, str) or not isinstance(shots, dict) or not shots:
+        return [issue("source_review_shots_missing", "Source review needs exact final-text shot or phase blocks.")]
+
+    def text_value(value: Any) -> bool:
+        return isinstance(value, str) and bool(value.strip())
+
+    def id_list(value: Any) -> bool:
+        return isinstance(value, list) and bool(value) and all(text_value(item) for item in value) and len(set(value)) == len(value)
+
+    shot_positions: dict[str, int] = {}
+    intervals: list[tuple[int, int]] = []
+    for shot_id, block in shots.items():
+        if not text_value(shot_id) or not text_value(block) or prompt.count(block) != 1:
+            errors.append(issue("source_review_shot_invalid", "Each shot block must occur exactly once in the final prompt.", shot_id=shot_id))
+            continue
+        start = prompt.index(block)
+        end = start + len(block)
+        if any(start < other_end and other_start < end for other_start, other_end in intervals):
+            errors.append(issue("source_review_shot_overlap", "Shot or phase evidence blocks may not overlap.", shot_id=shot_id))
+        intervals.append((start, end))
+        shot_positions[shot_id] = start
+
+    roles_by_treatment = {
+        "performance_transition": {
+            "visible_transition": ("baseline", "transition", "result"),
+            "ellipsis": ("baseline", "result"),
+            "withheld": ("baseline", "result"),
+        },
+        "camera_return": {
+            "continue": ("previous_frame", "return_start", "return_end"),
+            "hold": ("previous_frame", "return_start"),
+            "reset": ("previous_frame", "return_start"),
+        },
+        "scoped_constraint": {"preserve": ("constraint",)},
+        "reference_state": {"preserve": ("constraint",)},
+    }
+    seen_ids: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            errors.append(issue("source_review_entry_invalid", "Source review entries must be mappings."))
+            continue
+        intent_id = entry.get("intent_id")
+        if not text_value(intent_id) or intent_id in seen_ids:
+            errors.append(issue("source_review_id_invalid", "Source review intent IDs must be nonempty and unique."))
+        else:
+            seen_ids.add(intent_id)
+        if any(not text_value(entry.get(key)) for key in ("source_locator", "source_excerpt", "rationale")):
+            errors.append(issue("source_review_provenance_missing", "Each obligation needs its source location, excerpt, and scoped rationale.", intent_id=intent_id))
+        if entry.get("preservation_status") != "preserved":
+            errors.append(issue("source_review_unresolved", "Resolve material source obligations before final validation.", intent_id=intent_id))
+        scope, affected = entry.get("source_scope"), entry.get("affected_shots_or_phases")
+        if not id_list(scope) or not id_list(affected) or not set(affected).issubset(scope) or not set(scope).issubset(shots):
+            errors.append(issue("source_review_scope_invalid", "Affected shots must stay within the source scope and known final-text blocks.", intent_id=intent_id))
+            continue
+        requirement, treatment = entry.get("requirement_type"), entry.get("treatment")
+        treatments = roles_by_treatment.get(requirement, {}) if isinstance(requirement, str) else {}
+        roles = treatments.get(treatment) if isinstance(treatment, str) else None
+        if roles is None:
+            errors.append(issue("source_review_treatment_invalid", "Use a supported source-grounded treatment for this obligation.", intent_id=intent_id))
+            continue
+        evidence = entry.get("model_facing_carrier")
+        if not isinstance(evidence, list) or not evidence:
+            errors.append(issue("source_review_evidence_missing", "Source obligations need shot-local final-text evidence.", intent_id=intent_id))
+            continue
+        positions: dict[str, int] = {}
+        evidence_shots: dict[str, str] = {}
+        covered_shots: set[str] = set()
+        seen_roles: set[tuple[str, str]] = set()
+        for carrier in evidence:
+            if not isinstance(carrier, dict):
+                errors.append(issue("source_review_evidence_invalid", "Evidence must name shot_id, role, and exact span.", intent_id=intent_id))
+                continue
+            shot_id, role, span = carrier.get("shot_id"), carrier.get("role"), carrier.get("span")
+            if not text_value(shot_id) or shot_id not in affected or shot_id not in shot_positions:
+                errors.append(issue("source_review_evidence_scope", "Evidence belongs outside the affected source scope.", intent_id=intent_id))
+                continue
+            if not text_value(role) or role not in roles or (role in positions and role != "constraint") or (shot_id, role) in seen_roles:
+                errors.append(issue("source_review_evidence_role", "Each required role needs its own evidence record.", intent_id=intent_id))
+                continue
+            block = shots[shot_id]
+            if not text_value(span) or block.count(span) != 1:
+                errors.append(issue("source_review_span_missing", "Evidence must occur uniquely inside its specified final-text shot.", intent_id=intent_id, role=role))
+                continue
+            positions[role] = shot_positions[shot_id] + block.index(span)
+            evidence_shots[role] = shot_id
+            covered_shots.add(shot_id)
+            seen_roles.add((shot_id, role))
+        if any(role not in positions for role in roles):
+            errors.append(issue("source_review_relation_missing", "A required source relation has no final-text carrier.", intent_id=intent_id))
+        else:
+            ordered = [positions[role] for role in roles]
+            if len(set(ordered)) != len(ordered) or ordered != sorted(ordered):
+                errors.append(issue("source_review_order_changed", "Final text collapsed or reordered the protected relation.", intent_id=intent_id))
+            if requirement == "camera_return" and (
+                evidence_shots["previous_frame"] == evidence_shots["return_start"]
+                or (treatment == "continue" and evidence_shots["return_start"] != evidence_shots["return_end"])
+            ):
+                errors.append(issue("source_review_camera_shots", "A return must reference an earlier shot and keep its own start and end together.", intent_id=intent_id))
+        if covered_shots != set(affected):
+            errors.append(issue("source_review_affected_uncovered", "Every claimed affected shot needs localized evidence.", intent_id=intent_id))
+    return errors
+
+
 def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     prompt = data.get("prompt")
+    errors.extend(validate_source_review(data))
     if isinstance(prompt, str):
         errors.extend(
             validate_prompt_text(
@@ -1482,6 +1608,31 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
             span = event.get("prompt_evidence")
             if not isinstance(span, str) or span not in prompt or not all(value in span for value in (str(event.get("speaker", "")), str(exact_text or ""))):
                 errors.append(issue("vocal_event_prompt_evidence_missing", "Final-text vocal evidence must identify the speaker and exact event content.", event_id=event_id))
+        presentation = event.get("presentation")
+        presentations = presentation if isinstance(presentation, list) else [presentation] if presentation is not None else []
+        if presentation is not None and len(presentations) != allowed:
+            errors.append(issue("vocal_presentation_count_mismatch", "Provide one presentation record per approved occurrence of this vocal content.", event_id=event_id))
+        for presentation in presentations:
+            allowed_sync = {
+                "on_screen": {"required", "not_visible"},
+                "off_screen": {"not_visible"},
+                "voiceover": {"forbidden", "not_visible"},
+            }
+            if not isinstance(presentation, dict):
+                errors.append(issue("vocal_presentation_invalid", "Voice presentation must be a mapping.", event_id=event_id))
+                continue
+            placement, sync = presentation.get("placement"), presentation.get("lip_sync")
+            if not isinstance(placement, str) or not isinstance(sync, str) or sync not in allowed_sync.get(placement, set()):
+                errors.append(issue("vocal_presentation_conflict", "Voice placement and visible lip synchronization disagree.", event_id=event_id))
+            shot_id, span = presentation.get("shot_id"), presentation.get("span")
+            blocks = data.get("prompt_shots")
+            block = blocks.get(shot_id) if isinstance(blocks, dict) and isinstance(shot_id, str) else None
+            if (
+                not isinstance(block, str) or not block.strip() or prompt_text.count(block) != 1
+                or not isinstance(span, str) or not span.strip() or block.count(span) != 1
+                or not all(value in span for value in (str(event.get("speaker", "")), str(exact_text or "")))
+            ):
+                errors.append(issue("vocal_presentation_evidence_missing", "Voice presentation needs speaker and event content together in its exact shot-local evidence span.", event_id=event_id))
     for reaction in data.get("silent_reaction_beats", []) or []:
         if not isinstance(reaction, dict):
             continue
@@ -1879,6 +2030,7 @@ def validate_video_prompt_path(
     registry: Path = DEFAULT_REGISTRY,
     character_limit: int = 10_000,
     trace_path: Path | None = None,
+    source_review: bool = False,
 ) -> list[dict[str, Any]]:
     registry_data, registry_errors = load_adapter_registry(registry)
     errors = list(registry_errors)
@@ -1902,6 +2054,8 @@ def validate_video_prompt_path(
     text = path.read_text(encoding="utf-8")
     errors.extend(validate_prompt_text(text, character_limit))
     errors.extend(validate_serialization_ownership(data, text, registry))
+    if source_review and trace_path is None:
+        errors.append(issue("source_review_missing", "--source-review requires a current-scope --trace."))
     if trace_path is not None:
         trace = load_yaml(trace_path)
         trace_version = trace.get("core_version") if isinstance(trace, dict) else None
@@ -1911,6 +2065,8 @@ def validate_video_prompt_path(
         if version_match is None or tuple(map(int, version_match.groups())) < (4, 2, 0) or trace_version != current_core_version or trace.get("prompt") != text:
             errors.append(issue("video_trace_mismatch", "A v4.2+ compile trace must carry the exact final prompt text and a v4.2+ Core version."))
         else:
+            if source_review:
+                trace = {**trace, "source_review_required": True}
             errors.extend(validate_compile_trace(trace))
     return errors
 
@@ -2017,6 +2173,7 @@ def main() -> int:
     video_prompt_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     video_prompt_parser.add_argument("--character-limit", type=int, default=10_000)
     video_prompt_parser.add_argument("--trace", type=Path, help="Optional current-scope compile trace for final-text performance and vocal checks.")
+    video_prompt_parser.add_argument("--source-review", action="store_true", help="Require source-bound, shot-local semantic evidence in --trace.")
 
     keyframe_prompt_parser = subparsers.add_parser("keyframe-prompt")
     keyframe_prompt_parser.add_argument("path", type=Path)
@@ -2059,6 +2216,7 @@ def main() -> int:
                 args.registry,
                 args.character_limit,
                 args.trace,
+                args.source_review,
             ),
             args.json,
         )
