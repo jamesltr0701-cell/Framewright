@@ -1,0 +1,44 @@
+{
+  "core_version": "4.2.2",
+  "scope": "planning_only",
+  "initial_cases": 8,
+  "initial_parent_assessment": {
+    "satisfactory": [
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07"
+    ],
+    "partial": [
+      "B08"
+    ]
+  },
+  "observed_gap": "B08 invented a three-shot retained count where the approved plan was unavailable.",
+  "repair": "Reuse the approved retained-shot plan; recommend setup/handoff only until unavailable locks are supplied; do not infer count or redistribute rhythm.",
+  "isolated_followup": {
+    "case": "B08",
+    "parent_assessment": "satisfactory",
+    "observed_behavior": "The setup/handoff is planned, retained count is not inferred, and the actual locked plan is requested before freezing."
+  },
+  "artifacts": {
+    "testing/next-local/blocking_establishment_raw_requests.md": "90470f33f7525eba2f0bfbe41c18b37789f6daa47d83d6b439eb27d0058b5669",
+    "testing/next-local/blocking-establishment/initial-review.md": "01158f011f834e6b5547edacd72113670af843e3a6c8de586532cd55b0d4883a",
+    "testing/next-local/blocking-establishment/b08-followup-review.md": "3a82fc1b58d4a93c7cf9a8c9865932836cccf86aae2567497f7cb50c2e93f80f"
+  },
+  "core_sha256": "102a815bffbb831b72686a9bff863174e04bb7f35964b5eeb505e9939fec13b3",
+  "existing_checks": {
+    "regression_fixtures": "140/140",
+    "mutation_and_installation_tests": 18,
+    "skill_format": "pass",
+    "whitespace": "pass"
+  },
+  "limits": [
+    "The initial eight cases share one independent reviewer; the follow-up uses a fresh reviewer and the unchanged B08 request alone.",
+    "One planning sample per case; no baseline comparison or reliability statistics.",
+    "No model-facing prompt compilation, adapter route test, media generation, or measured visual-continuity result.",
+    "Parent judgments evaluate source constraints; they are not automated aesthetic scores."
+  ]
+}

@@ -2,8 +2,8 @@
 
 This directory stores immutable, version-numbered Framewright release snapshots.
 
-Current release for director trial: `framewright-v4.2.1.md`.
-Rollback release: `framewright-v4.2.0.md`; the complete Skill is preserved by Git tag `v4.2.0`.
+Current release for director trial: `framewright-v4.2.2.md`.
+Rollback release: `framewright-v4.2.1.md`; the complete Skill is preserved by Git tag `v4.2.1`. Earlier snapshots and tags, including v4.2.0, remain intact.
 
 For every patch or feature release:
 

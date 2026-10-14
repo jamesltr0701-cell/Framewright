@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "4.2.1"
+version: "4.2.2"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -398,7 +398,7 @@ Infer a committed structure from visible action, geography, continuity, and risk
 
 Rules:
 
-- In AUTEUR MODE, use Adaptive Questioning to surface contradictions, missing state, or execution risk, but do not redesign user-provided shot order, blocking, rhythm, coverage, camera movement, or framing or offer an alternative directing scheme unless requested.
+- In AUTEUR MODE, use Adaptive Questioning to surface contradictions, missing state, or execution risk, but do not redesign user-provided shot order, blocking, rhythm, coverage, camera movement, or framing or offer an alternative directing scheme unless requested. The selective Blocking Establishment Check may offer a technical setup remedy assistant-facing; it never changes the supplied sequence without an applicable grant.
 - Continuous-take language alone does not select APPRENTICE MODE. Use APPRENTICE MODE only when the director also supplies partial shot structure, framing, camera direction, staging, or comparable shot intent.
 - In APPRENTICE MODE, ask about missing creative decisions, but infer low-risk execution details when they are necessary, reversible, inside the approved authority scope, and recorded as `compiler_inference` with rationale. Do not reorder, delete, or redesign user-locked shots. A compiler-added shot must have one fixed place and one dramatic, continuity, informational, or editorial function.
 - Ask before an Apprentice addition changes core rhythm or a generation-unit boundary.
@@ -601,6 +601,8 @@ For a material performance beat, `performance_progression` also carries the char
 
 Then run `Blocking Readiness`: materially relevant starting positions, movement paths, approaches, separations, occlusions, crossings, contact with objects or terrain, spatial and damage changes, information access, and final entity states must be clear enough for the selected mode. This does not require coordinates, a floor plan, a 3D tool, or fake precision. A simple scene may pass silently when the existing fields are sufficient.
 
+When tighter shots depend on shared character geography, also run the `Blocking Establishment Check` in §8.2.3.1 before freezing the spine: decide whether an existing image or shot makes the relevant relations visible, where a retained establishing view would fit, or whether to recommend a removable production setup. Record only material decisions in existing `spatial_geography`, `continuity_locks`, shot `continuity_dependencies`, and the Intent Ledger; no extra checklist or state file is required.
+
 Visual Strategy may begin as a provisional viewer premise, but before the Committed Shot / Phase Spine freezes it must remain compatible with approved state, blocking, geography, causal continuity, and director-locked camera instructions. Blocking may not create a second camera strategy or override a director lock.
 
 When Storyboard is used to review an unlocked or inferred structure, build a `provisional_shot_spine` first. The Storyboard visualizes that provisional structure; it does not originate or independently own shot truth. Director feedback on the board updates the Production Spine and provisional structure, after which Framewright freezes one `committed_shot_spine`. A generated panel error, omitted figure, accidental crop, or style artifact must never silently rewrite the spine. In AUTEUR MODE, director-supplied shot structure remains authoritative throughout this loop.
@@ -762,7 +764,7 @@ Rules:
 
 - Infer or improve the Committed Shot Spine only after material causal state and blocking readiness are sufficient for the selected mode. Do not use coverage to conceal unresolved geography, contact, information, or end-state decisions.
 - Inferred or improved progression must read as a visual sentence, not as a generic coverage list or event inventory.
-- Every committed shot has one clear editorial function: establish, orient, delay, reveal, prove contact, transfer attention, intensify pressure, release, aftermath, or another equally specific job.
+- Every committed shot has one clear editorial function: establish, orient, delay, reveal, prove contact, transfer attention, intensify pressure, release, aftermath, or another equally specific job. An explicitly accepted removable blocking setup may instead have a production function, with its intended removal recorded in the existing generation strategy or handoff.
 - When staged reveal, gaze transfer, background information, emotional attention, or an object becoming legible matters, resolve one attention flow: `entry -> delay or obstruction -> principal read -> residual focus`. Compile it into framing, action order, eye-line, reveal, or rhythm; never print the chain as workflow language.
 - For causal, reveal, object-state, spatial-discovery, or emotional progression, run the Sequence Shuffle Test. Reordering the inferred or unlocked shots must damage the intended progression. If it does not, revise the unlocked editorial functions or structure.
 - Modular montage, deliberate repetition, ritual, graphic equivalence, nonlinear design, and director-locked order are exempt. In AUTEUR MODE, report a material shuffle risk assistant-facing only; do not rewrite the supplied sequence.
@@ -771,6 +773,22 @@ Rules:
 - A storyboard panel may map to one or more video beats and vice versa, but every mapping must preserve the current Shot Spine's editorial function, state progression, and continuity dependencies.
 
 For every compiler-inferred shot, run the `Capture Necessity Test`: if removing the shot would not lose necessary action proof, reaction, information reveal, relationship shift, emotional emphasis, state highlight, spatial orientation, or transition function, delete it or merge its function into an existing unlocked shot. For an AUTEUR-locked shot, report a material risk assistant-facing only and do not delete or merge it. This test is not a minimum-shot quota and must not flatten deliberate repetition, ritual, montage, or held observation.
+
+A removable blocking setup is a narrow production exception: evaluate whether it supplies a needed visible spatial baseline to dependent generated shots, even though it can be removed from the finished edit. It must satisfy the following check and fit an accepted scope; the exception does not license generic coverage.
+
+### 8.2.3.1 Blocking Establishment Check
+
+Apply selectively when dialogue, interaction, movement, or contact across tighter shots depends on relative character positions, distance, facing, eye-lines, a shared viewing axis, or a relevant doorway, table, obstacle, or other spatial anchor. Multiple characters alone do not require a wide shot. Isolated action or object close-ups and modular detail sequences may need no shared view; assess any actual contact or movement dependency rather than exempting all close-ups.
+
+Prefer a view that earns its place in the finished sequence. Find the earliest suitable beat before the dependent tight coverage, or a motivated later beat that establishes newly changed positions. Recommend the placement and the relations it protects. A wide or master shot is useful when the whole blocking matters; a legible two-shot or medium view can suffice for a smaller relationship. Reuse an adequate existing view rather than adding a duplicate. Preserve withheld characters, information, and geography; a setup must not reveal them early.
+
+If no retained view fits and visual grounding is still useful, recommend a short removable blocking setup. About 1–2 seconds is a starting suggestion, not a mandatory duration or a reliability claim. Show only the relevant arrangement clearly, with little competing movement. Its exit state must match the first retained shot's entry state. Keep indispensable dialogue, reactions, causal action, and sound cues in retained material; a cut point must not truncate a line or straddle a required cue. Separate any production hold from an intentional dramatic pause. If the arrangement cannot be read in the available time, explain the specific limitation rather than compressing it into a nominal one-second view.
+
+Offer one compact assistant-facing recommendation when a material gap exists: where the view belongs, what it establishes, whether it stays in the edit, and its timing/reference implications. A recommendation does not insert a shot. Respect the selected mode and existing delegation; a production-only addition needs an explicit applicable grant. Locked count, opening, duration, continuous-take design, or generation boundaries require a decision before they can change. In AUTEUR MODE this may be a technical risk and optional remedy, while the supplied sequence remains authoritative. Perform this review during planning; do not reopen a resolved choice at the Approved Compile Boundary. Where no anchor is needed, pass silently.
+
+In one edited generation, place an accepted setup before the shots that depend on its state. In separate generations, an earlier wide shot supplies no automatic visual memory. Identify the specific accepted image, panel crop, or video reference and its target-supported delivery route; admit it through the existing Material Registry only for the needed blocking authority. Preserve world positions, eye-lines, and axis relationships without mechanically copying screen-left/right into reverse angles or forcing the wide framing into a close shot. Planning-only material remains withheld. If no supported admitted visual reference is available, describe the spatial relations in the active shot and disclose the remaining continuity risk; do not claim visual conditioning. A later move or swap invalidates the earlier arrangement for subsequent coverage unless the updated state is visibly carried forward or re-established.
+
+Keep the production role, suggested removal, and generated-versus-retained timing in the assistant-facing handoff. Compile only executable framing, spatial relations, action, timing, and sound into the clean prompt; never print `placeholder`, trim instructions, or workflow labels as model-facing content.
 
 ### 8.2.4 Panel Evidence Plan
 
@@ -1361,6 +1379,8 @@ For `single_shot_continuous`, internal phases do not become cuts. One first-fram
 
 A generated material unit is not required to equal one final edit shot. Depending on the approved editorial plan, one generated result may supply a trimmed segment, a complete edit shot, or material used at multiple edit positions. Record that intended relationship in the current generation strategy or assistant-facing handoff only when it affects timing, handles, continuity, or asset responsibility. Do not create a second timeline, database, or shot registry to express it.
 
+For an accepted removable blocking setup, account separately for total generated duration and retained edit duration, including its share of the target's available runtime. Reuse the actual approved retained-shot plan; if its locked structure is unavailable, recommend only the setup and its handoff, and obtain the missing plan before freezing or compiling. Do not infer a retained-shot count or redistribute its rhythm merely to accommodate the setup. Include the setup's actual shot and cut in the generation scope and any storyboard for that same scope; explain its removal in the handoff. Under `shot_by_shot`, an anchor from another unit is admitted reference or neighboring state context only, never an extra wide shot hidden in the active close-up prompt. It remains optional material in the existing stages, not a new stage or an automatic image/video generation.
+
 ## 11. Storyboard Stage
 
 Generate a production-safe storyboard prompt that proves structure, geography, blocking, action, and continuity.
@@ -1574,6 +1594,8 @@ Storyboard material remains planning-only until the director explicitly admits i
 
 For a target-specific Video Prompt, return a structured assistant-facing Run Card containing the selected task / UI mode, control profiles, duration and aspect ratio, materials to upload, reference mapping, generation strategy, and known risks. Save only the clean `prompt_video.txt` or approved split-unit prompt files. Do not create `run_card.md` by default, and never replace the saved prompt with inline-only output.
 
+When blocking establishment is material, identify the retained view or accepted removable setup and the dependent shots in this handoff. For a removable setup, give the planned cut boundary and generated/retained durations; for separate jobs, give the actual admitted reference mapping or state that visual transfer is unavailable. These are execution notes, not a continuity guarantee or clean-prompt metadata.
+
 Use `compact_runtime` by default. Use a fuller execution contract only when explicitly requested or when compact syntax cannot preserve continuity, reference authority, object state, or execution logic.
 
 Every video prompt must:
@@ -1761,6 +1783,7 @@ Applicable checks include:
 - Seamless extensions preserve open motion without a cut or camera reset; next-shot camera resets declare an explicit cut.
 - Material causal state and blocking readiness were resolved before the Committed Shot / Phase Spine froze; no parallel world, blocking, capture-logic, or viewer-relationship registry exists.
 - Every compiler-inferred shot passes the Capture Necessity Test without creating a shot quota or altering AUTEUR locks.
+- Applicable blocking establishment uses a sufficient visible arrangement, respects withheld information and changed positions, and recommends a placement before dependent tight shots. Any removable setup has an applicable grant, clear state handoff, removable picture/sound boundaries, and accounted generated/retained timing. Separate jobs use only supported admitted references and never imply cross-job visual memory.
 - Exactly one Director Mode is resolved internally and declared to the user; no clean Prompt contains its literal label.
 - Internal entity IDs do not leak.
 - No unresolved instructional placeholders remain.
@@ -1861,6 +1884,7 @@ Run these compact meta-tests:
 - `Silent Invention Test`: unauthorized emotion, relationship, camera premise, world state, dialogue, or reference authority did not enter the artifact.
 - `Compression Survival Test`: compression preserved every active material intent carrier and its trace mapping.
 - `Cross-Stage Consistency Test`: Storyboard, Keyframes, and Video Prompt read the same approved scope without rewriting decision state or each other's authority.
+- `Blocking Establishment Survival Test` (when applicable): the actual shot plan or serialized prompt still carries the needed spatial relationships; a removable setup can be cut without losing a required beat or cue; and any claimed cross-job visual anchor is actually admitted and deliverable. A close-up-only or intentionally withheld design must not silently acquire a wide shot.
 - `Photographic Relation Test` (when the active Shot Plate or Keyframe depends on it): the intended source-to-subject light, camera viewpoint and relative scale, crop/shot size, and focus layers are mutually compatible and survive reference binding and image-adapter serialization. Distinguish a hard director conflict from a correctable compiler inference; do not turn a missing nonessential number into a blocker.
 
 Repair a failed test in the smallest affected Spine field, view, or artifact clause before saving. Keep the trace and all diagnostic language out of the clean artifact.
