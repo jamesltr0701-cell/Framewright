@@ -24,6 +24,8 @@ The v4.2.1 patch strengthens source-to-prompt checks for scoped performance chan
 
 The **v4.2.2 release** adds selective blocking establishment: a retained establishing view when suitable, an explicitly accepted removable setup when needed, and explicit reference transfer for separate generations. It preserves approved shot structure, withheld information, state handoffs, and generated-versus-retained timing. v4.2.1 remains the complete rollback release. [Validation and limits](versions/iterations/framewright-v4.2.2-blocking-establishment-release-report.md) cover planning behavior; improved generated-video continuity has not been measured.
 
+The same-version [opening-anchor correction](versions/iterations/framewright-v4.2.2-opening-anchor-correction.md) requires a needed generated blocking anchor to be the first shot of each applicable generation unit. A later wide shot can re-establish changed positions but cannot replace the opening baseline. Use current `main` for this corrected v4.2.2 package; the original `v4.2.2` tag remains preserved.
+
 ## You direct. Framewright compiles.
 
 | You decide | Framewright handles |
@@ -111,7 +113,7 @@ After installation, invoke the Skill explicitly with `$framewright`.
 
 ## Versioning and development
 
-GitHub `main` is the source of truth for the synchronized current release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching immutable 4.2.2 snapshot is [`versions/releases/framewright-v4.2.2.md`](versions/releases/framewright-v4.2.2.md). The `v4.2.1` tag preserves the complete earlier Skill for rollback, including its adapters and validator. Older snapshots and tags remain available.
+GitHub `main` is the source of truth for the synchronized current release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching corrected 4.2.2 snapshot is [`versions/releases/framewright-v4.2.2.md`](versions/releases/framewright-v4.2.2.md). The [initial 4.2.2 snapshot](versions/releases/framewright-v4.2.2-initial.md) and original `v4.2.2` tag preserve the pre-correction release. The `v4.2.1` tag preserves the complete earlier Skill for rollback, including its adapters and validator. Older snapshots and tags remain available.
 
 Promoted releases preserve older snapshots. Experimental candidates may remain isolated on local branches and do not become stable releases until separately approved. Desktop mirror and local-install synchronization are maintainer concerns; they do not change the public Skill interface.
 
