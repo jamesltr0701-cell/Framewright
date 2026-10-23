@@ -4,15 +4,19 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
 VALIDATOR="$REPO_ROOT/skill/framewright/scripts/validate_framewright.py"
-PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/python/yaml-runtime/bin/python}
+PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-python3}
 
-"$PYTHON_BIN" -c "import yaml"
+if ! "$PYTHON_BIN" -c "import yaml"; then
+  echo 'Use a project-local Python environment with PyYAML and set FRAMEWRIGHT_PYTHON to its interpreter.' >&2
+  exit 1
+fi
 "$PYTHON_BIN" "$VALIDATOR" core \
   --core "$REPO_ROOT/skill/framewright/references/framewright.md" \
   --skill "$REPO_ROOT/skill/framewright/SKILL.md" \
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/seedance_2_0.md" \
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/seedance_2_5.md" \
   --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/minimax_h3.md" \
+  --profile "$REPO_ROOT/skill/framewright/references/runtime_profiles/kling_4_0.md" \
   --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/midjourney_v8_2.md" \
   --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/gpt_image_2_5.md" \
   --image-profile "$REPO_ROOT/skill/framewright/references/keyframe_profiles/gpt_image_2_5_edit.md" \
@@ -21,10 +25,11 @@ PYTHON_BIN=${FRAMEWRIGHT_PYTHON:-/Users/jameslee/Documents/Codex/_shared-tools/p
   --manifest "$SCRIPT_DIR/expected/protected_anchors.yaml"
 "$PYTHON_BIN" "$VALIDATOR" regression "$SCRIPT_DIR/fixtures"
 PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_source_review.py"
+PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_kling_4_0.py"
 
-PROMPT_PATH=$(mktemp /private/tmp/framewright-seedance20-adapter.XXXXXX)
-KEYFRAME_PROMPT_PATH=$(mktemp /private/tmp/framewright-midjourney-v82-adapter.XXXXXX)
-STORYBOARD_PROMPT_PATH=$(mktemp /private/tmp/framewright-image25-storyboard-adapter.XXXXXX)
+PROMPT_PATH=$(mktemp "${TMPDIR:-/tmp}/framewright-seedance20-adapter.XXXXXX")
+KEYFRAME_PROMPT_PATH=$(mktemp "${TMPDIR:-/tmp}/framewright-midjourney-v82-adapter.XXXXXX")
+STORYBOARD_PROMPT_PATH=$(mktemp "${TMPDIR:-/tmp}/framewright-image25-storyboard-adapter.XXXXXX")
 trap 'rm -f -- "$PROMPT_PATH" "$KEYFRAME_PROMPT_PATH" "$STORYBOARD_PROMPT_PATH"' EXIT HUP INT TERM
 printf '%s\n' 'A woman crosses the room. Quiet ventilation and synchronized footsteps; no music.' > "$PROMPT_PATH"
 "$PYTHON_BIN" "$VALIDATOR" video-prompt "$PROMPT_PATH" \

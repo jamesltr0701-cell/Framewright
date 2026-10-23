@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "4.2.2"
+version: "4.2.3"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -14,6 +14,7 @@ video_target_models:
   - "Seedance 2.0"
   - "Seedance 2.5"
   - "MiniMax H3"
+  - "Kling 4.0"
 output_stages:
   - "storyboard"
   - "keyframes"
@@ -1289,6 +1290,8 @@ For Seedance 2.0 and Seedance 2.5, `@` is a structured asset-mention operation, 
 Every native mention must map to one active runtime material, and every mapped active material must be used. Count plain-text surrogates against the character limit. Do not include upload instructions in the clean prompt.
 
 For MiniMax H3, use only its registered `<Subject N>`, `<Picture N>`, `<Video N>`, and `<Audio N>` labels. Generic `{{HANDLE}}` aliases are not valid H3 serialization.
+
+For Kling 4.0, the registered adapter owns actual upload mentions, voice-profile binding, and the separate Omni Reference / Keyframes entry contracts. Do not carry Seedance audio punctuation or H3 semantic labels into Kling serialization; Standard 4.0 and Flash are distinct targets.
 
 For MiniMax H3, the loaded profile owns its semantic label system (`<Subject N>`, `<Picture N>`, `<Video N>`, and `<Audio N>`). These labels describe prompt-local subject and source relationships; they are not upload-order handles, API asset IDs, or replacements for stable Material Registry identity. Use them only after the director explicitly selects H3 and map each label to the intended active material in the Run Card.
 

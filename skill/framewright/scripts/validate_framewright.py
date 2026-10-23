@@ -129,7 +129,7 @@ ENDPOINT_PURPOSES = {
     "edit_point",
     "reveal_or_payoff",
 }
-NATIVE_BINDING_ADAPTERS = {"seedance_2_0", "seedance_2_5", "minimax_h3"}
+NATIVE_BINDING_ADAPTERS = {"seedance_2_0", "seedance_2_5", "minimax_h3", "kling_4_0"}
 GENERATION_STRATEGIES = {
     "single_shot_continuous",
     "edited_sequence_single_generation",
@@ -190,6 +190,7 @@ OWNERSHIP_PROMPT_TERMS = (
     "framewright_adapter_seedance_2_0",
     "framewright_adapter_seedance_2_5",
     "framewright_adapter_minimax_h3",
+    "framewright_adapter_kling_4_0",
 )
 PLATFORM_SERIALIZER_KEY_RE = re.compile(
     r"(?:platform|surface|provider|jimeng|libtv).*(?:dialect|serializ|owner)"
@@ -372,6 +373,7 @@ def ownership_validation_required(data: dict[str, Any]) -> bool:
             "core_native_profile_contract",
             "seedance25",
             "minimax_h3",
+            "kling40",
         )
     )
 
@@ -445,6 +447,8 @@ def validate_serialization_ownership(
         if expected_adapter == "seedance_2_5"
         else isinstance(data.get("minimax_h3"), dict)
         if expected_adapter == "minimax_h3"
+        else isinstance(data.get("kling40"), dict)
+        if expected_adapter == "kling_4_0"
         else data.get("adapter_profile_contract") == expected_adapter
     )
     if not matching_contract and data.get("adapter_profile_contract") != expected_adapter:
@@ -453,6 +457,10 @@ def validate_serialization_ownership(
         expected_adapter == "seedance_2_5" and "minimax_h3" in data
     ) or (
         expected_adapter == "minimax_h3" and "seedance25" in data
+    ) or (
+        expected_adapter == "kling_4_0" and any(key in data for key in ("seedance20", "seedance25", "minimax_h3"))
+    ) or (
+        expected_adapter != "kling_4_0" and "kling40" in data
     )
     if foreign_contract:
         errors.append(issue("adapter_profile_contract_mismatch", "A foreign adapter profile contract is present."))
@@ -1297,6 +1305,118 @@ def validate_source_review(data: dict[str, Any]) -> list[dict[str, Any]]:
     return errors
 
 
+def validate_kling40(data: Any, prompt: str) -> list[dict[str, Any]]:
+    """Check declared web-entry facts; unknown measurements are not verified.
+
+    This does not inspect uploaded pixels, infer a Kling tokenizer, or assess
+    prompt semantics. Limits come from the 2026-10-14 official 4.0 guide.
+    """
+    if not isinstance(data, dict):
+        return [issue("kling_contract_missing", "Kling 4.0 requires a current runtime qualification mapping.")]
+    errors: list[dict[str, Any]] = []
+
+    def reject(code: str, message: str, **context: Any) -> None:
+        errors.append(issue("kling_" + code, message, **context))
+
+    def number(value: Any) -> bool:
+        return type(value) in (int, float) and float("-inf") < value < float("inf")
+
+    if data.get("explicit_target_selection") is not True:
+        reject("target_not_explicit", "Select Standard Kling 4.0 explicitly; Flash is not an alias.")
+    entry, task = data.get("entry"), data.get("task")
+    if not isinstance(entry, str) or entry not in {"omni_reference", "keyframes"}:
+        reject("entry_invalid", "Choose exactly one verified Kling web entry.")
+    if not isinstance(task, str) or task not in {"generate", "edit"} or (task == "edit" and entry != "omni_reference"):
+        reject("task_invalid", "Video editing requires Omni Reference.")
+    duration = data.get("duration_seconds")
+    if type(duration) is not int or not 3 <= duration <= 30:
+        reject("duration_invalid", "Standard 4.0 duration must be an integer from 3 through 30.")
+    if not isinstance(data.get("resolution"), str) or data["resolution"] not in {"720p", "1080p", "4K"}:
+        reject("resolution_invalid", "Unsupported Standard 4.0 resolution.")
+    tokens = data.get("prompt_token_count")
+    if tokens is not None and (type(tokens) is not int or not 0 < tokens <= 8000):
+        reject("token_limit", "A supplied Kling token count must be between 1 and 8,000; characters are not tokens.")
+
+    bindings = data.get("input_bindings")
+    if not isinstance(bindings, list):
+        reject("bindings_invalid", "Input bindings must be an explicit list, empty for text-only work.")
+        bindings = []
+    counts = {kind: 0 for kind in ("image", "video", "image_element", "video_element", "voice_profile")}
+    mentions: list[str] = []
+    primary = 0
+    times: list[float] = []
+    video_seconds = 0.0
+    for index, binding in enumerate(bindings):
+        if not isinstance(binding, dict):
+            reject("binding_invalid", "Each binding must be a mapping.", index=index)
+            continue
+        kind, role = binding.get("kind"), binding.get("role")
+        if not isinstance(kind, str) or kind not in counts:
+            reject("input_kind_invalid", "Unsupported input kind; arbitrary audio is not a voice profile.", index=index)
+            continue
+        counts[kind] += 1
+        if not all(binding.get(key) for key in ("material_key", "allowed_authority", "denied_authority")):
+            reject("authority_missing", "Each input needs a stable identity and scoped authority.", index=index)
+        mention = binding.get("native_mention")
+        if not isinstance(mention, str) or not mention.startswith("@") or not mention.strip("@ "):
+            reject("mention_invalid", "Bind the actual uploaded asset or selected voice-profile mention.", index=index)
+        else:
+            mentions.append(mention)
+            if kind in {"image", "video"} and not re.fullmatch(r"@" + kind.title() + r"\s*[1-9]\d*", mention):
+                reject("mention_kind", "Image/video mentions must match their actual media kind.", index=index)
+            if mention not in prompt:
+                reject("binding_unused", "Admitted input has no reference in the final prompt.", mention=mention)
+        if entry == "keyframes":
+            if kind != "image" or not isinstance(role, str) or role not in {"first_frame", "middle_frame", "last_frame"}:
+                reject("entry_role_conflict", "Dedicated Keyframes accepts image-keyframe inputs only.", index=index)
+            at = binding.get("time_seconds")
+            if not number(at) or not number(duration) or not 0 <= at <= duration:
+                reject("keyframe_time", "Keyframe time must lie within the output duration.", index=index)
+            else:
+                times.append(float(at))
+                if (role == "first_frame" and at != 0) or (role == "last_frame" and at != duration) or (role == "middle_frame" and not 0 < at < duration):
+                    reject("keyframe_role_time", "Keyframe role and timestamp disagree.", index=index)
+        elif entry == "omni_reference":
+            allowed = {"voice"} if kind == "voice_profile" else {"reference", "edit_base"} if kind == "video" else {"reference"}
+            if not isinstance(role, str) or role not in allowed:
+                reject("entry_role_conflict", "Omni reference roles cannot masquerade as dedicated timeline slots.", index=index)
+        if role == "edit_base":
+            primary += 1
+        media_duration = binding.get("duration_seconds")
+        if media_duration is not None:
+            limits = {"video": (3, 30), "video_element": (3, 8), "voice_profile": (5, 30)}.get(kind)
+            if limits and (not number(media_duration) or not limits[0] <= media_duration <= limits[1]):
+                reject("media_duration", "Declared source duration is outside its input-kind limit.", index=index)
+            if kind in {"video", "video_element"} and number(media_duration):
+                video_seconds += media_duration
+        size = binding.get("size_mb")
+        size_limit = {"image": 30, "video": 300, "voice_profile": 50}.get(kind)
+        if size is not None and size_limit is not None and (not number(size) or not 0 < size <= size_limit):
+            reject("media_size", "Declared source size is outside its input-kind limit.", index=index)
+        ratio = binding.get("aspect_ratio")
+        if ratio is not None and kind in {"image", "video"} and (not number(ratio) or not 0.4 <= ratio <= 2.5):
+            reject("media_aspect", "Declared input aspect must be within 2:5–5:2.", index=index)
+    if len(mentions) != len(set(mentions)):
+        reject("mention_duplicate", "Each uploaded mention must map to one binding.")
+    used = {m.group(0) for m in re.finditer(r"@(?:Image|Video|Element)\s*[1-9]\d*", prompt)}
+    if used - set(mentions):
+        reject("mention_unmapped", "Final prompt refers to undeclared uploads.", values=sorted(used - set(mentions)))
+    if len(times) != len(set(times)):
+        reject("keyframe_time_conflict", "Two distinct keyframe inputs occupy the same instant.")
+    if primary != (1 if task == "edit" else 0):
+        reject("edit_base_count", "Edit requires exactly one primary video; generation has none.")
+    video_count = counts["video"] + counts["video_element"]
+    if video_count > 5 or video_seconds > 30:
+        reject("video_pool_limit", "Reference, edit and element videos share five clips and thirty seconds.")
+    if counts["image"] > 10 or counts["voice_profile"] > 3 or counts["video_element"] > 3 or counts["image_element"] + counts["video_element"] > 7 or len(bindings) > 15:
+        reject("asset_limit", "The selected input set exceeds a per-kind or combined asset limit.")
+    concrete = {"21:9", "16:9", "1:1", "9:16"}
+    allowed_aspects = {"inherited"} if entry == "keyframes" and bindings else concrete | ({"Auto"} if entry == "omni_reference" else set())
+    if not isinstance(data.get("aspect_ratio"), str) or data["aspect_ratio"] not in allowed_aspects:
+        reject("aspect_invalid", "Omni uses a supported ratio/Auto; uploaded Keyframes inherit the first image ratio.")
+    return errors
+
+
 def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     prompt = data.get("prompt")
@@ -1305,7 +1425,7 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         errors.extend(
             validate_prompt_text(
                 prompt,
-                int(data.get("character_limit", 10_000)),
+                int(data.get("character_limit", max(len(prompt), 1) if data.get("adapter_id") == "kling_4_0" else 10_000)),
                 data.get("native_bindings"),
             )
         )
@@ -1338,6 +1458,9 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     minimax_h3 = data.get("minimax_h3")
     if minimax_h3 is not None:
         errors.extend(validate_minimax_h3(minimax_h3, prompt if isinstance(prompt, str) else ""))
+
+    if data.get("adapter_id") == "kling_4_0" or "kling40" in data:
+        errors.extend(validate_kling40(data.get("kling40"), prompt if isinstance(prompt, str) else ""))
 
     language_compaction = data.get("language_compaction")
     if language_compaction is not None:
@@ -2028,7 +2151,7 @@ def validate_video_prompt_path(
     profile_contract: str | None,
     compiler_sources: list[str] | None,
     registry: Path = DEFAULT_REGISTRY,
-    character_limit: int = 10_000,
+    character_limit: int | None = None,
     trace_path: Path | None = None,
     source_review: bool = False,
 ) -> list[dict[str, Any]]:
@@ -2052,10 +2175,15 @@ def validate_video_prompt_path(
         "compiler_instruction_sources": sources,
     }
     text = path.read_text(encoding="utf-8")
+    if character_limit is None:
+        token_budget = isinstance(record, dict) and record.get("prompt_budget_unit") == "tokens"
+        character_limit = max(len(text), 1) if token_budget else 10_000
     errors.extend(validate_prompt_text(text, character_limit))
     errors.extend(validate_serialization_ownership(data, text, registry))
     if source_review and trace_path is None:
         errors.append(issue("source_review_missing", "--source-review requires a current-scope --trace."))
+    if adapter_id == "kling_4_0" and trace_path is None:
+        errors.append(issue("kling_contract_missing", "Kling validation requires --trace with current kling40 qualification."))
     if trace_path is not None:
         trace = load_yaml(trace_path)
         trace_version = trace.get("core_version") if isinstance(trace, dict) else None
@@ -2065,6 +2193,8 @@ def validate_video_prompt_path(
         if version_match is None or tuple(map(int, version_match.groups())) < (4, 2, 0) or trace_version != current_core_version or trace.get("prompt") != text:
             errors.append(issue("video_trace_mismatch", "A v4.2+ compile trace must carry the exact final prompt text and a v4.2+ Core version."))
         else:
+            if adapter_id == "kling_4_0" and any(trace.get(key) != data.get(key) for key in ("target_model", "serialization_owner", "adapter_id")):
+                errors.append(issue("kling_trace_owner_mismatch", "Kling trace ownership must match the command's selected target."))
             if source_review:
                 trace = {**trace, "source_review_required": True}
             errors.extend(validate_compile_trace(trace))
@@ -2171,7 +2301,7 @@ def main() -> int:
     video_prompt_parser.add_argument("--profile-contract")
     video_prompt_parser.add_argument("--compiler-source", action="append")
     video_prompt_parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
-    video_prompt_parser.add_argument("--character-limit", type=int, default=10_000)
+    video_prompt_parser.add_argument("--character-limit", type=int, help="Optional operator character budget; does not substitute for a model token limit.")
     video_prompt_parser.add_argument("--trace", type=Path, help="Optional current-scope compile trace for final-text performance and vocal checks.")
     video_prompt_parser.add_argument("--source-review", action="store_true", help="Require source-bound, shot-local semantic evidence in --trace.")
 

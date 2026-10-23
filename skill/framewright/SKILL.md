@@ -5,7 +5,7 @@ description: Preserve cinematic intent while compiling a scene idea, screenplay 
 
 # Framewright
 
-Current release: **v4.2.2**. Read the authoritative reference's version before compiling; the installed entrypoint and reference must agree.
+Current release: **v4.2.3**. Read the authoritative reference's version before compiling; the installed entrypoint and reference must agree.
 
 Use Framewright as a director-steered, intent-preserving cinematic compiler whose primary executable output is a prompt artifact for AI filmmaking pre-production.
 
@@ -20,6 +20,7 @@ For Video Prompt, first compile the approved Production Spine into the model-neu
 - Seedance 2.0: `references/runtime_profiles/seedance_2_0.md`
 - Seedance 2.5: `references/runtime_profiles/seedance_2_5.md`
 - MiniMax H3: `references/runtime_profiles/minimax_h3.md`
+- Kling 4.0: `references/runtime_profiles/kling_4_0.md`; Standard 4.0 only, not Flash.
 
 Do not infer a target model from supplied media, prompt style, platform, provider, surface, or profile availability. Target model—not platform—selects the dialect. Load exactly one adapter profile for exactly one target. If the requested target is unsupported or ambiguous, ask one compact target-model question. An adapter may qualify feasibility and serialize the approved Prompt IR, but it may not reinterpret creative intent, modify the IR, or override the authoritative reference, director locks, state, stage, or compiler ownership.
 
@@ -30,6 +31,10 @@ For Storyboard, Shot Plate, or Keyframe work, first read `references/keyframe_pr
 Framewright is the exclusive compiler whenever the user explicitly invokes Framewright. Do not treat another installed model-prompt skill as an implicit compiler source and do not merge its rules into the active Framewright compile. A separately requested comparison may remain outside the clean artifact and must not change the active serialization owner.
 
 That selection remains active for follow-up advice, local revisions, and troubleshooting in the same work. Selecting a Seedance target does not select the external Seedance skill. If earlier conversation loaded external prompt rules, re-anchor the current task to the approved Spine, Core, and selected adapter; do not carry those external defaults forward as authority.
+
+## Optional director preferences
+
+Only when the user or active project explicitly selects Ran / 然哥 Profile, read `references/director_profiles/RAN_DIRECTOR_PROFILE.md` and apply its relevant preferences to unspecified decisions. Do not load it merely because it is bundled. It is personal director input, not a compiler instruction source or adapter; do not add it to `--compiler-source`, change the selected Director Mode, or infer generation authorization. Current instructions, approved shot choices and stricter sound limits take priority. A project may use its own selected profile path instead of this bundled copy.
 
 ## Integrated craft references
 

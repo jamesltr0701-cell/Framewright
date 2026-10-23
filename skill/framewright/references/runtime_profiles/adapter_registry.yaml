@@ -23,3 +23,9 @@ registered_targets:
     adapter_id: minimax_h3
     profile: minimax_h3.md
     overflow_language_strategy: lossless_zh_payload
+  kling_4_0:
+    serialization_owner: framewright_adapter_kling_4_0
+    adapter_id: kling_4_0
+    profile: kling_4_0.md
+    overflow_language_strategy: lossless_zh_payload
+    prompt_budget_unit: tokens

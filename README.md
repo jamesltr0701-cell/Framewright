@@ -10,7 +10,7 @@ Framewright turns approved director intent, production assets, and shot decision
 
 Framewright is not a one-click filmmaking system and it is not an autonomous AI director. It is a production tool for translating a resolved creative direction into clear, model-facing artifacts.
 
-`v4.2.2` · Codex Skill · Source available · Director trial
+`v4.2.3` · Codex Skill · Source available · Director trial
 
 ## What is Framewright?
 
@@ -24,7 +24,9 @@ The v4.2.1 patch strengthens source-to-prompt checks for scoped performance chan
 
 The **v4.2.2 release** adds selective blocking establishment: a retained establishing view when suitable, an explicitly accepted removable setup when needed, and explicit reference transfer for separate generations. It preserves approved shot structure, withheld information, state handoffs, and generated-versus-retained timing. v4.2.1 remains the complete rollback release. [Validation and limits](versions/iterations/framewright-v4.2.2-blocking-establishment-release-report.md) cover planning behavior; improved generated-video continuity has not been measured.
 
-The same-version [opening-anchor correction](versions/iterations/framewright-v4.2.2-opening-anchor-correction.md) requires a needed generated blocking anchor to be the first shot of each applicable generation unit. A later wide shot can re-establish changed positions but cannot replace the opening baseline. Use current `main` for this corrected v4.2.2 package; the original `v4.2.2` tag remains preserved.
+The same-version [opening-anchor correction](versions/iterations/framewright-v4.2.2-opening-anchor-correction.md) requires a needed generated blocking anchor to be the first shot of each applicable generation unit. A later wide shot can re-establish changed positions but cannot replace the opening baseline. This correction carries forward into v4.2.3; the original `v4.2.2` tag remains preserved.
+
+The **v4.2.3 release** adds Kling 4.0 Standard prompt compilation and the explicitly selected Ran director profile. It retains the existing blocking rules. See [validation and limits](versions/iterations/framewright-v4.2.3-kling-profile-release-report.md).
 
 ## You direct. Framewright compiles.
 
@@ -48,7 +50,7 @@ Completing one stage may inform a later stage, but it never starts that stage au
 
 ## Current model routes
 
-These are the registered Framewright 4.2.2 routes. A route is selected for the active artifact and operation; unlisted models are not implied to be supported.
+These are the registered Framewright 4.2.3 routes. A route is selected for the active artifact and operation; unlisted models are not implied to be supported.
 
 ### Image
 
@@ -64,9 +66,17 @@ When the active surface exposes an implementation-model selector, the GPT Image 
 
 | Artifact | Supported target routes |
 | --- | --- |
-| Video Prompt | Seedance 2.0 · Seedance 2.5 · MiniMax H3 |
+| Video Prompt | Seedance 2.0 · Seedance 2.5 · MiniMax H3 · Kling 4.0 Standard |
 
 Framewright compiles prompts for these registered routes. It does not bundle or require an external Seedance skill pack.
+
+The [Kling 4.0 adapter](skill/framewright/references/runtime_profiles/kling_4_0.md) covers the official Standard web workflow: Omni Reference generation/editing and the separate Keyframes entry. Flash and API integrations are not registered. Entry compatibility, shared video quotas and voice-profile bindings are checked; text validation does not establish generated-video quality.
+
+## Optional director profile
+
+The [然哥导演 Profile](skill/framewright/references/director_profiles/RAN_DIRECTOR_PROFILE.md) shares my personal preferences, including the EP04–5 additions on scene energy, interfering actions, background participants, meaningful wide shots and explicitly delegated exploration. It applies only when you or your project explicitly select it; Framewright does not impose these preferences on other directors.
+
+For example: `$framewright 选用然哥 Profile，用 Kling 4.0 为这场戏编写视频提示词。` The profile supplies director preferences; the selected target still owns serialization.
 
 ## Quick Start
 
@@ -113,7 +123,7 @@ After installation, invoke the Skill explicitly with `$framewright`.
 
 ## Versioning and development
 
-GitHub `main` is the source of truth for the synchronized current release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching corrected 4.2.2 snapshot is [`versions/releases/framewright-v4.2.2.md`](versions/releases/framewright-v4.2.2.md). The [initial 4.2.2 snapshot](versions/releases/framewright-v4.2.2-initial.md) and original `v4.2.2` tag preserve the pre-correction release. The `v4.2.1` tag preserves the complete earlier Skill for rollback, including its adapters and validator. Older snapshots and tags remain available.
+GitHub `main` is the source of truth for the synchronized current release. The canonical specification is versioned in [`skill/framewright/references/framewright.md`](skill/framewright/references/framewright.md); the matching immutable 4.2.3 snapshot is [`versions/releases/framewright-v4.2.3.md`](versions/releases/framewright-v4.2.3.md). The corrected [4.2.2 snapshot](versions/releases/framewright-v4.2.2.md) remains preserved. The [initial 4.2.2 snapshot](versions/releases/framewright-v4.2.2-initial.md) and original `v4.2.2` tag preserve the pre-correction release. The `v4.2.1` tag preserves the complete earlier Skill for rollback, including its adapters and validator. Older snapshots and tags remain available.
 
 Promoted releases preserve older snapshots. Experimental candidates may remain isolated on local branches and do not become stable releases until separately approved. Desktop mirror and local-install synchronization are maintainer concerns; they do not change the public Skill interface.
 

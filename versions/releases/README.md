@@ -2,10 +2,10 @@
 
 This directory stores version-numbered Framewright release snapshots and preserved original release bytes.
 
-Current release for director trial: `framewright-v4.2.2.md`.
+Current release for director trial: `framewright-v4.2.3.md` (Kling 4.0 Standard adapter and optional Ran director profile). The corrected `framewright-v4.2.2.md` snapshot remains preserved.
 Rollback release: `framewright-v4.2.1.md`; the complete Skill is preserved by Git tag `v4.2.1`. Earlier snapshots and tags, including v4.2.0, remain intact.
 
-The director explicitly requested the opening-anchor correction without changing v4.2.2. `framewright-v4.2.2.md` therefore reflects that correction; `framewright-v4.2.2-initial.md` and the existing `v4.2.2` tag preserve the original release. Use current `main` for the corrected package. This is a bounded exception to the normal immutable-snapshot policy, not a tag rewrite or a new version number.
+The director explicitly requested the opening-anchor correction without changing v4.2.2. `framewright-v4.2.2.md` therefore reflects that correction; `framewright-v4.2.2-initial.md` and the existing `v4.2.2` tag preserve the original release. That correction carries forward into v4.2.3. This was a bounded exception to the normal immutable-snapshot policy, not a tag rewrite.
 
 For every patch or feature release:
 
