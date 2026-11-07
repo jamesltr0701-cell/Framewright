@@ -74,7 +74,7 @@ The [Kling 4.0 adapter](skill/framewright/references/runtime_profiles/kling_4_0.
 
 ## Optional director profile
 
-The [然哥导演 Profile](skill/framewright/references/director_profiles/RAN_DIRECTOR_PROFILE.md) shares my personal preferences, including the EP04–5 additions on scene energy, interfering actions, background participants, meaningful wide shots and explicitly delegated exploration. It applies only when you or your project explicitly select it; Framewright does not impose these preferences on other directors.
+The [然哥导演 Profile](skill/framewright/references/director_profiles/RAN_DIRECTOR_PROFILE.md) shares my personal preferences and is synchronized through 2026-11-07. Alongside the EP04–5 preferences, it covers camera movement with blocking, handheld intensity and travel, casting identity during realistic rendering, editing uses for generated footage, and pacing. Its SINO-CYBER section applies to that series. Select the profile explicitly in your request or project rules.
 
 For example: `$framewright 选用然哥 Profile，用 Kling 4.0 为这场戏编写视频提示词。` The profile supplies director preferences; the selected target still owns serialization.
 
