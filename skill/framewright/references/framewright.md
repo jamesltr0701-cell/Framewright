@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "4.2.3"
+version: "4.2.4"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -765,6 +765,7 @@ Rules:
 
 - Infer or improve the Committed Shot Spine only after material causal state and blocking readiness are sufficient for the selected mode. Do not use coverage to conceal unresolved geography, contact, information, or end-state decisions.
 - Inferred or improved progression must read as a visual sentence, not as a generic coverage list or event inventory.
+- When an open shot choice materially changes what viewers learn, notice, or feel, recommend one concrete treatment in the existing Production Reading or shot proposal. Say what the camera stays with, follows, or cuts to, and what viewers read as a result. Mention another treatment only when its effect informs a real decision. Preserve source actions and required visible evidence. A glance or offscreen sound can carry information when the source leaves its visibility open. Commit the choice through the current Director Mode and approval scope.
 - Every committed shot has one clear editorial function: establish, orient, delay, reveal, prove contact, transfer attention, intensify pressure, release, aftermath, or another equally specific job. An explicitly accepted removable blocking setup may instead have a production function, with its intended removal recorded in the existing generation strategy or handoff.
 - When staged reveal, gaze transfer, background information, emotional attention, or an object becoming legible matters, resolve one attention flow: `entry -> delay or obstruction -> principal read -> residual focus`. Compile it into framing, action order, eye-line, reveal, or rhythm; never print the chain as workflow language.
 - For causal, reveal, object-state, spatial-discovery, or emotional progression, run the Sequence Shuffle Test. Reordering the inferred or unlocked shots must damage the intended progression. If it does not, revise the unlocked editorial functions or structure.
@@ -1104,6 +1105,8 @@ Before choosing carriers for a material state change, determine from the source 
 Bind local instructions to their subject and shot or phase before resolving apparent contradictions. `Already no longer smiling here` governs that later state; it does not by itself prohibit a preceding transition. Conversely, an explicit instruction to omit the change must not become an excuse to animate it elsewhere. Record the scope in the existing Intent Ledger and derive it into Semantic Trace only when needed; do not create a gesture checklist or a new user form.
 
 Within an established emotional meaning and relationship, Framewright may actively devise the bodily expression as a `delegated_decision` or source-grounded `compiler_inference` in the existing Intent Ledger. This includes a coordinated acceptance reaction, breath still recovering after a run, or a hesitation before a known reply. Give the director a brief Intent Delta, not approval requests for every low-risk detail. Do not infer hidden hostility, deceit, romance, trauma, a changed decision, or any other new dramatic meaning. Respect locked minimalism and intentional freedom. Ask only when the missing meaning would change the scene.
+
+Choose a cue whose implied intention matches the established beat. A held gaze can make quiet reflection legible. An aborted reply or a startled breath carries a specific dramatic implication and needs support from the current direction.
 
 When a performance beat is material, derive it inside the existing `performance_progression` field:
 
