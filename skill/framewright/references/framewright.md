@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "4.2.4"
+version: "4.2.5"
 author: "Tairan Li"
 language: "en"
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -779,6 +779,10 @@ For every compiler-inferred shot, run the `Capture Necessity Test`: if removing 
 A removable blocking setup is a narrow production exception: evaluate whether it supplies a needed visible spatial baseline to dependent generated shots, even though it can be removed from the finished edit. It must satisfy the following check and fit an accepted scope; the exception does not license generic coverage.
 
 ### 8.2.3.1 Blocking Establishment Check
+
+For fixed-position multi-shot interactions, establish the shared arrangement in the existing Spine from the current approved direction, accepted take, or admitted spatial reference. Name the relevant occupants, environmental landmarks, seat/body facing, and shared target. Derive each camera view from this arrangement, including its looking direction, projected left/right order, eye-lines, foreground shoulder, and visible background. Keep anatomical side attached to the person throughout. Resolve these facts only to the detail needed by the shot.
+
+When changing observation direction, specify the cut or continuous camera path that produces the new view. Recheck the whole arrangement when tight shots widen, an OTS foreground changes, or a move reveals a shared target or landmark. The required face angle, shoulder, background and target must fit one realizable viewpoint. Correct a conflicting compiler inference at its source. Bring conflicting director locks back as one specific decision. Carry only the relevant spatial clauses into each shot. An approved face-only opening can inherit an adequate admitted spatial reference through the existing reference route.
 
 Apply selectively when dialogue, interaction, movement, or contact across tighter shots depends on relative character positions, distance, facing, eye-lines, a shared viewing axis, or a relevant doorway, table, obstacle, or other spatial anchor. Multiple characters alone do not require a wide shot. Isolated action or object close-ups and modular detail sequences may need no shared view; assess any actual contact or movement dependency rather than exempting all close-ups.
 
@@ -1864,6 +1868,8 @@ semantic_trace:
 ```
 
 Semantic Trace is not a second editable source and is not saved by default.
+
+For fixed-position interactions whose camera changes affect spatial continuity, derive source-review obligations from the approved arrangement before inspecting the draft. Use the existing `reference_state` or `scoped_constraint` treatment for the affected shot-local relations. Check the semantic compatibility of seat, target, camera and background first, then bind the verified clauses to exact final-text spans. The validator checks those spans and their scope. Geometric compatibility remains a semantic review responsibility.
 
 First review the current original direction, effective revisions, and admitted material descriptions against the Spine, without using the draft prompt or a filled trace as the checklist. Resolve material performance transitions, camera returns, and locally scoped constraints with their source and scope. Then review the actual serialized prompt against those source-derived obligations. Repair the smallest missing relation; never manufacture a requirement from a historical approved answer. This source-to-plan pass and the plan-to-text pass are separate: checking populated fields alone cannot discover an obligation omitted during planning.
 

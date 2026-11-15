@@ -26,6 +26,8 @@ Focus is a layer plan, not a foreground/background binary. Identify the intended
 
 ## Couple action to camera coverage
 
+For seated dialogue across camera directions, derive views from the approved room. For example, A sits beside the inner wall and B beside the window, both facing a screen. An established rear view places A left and B right. A view from the screen toward their faces reverses that order while each person keeps the same chair. For each OTS, derive the foreground shoulder and background from the actual offset. On widening, check the screen's position relative to the chair fronts as well as the wall/window relationship. A visible anatomical feature stays on the person's own side as the camera changes.
+
 For an interaction, identify the trigger, the action, what changes, and which parts the camera actually shows. Let concurrent actions remain concurrent when approved. Do not make a performer wait for the camera to arrive merely because the prompt lists camera clauses first.
 
 For a continuous reveal involving clothing or equipment removal, retain the approved order of fastening release, separation, body exposure, and object destination. Resolve which intermediate states must be visible and which can occur offscreen. Do not turn removal into a material morph, invent hidden equipment, or stop the action after every camera phase.

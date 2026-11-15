@@ -25,6 +25,7 @@ fi
   --manifest "$SCRIPT_DIR/expected/protected_anchors.yaml"
 "$PYTHON_BIN" "$VALIDATOR" regression "$SCRIPT_DIR/fixtures"
 PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_source_review.py"
+PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_spatial_source_review.py"
 PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_kling_4_0.py"
 
 PROMPT_PATH=$(mktemp "${TMPDIR:-/tmp}/framewright-seedance20-adapter.XXXXXX")

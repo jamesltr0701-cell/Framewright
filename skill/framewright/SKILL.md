@@ -5,7 +5,7 @@ description: Preserve cinematic intent while compiling a scene idea, screenplay 
 
 # Framewright
 
-Current release: **v4.2.4**. Read the authoritative reference's version before compiling. The installed entrypoint and reference must agree.
+Current release: **v4.2.5**. Read the authoritative reference's version before compiling. The installed entrypoint and reference must agree.
 
 Use Framewright as a director-steered, intent-preserving cinematic compiler whose primary executable output is a prompt artifact for AI filmmaking pre-production.
 
