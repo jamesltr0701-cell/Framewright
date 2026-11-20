@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.0 Runtime Profile"
-profile_version: "2.3.0"
+profile_version: "2.3.1"
 profile_role: "subordinate_video_prompt_adapter"
 target_model: "seedance_2_0"
 evidence_scope: "model_execution_heuristics_not_platform_guarantees"
@@ -135,4 +135,4 @@ Remove hollow boosters, repeated adjectives, duplicated authority, repeated came
 
 The final clean prompt contains executable direction only and stays within the active character limit. Put capability uncertainty, surface setup, evidence labels, fidelity allocation, overload warnings, reference map, and residual risk in the Run Card.
 
-When a complete clean English candidate exceeds that limit, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Seedance 2.0 permits the complete natural-language payload to be re-expressed in concise Chinese. Preserve `@Image N`, `@Video N`, `@Audio N`, proper names marked exact, exact approved speech or visible text, symbols, numbers, and material-role boundaries byte-for-byte. Do not mix the language of one dialogue event except for approved proper nouns. Use the Chinese candidate only after semantic anchors and all native bindings match the English candidate and the recount passes.
+Write prose in the language resolved by Core §8.7. Preserve `@Image N`, `@Video N`, `@Audio N`, exact names, approved speech and visible text, symbols, numbers, and material-role boundaries. Keep the approved language within each dialogue event. If the prompt is over budget, compact it in the selected language. Apply Core's Lossless Chinese Overflow Re-serialization only with a current grant for that fallback.

@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.5.0"
+profile_version: "1.5.1"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -474,9 +474,9 @@ When critical typography, formulas, signage, subtitle layout, or frame-accurate 
 
 ### 9.3 Compactness Qualification
 
-Retain the 10,000-character hard ceiling. Passing it is necessary, not sufficient: record character count, active-material count, stage count, and preserved semantic anchors for representative routes; reject duplicated instructions, inactive blocks, assistant-facing leakage, and low-value headings. Compression must preserve identity, state, boundary, reference authority, camera causality, material performance stimulus-to-aftermath, exact dialogue and authorized vocal-event count, and explicit negatives.
+Apply Core's 10,000-character Framewright validation budget and any stricter verified cap for the actual entry. For representative routes record character count, active-material count, stage count, and preserved semantic anchors. Remove duplicated instructions, inactive blocks, assistant-facing leakage, and low-value headings. Preserve identity, state, boundary, reference authority, camera causality, material performance stimulus-to-aftermath, exact dialogue and authorized vocal-event count, and explicit negatives.
 
-When a complete clean English candidate still exceeds the ceiling, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Re-express every natural-language schema value in concise Chinese from the approved Prompt IR. Preserve task headings, `@Image N` / `@Video N` / `@Audio N`, special audio or subtitle symbols, proper names marked exact, exact approved dialogue or visible text, numbers, and route literals byte-for-byte. Use the Chinese candidate only when semantic anchors and protected literals match and the complete prompt fits. If it still exceeds the ceiling, resume Core Compression Safety without silently changing structure or reference authority.
+Write prose in the language resolved by Core §8.7. Preserve task headings, `@Image N` / `@Video N` / `@Audio N`, audio or subtitle symbols, exact names, approved dialogue and visible text, numbers, and route literals. If the prompt is over budget, compact it in the selected language. Apply Core's Lossless Chinese Overflow Re-serialization only with a current grant for that fallback.
 
 ## 10. Advanced Task Feasibility
 

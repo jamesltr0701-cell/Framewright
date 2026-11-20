@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright MiniMax H3 Runtime Profile"
-profile_version: "0.3.0-local"
+profile_version: "0.3.1-local"
 target_model: "MiniMax H3"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 15
@@ -166,7 +166,7 @@ An ordinary reference video does not automatically activate its audio. Audio reu
 
 ## 6. H3 Serialization Schemas
 
-Use exactly one schema as the clean-prompt serialization owner. Keep H3 field names, relationship markers, labels, shot markers, timestamp syntax, and required literals in English. Natural-language field values normally follow the working prompt language; preserve approved dialogue, lyrics, and visible text in their original language.
+Use exactly one schema as the clean-prompt serialization owner. Keep H3 field names, relationship markers, labels, shot markers, timestamp syntax, and required literals in their native form. Write natural-language values in the language resolved by Core §8.7, preserving approved dialogue, lyrics, and visible text in their original language.
 
 ### 6.1 Base Modes: T2VA, I2VA, FL2VA, L2VA
 
@@ -246,9 +246,7 @@ Put shot-local dialogue and each authorized counted vocal sound inside its curre
 
 ### 8.1 Lossless Chinese Overflow Payload
 
-When a complete clean English H3 candidate exceeds the 7,000-character profile limit, apply Core's Lossless Chinese Overflow Re-serialization before deleting active content. Keep all schema field names, `<Subject N>` / `<Picture N>` / `<Video N>` / `<Audio N>` labels, relationship markers, `[Shot N]`, timestamps, speaker IDs, `<d>[Language]...</d>` wrappers, `N/A`, proper names marked exact, and exact approved speech or visible text byte-for-byte. Re-serialize only natural-language field values in concise Chinese from the same approved Prompt IR.
-
-Use the hybrid Chinese candidate only when every semantic anchor and protected literal matches the English candidate and the complete prompt fits. Do not translate H3 structure, alter cut timing, or summarize a shot. If the hybrid candidate remains over limit, resume Core Compression Safety and preserve H3's required fields.
+Apply the 7,000-character profile limit and any stricter active cap under Core. If over budget, compact the natural-language values in the selected language. A director-authorized Chinese fallback changes only those values from the same approved Prompt IR. Preserve the schema fields, `<Subject N>` / `<Picture N>` / `<Video N>` / `<Audio N>` labels, relationship markers, `[Shot N]`, timestamps, speaker IDs, `<d>[Language]...</d>` wrappers, `N/A`, exact names, and approved speech and visible text. Validate fallback parity and recount under Core §8.7.
 
 ## 9. Context-IR Boundary
 

@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Kling 4.0 Runtime Profile"
-profile_version: "0.1.0"
+profile_version: "0.1.1"
 target_model: "Kling 4.0"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -62,7 +62,7 @@ Imported audio is a **voice-profile source**, not a general music, sound-effect,
 
 ## Serialization
 
-Write clear natural language in the director's working language. Use compact sections only when useful: source roles; shared scene/camera conditions; shot or continuous-phase progression; sound and final state. These are organizational aids, not mandatory Kling API fields. Keep platform settings, ownership fields, and compiler rationale in the Run Card.
+Write clear prose in the language resolved by Core §8.7. Use compact sections only when useful to express source roles, shared conditions, shot or phase progression, sound, and final state. Keep platform settings, ownership fields, and compiler rationale in the Run Card.
 
 - Give each active mention its job. Reuse identities and objects across cuts without restating a character biography in every shot.
 - Preserve the approved shot count, cut order, action triggers, local performance changes, and end state. A continuous shot explicitly remains uninterrupted; describe changes as phases, not numbered shots. Kling's automatic storyboarding is not permission to add cuts, and no separate “disable Smart Storyboard” switch is assumed.
@@ -72,7 +72,7 @@ Write clear natural language in the director's working language. Use compact sec
 - Put dialogue in ordinary quotation marks with the speaker, language, delivery, and on/offscreen relationship. Preserve protected literals and authorized vocal events exactly. Do not apply Seedance braces or angle-bracket sound tags as required Kling syntax.
 - Prefer concrete positive descriptions; retain necessary director prohibitions. A concise-expression recommendation never deletes strict silence, no-cut, passive-body, or identity locks. State music and subtitle intent explicitly where resolved, since leaving them open can allow additions. Native audiovisual generation does not authorize extra speech, vocal reactions, music, or subtitles.
 
-Do not fill the token budget. If the actual surface rejects length, remove repetition and losslessly reserialize natural-language payload in Chinese when allowed by Core; keep dialogue, asset mentions, order, and meaning. Recount using the surface's token counter if available. A character count or an unrelated model's tokenizer is not a verified Kling token count; if still over budget, return the material tradeoff to the director.
+If over budget, compact the prose in the selected language. Reserialize in Chinese only when the director allows that fallback under Core §8.7. Preserve dialogue, asset mentions, order, and meaning. Recount using the surface's token counter if available. Mark an unmeasured Kling token count as unverified. If the prompt still exceeds budget, return the material tradeoff to the director.
 
 ## Run Card and validation
 
