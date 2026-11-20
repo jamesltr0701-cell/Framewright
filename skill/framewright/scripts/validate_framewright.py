@@ -114,6 +114,19 @@ H3_VISIBLE_RELATIONSHIPS = {"fully_preserved", "partially_preserved", "attribute
 H3_AUDIO_RELATIONSHIPS = {"fully_copy", "partially_copy", "reference", "weak_reference"}
 VOCAL_EVENT_TYPES = {"locked_dialogue", "authorized_short_response", "authorized_nonlexical"}
 VOCAL_AUTH_SOURCES = {"user_scope", "production_preference", "user_preference"}
+VOCAL_PLACEMENT_SYNC = {
+    "on_screen": {"required", "not_visible"},
+    "off_screen": {"not_visible"},
+    "voiceover": {"forbidden", "not_visible"},
+}
+RECORDED_AUDIO_ROLE = {
+    "zh": "所有对白只按这段录音表演，保留原话、语气、节奏、停顿和各角色音色。",
+    "en": "Use only this recording for dialogue. Match its words, delivery, pacing, pauses, and each character's voice.",
+}
+RECORDED_TURN_RE = re.compile(
+    r".+在画[内外](?:开始|继续)录音第[0-9]+轮对白.*"
+    r"|.+ (?:starts|continues) recorded turn [0-9]+ (?:off-screen|on screen).*"
+)
 DRAMATIC_LENSES = {
     "turn_or_progression",
     "objective_obstacle_tactic",
@@ -560,6 +573,58 @@ def validate_prompt_text(
     return errors
 
 
+def validate_recorded_turns(sound: dict[str, Any], shot_ids: list[Any]) -> list[dict[str, Any]]:
+    events = sound.get("vocal_events")
+    if "recorded_dialogue" not in sound and not (
+        isinstance(events, list) and any(isinstance(event, dict) and "source_turn" in event for event in events)
+    ):
+        return []
+    recording = sound.get("recorded_dialogue")
+    if not isinstance(recording, dict) or not isinstance(recording.get("material_key"), str) or not recording["material_key"].strip():
+        return [issue("recorded_dialogue_missing", "Recorded dialogue needs an approved audio material and speaker order.")]
+    speakers = recording.get("speaker_order")
+    if (
+        not isinstance(speakers, list) or not speakers
+        or any(not isinstance(speaker, str) or not speaker.strip() or "\n" in speaker or "\r" in speaker for speaker in speakers)
+        or not isinstance(events, list) or len(events) != len(speakers)
+    ):
+        return [issue("recorded_dialogue_turn_order", "Provide one vocal event for each approved speaker turn in the excerpt.")]
+
+    errors: list[dict[str, Any]] = []
+    for turn, (event, speaker) in enumerate(zip(events, speakers), start=1):
+        if (
+            not isinstance(event, dict) or type(event.get("source_turn")) is not int
+            or event["source_turn"] != turn or event.get("speaker") != speaker
+        ):
+            errors.append(issue("recorded_dialogue_turn_order", "Vocal events must follow the approved order and characters.", turn=turn))
+            continue
+        if (
+            event.get("event_type", "locked_dialogue") != "locked_dialogue"
+            or type(event.get("allowed_count")) is not int or event["allowed_count"] != 1
+            or any(key in event for key in ("exact_text", "nonlexical_description", "presentation"))
+        ):
+            errors.append(issue("recorded_dialogue_competing_event", "A recorded turn must occur once, without supplied words or an added vocal event.", turn=turn))
+        parts = event.get("recording_parts")
+        if not isinstance(parts, list) or not parts:
+            errors.append(issue("recorded_dialogue_parts_missing", "A recorded turn must be assigned to at least one shot.", turn=turn))
+            continue
+        used_shots: set[str] = set()
+        for part in parts:
+            if not isinstance(part, dict):
+                errors.append(issue("recorded_dialogue_part_invalid", "A recorded turn part needs shot and voice placement.", turn=turn))
+                continue
+            shot_id, placement, sync = part.get("shot_id"), part.get("placement"), part.get("lip_sync")
+            if (
+                not isinstance(shot_id, str) or not shot_id.strip() or shot_id not in shot_ids or shot_id in used_shots
+                or placement not in ("on_screen", "off_screen") or not isinstance(sync, str)
+                or sync not in VOCAL_PLACEMENT_SYNC[placement]
+            ):
+                errors.append(issue("recorded_dialogue_part_invalid", "Each recorded turn part needs a distinct active shot with compatible lip sync.", turn=turn))
+                continue
+            used_shots.add(shot_id)
+    return errors
+
+
 def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     if not isinstance(document, dict) or not isinstance(document.get("video_prompt_ir"), dict):
@@ -612,6 +677,17 @@ def validate_prompt_ir_data(document: Any) -> list[dict[str, Any]]:
             errors.append(issue("prompt_ir_performance_invalid", "Structured performance contract needs identified beats."))
     sound = prompt_ir.get("sound_contract")
     if isinstance(sound, dict):
+        recording_errors = validate_recorded_turns(sound, prompt_scope if isinstance(prompt_scope, list) else [])
+        errors.extend(recording_errors)
+        if "recorded_dialogue" in sound and not recording_errors:
+            material_key = sound["recorded_dialogue"]["material_key"]
+            references = prompt_ir.get("active_references")
+            matches = [
+                reference for reference in references
+                if isinstance(reference, dict) and reference.get("material_key") == material_key
+            ] if isinstance(references, list) else []
+            if len(matches) != 1 or matches[0].get("media_type") != "audio":
+                errors.append(issue("recorded_dialogue_reference_inactive", "The dialogue recording must identify one admitted audio reference.", material_key=material_key))
         events = sound.get("vocal_events", [])
         if not isinstance(events, list):
             errors.append(issue("prompt_ir_vocal_events_invalid", "Structured sound contract needs a vocal-event list."))
@@ -1417,6 +1493,87 @@ def validate_kling40(data: Any, prompt: str) -> list[dict[str, Any]]:
     return errors
 
 
+def recorded_turn_line(speaker: str, turn: int, part: dict[str, Any], first: bool, language: str) -> str:
+    on_screen = part["placement"] == "on_screen"
+    if language == "zh":
+        action = "开始" if first else "继续"
+        placement = "画内" if on_screen else "画外"
+        sync = ""
+        if on_screen:
+            sync = "，口型同步" if part["lip_sync"] == "required" else "，嘴部不可见"
+        return f"{speaker}在{placement}{action}录音第{turn}轮对白{sync}。"
+    action = "starts" if first else "continues"
+    placement = "off-screen"
+    if on_screen:
+        placement = "on screen with synced lips" if part["lip_sync"] == "required" else "on screen with their mouth out of view"
+    return f"{speaker} {action} recorded turn {turn} {placement}."
+
+
+def validate_recorded_dialogue_text(data: dict[str, Any], prompt: str) -> list[dict[str, Any]]:
+    errors: list[dict[str, Any]] = []
+    recording = data["recorded_dialogue"]
+    seedance = data.get("seedance25")
+    if data.get("adapter_id") != "seedance_2_5" or not isinstance(seedance, dict) or seedance.get("route") != "omni_reference":
+        errors.append(issue("recorded_dialogue_route_unsupported", "This recorded dialogue contract is qualified for Seedance 2.5 Omni Reference."))
+
+    native_ref, language = recording.get("native_ref"), recording.get("prompt_language")
+    bindings = data.get("native_bindings")
+    if (
+        not isinstance(native_ref, str) or not re.fullmatch(r"@Audio [1-9][0-9]*", native_ref)
+        or not isinstance(bindings, (list, dict)) or native_ref not in bindings
+    ):
+        errors.append(issue("recorded_dialogue_binding_missing", "Bind the recorded dialogue excerpt to its active native audio mention."))
+    if not isinstance(language, str) or language not in RECORDED_AUDIO_ROLE:
+        errors.append(issue("recorded_dialogue_language_unsupported", "The recorded turn instructions are qualified in Chinese and English."))
+    if errors:
+        return errors
+
+    role = f"{native_ref}: {RECORDED_AUDIO_ROLE[language]}"
+    lines = prompt.splitlines()
+    roles = [line for line in lines if re.match(rf"^[ \t]*{re.escape(native_ref)}[ \t]*[:：]", line)]
+    if roles != [role]:
+        errors.append(issue("recorded_dialogue_authority_missing", "The audio role must uniquely assign wording, delivery, timing, and voices to the recording."))
+
+    excluded_lines = data.get("excluded_script_lines", [])
+    if not isinstance(excluded_lines, list) or any(not isinstance(line, str) or not line.strip() for line in excluded_lines):
+        errors.append(issue("recorded_dialogue_script_check_invalid", "Excluded script evidence must be a list of known full written lines."))
+    elif any(line.strip() in prompt for line in excluded_lines) or re.search(r"\{[^{}]+\}", prompt):
+        errors.append(issue("recorded_dialogue_written_words", "The recorded dialogue prompt contains competing written speech."))
+
+    shots = data["prompt_shots"]
+    expected_lines = []
+    previous_end = 0
+    for event in data["vocal_events"]:
+        for part_number, part in enumerate(event["recording_parts"]):
+            shot_id = part["shot_id"]
+            block = shots[shot_id]
+            line = recorded_turn_line(event["speaker"], event["source_turn"], part, part_number == 0, language)
+            expected_lines.append(line)
+            if not isinstance(block, str) or not block or prompt.count(block) != 1 or block.splitlines().count(line) != 1:
+                errors.append(issue("recorded_dialogue_shot_evidence", "Each turn part needs its exact start or continuation line in the assigned shot.", shot_id=shot_id))
+                continue
+            position = prompt.index(block) + block.index(line)
+            if position < previous_end:
+                errors.append(issue("recorded_dialogue_turn_order", "Recorded dialogue moves back to an earlier shot or turn.", shot_id=shot_id))
+            previous_end = position + len(line)
+    if [line for line in lines if RECORDED_TURN_RE.fullmatch(line)] != expected_lines:
+        errors.append(issue("recorded_dialogue_turn_inventory", "Keep only the approved starts and continuations, in recorded order."))
+    return errors
+
+
+def vocal_event_matches_reaction(event: dict[str, Any], reaction: dict[str, Any]) -> bool:
+    if reaction.get("speaker") is not None and event.get("speaker") != reaction["speaker"]:
+        return False
+    beat = reaction.get("beat_id")
+    if "source_turn" not in event:
+        return event.get("beat") == beat
+    parts = event.get("recording_parts")
+    return isinstance(parts, list) and any(
+        isinstance(part, dict) and (part.get("shot_id") == beat or (part.get("beat") is not None and part["beat"] == beat))
+        for part in parts
+    )
+
+
 def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
     errors: list[dict[str, Any]] = []
     prompt = data.get("prompt")
@@ -1697,6 +1854,14 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
 
     prompt_text = prompt if isinstance(prompt, str) else ""
     vocal_events = data.get("vocal_events", []) or []
+    shots = data.get("prompt_shots")
+    recording_errors = validate_recorded_turns(data, list(shots) if isinstance(shots, dict) else [])
+    errors.extend(recording_errors)
+    if "recorded_dialogue" in data and not recording_errors:
+        errors.extend(validate_recorded_dialogue_text(data, prompt_text))
+    if not isinstance(vocal_events, list):
+        errors.append(issue("vocal_events_invalid", "Vocal events must be a list."))
+        vocal_events = []
     seen_events: set[str] = set()
     for event in vocal_events:
         if not isinstance(event, dict):
@@ -1706,6 +1871,8 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         if not event_id or event_id in seen_events:
             errors.append(issue("vocal_event_duplicate", "Vocal event IDs must be unique.", event_id=event_id))
         seen_events.add(event_id)
+        if "source_turn" in event:
+            continue
         event_type = event.get("event_type", "locked_dialogue")
         if event_type not in VOCAL_EVENT_TYPES:
             errors.append(issue("vocal_event_type_invalid", "Vocal event type is unsupported.", event_id=event_id))
@@ -1736,16 +1903,11 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         if presentation is not None and len(presentations) != allowed:
             errors.append(issue("vocal_presentation_count_mismatch", "Provide one presentation record per approved occurrence of this vocal content.", event_id=event_id))
         for presentation in presentations:
-            allowed_sync = {
-                "on_screen": {"required", "not_visible"},
-                "off_screen": {"not_visible"},
-                "voiceover": {"forbidden", "not_visible"},
-            }
             if not isinstance(presentation, dict):
                 errors.append(issue("vocal_presentation_invalid", "Voice presentation must be a mapping.", event_id=event_id))
                 continue
             placement, sync = presentation.get("placement"), presentation.get("lip_sync")
-            if not isinstance(placement, str) or not isinstance(sync, str) or sync not in allowed_sync.get(placement, set()):
+            if not isinstance(placement, str) or not isinstance(sync, str) or sync not in VOCAL_PLACEMENT_SYNC.get(placement, set()):
                 errors.append(issue("vocal_presentation_conflict", "Voice placement and visible lip synchronization disagree.", event_id=event_id))
             shot_id, span = presentation.get("shot_id"), presentation.get("span")
             blocks = data.get("prompt_shots")
@@ -1762,7 +1924,7 @@ def validate_compile_trace(data: dict[str, Any]) -> list[dict[str, Any]]:
         mode = reaction.get("mode", "strict_no_vocal")
         if mode not in {"strict_no_vocal", "no_dialogue"}:
             errors.append(issue("silence_mode_invalid", "Silent reaction mode is unsupported.", beat_id=reaction.get("beat_id")))
-        matching = [event for event in vocal_events if isinstance(event, dict) and event.get("beat") == reaction.get("beat_id")]
+        matching = [event for event in vocal_events if isinstance(event, dict) and vocal_event_matches_reaction(event, reaction)]
         forbidden = mode == "strict_no_vocal" and matching or mode == "no_dialogue" and any(event.get("event_type", "locked_dialogue") != "authorized_nonlexical" for event in matching)
         if reaction.get("speech") or reaction.get("subtitle_or_visible_text") or forbidden:
             errors.append(issue("silence_ownership_violation", "A silent reaction acquired unauthorized voice, speech, or visible text.", beat_id=reaction.get("beat_id")))
@@ -2154,6 +2316,7 @@ def validate_video_prompt_path(
     character_limit: int | None = None,
     trace_path: Path | None = None,
     source_review: bool = False,
+    recorded_dialogue: bool = False,
 ) -> list[dict[str, Any]]:
     registry_data, registry_errors = load_adapter_registry(registry)
     errors = list(registry_errors)
@@ -2182,6 +2345,8 @@ def validate_video_prompt_path(
     errors.extend(validate_serialization_ownership(data, text, registry))
     if source_review and trace_path is None:
         errors.append(issue("source_review_missing", "--source-review requires a current-scope --trace."))
+    if recorded_dialogue and trace_path is None:
+        errors.append(issue("recorded_dialogue_missing", "--recorded-dialogue requires a current-scope --trace."))
     if adapter_id == "kling_4_0" and trace_path is None:
         errors.append(issue("kling_contract_missing", "Kling validation requires --trace with current kling40 qualification."))
     if trace_path is not None:
@@ -2195,6 +2360,10 @@ def validate_video_prompt_path(
         else:
             if adapter_id == "kling_4_0" and any(trace.get(key) != data.get(key) for key in ("target_model", "serialization_owner", "adapter_id")):
                 errors.append(issue("kling_trace_owner_mismatch", "Kling trace ownership must match the command's selected target."))
+            if recorded_dialogue and "recorded_dialogue" not in trace:
+                errors.append(issue("recorded_dialogue_missing", "The current trace must declare the approved recorded dialogue contract."))
+            if "recorded_dialogue" in trace and any(trace.get(key) != data.get(key) for key in ("target_model", "serialization_owner", "adapter_id")):
+                errors.append(issue("recorded_dialogue_trace_owner_mismatch", "Recorded dialogue trace ownership must match the command's selected target."))
             if source_review:
                 trace = {**trace, "source_review_required": True}
             errors.extend(validate_compile_trace(trace))
@@ -2304,6 +2473,7 @@ def main() -> int:
     video_prompt_parser.add_argument("--character-limit", type=int, help="Optional operator character budget; does not substitute for a model token limit.")
     video_prompt_parser.add_argument("--trace", type=Path, help="Optional current-scope compile trace for final-text performance and vocal checks.")
     video_prompt_parser.add_argument("--source-review", action="store_true", help="Require source-bound, shot-local semantic evidence in --trace.")
+    video_prompt_parser.add_argument("--recorded-dialogue", action="store_true", help="Require the recorded dialogue contract and shot-local audio cues in --trace.")
 
     keyframe_prompt_parser = subparsers.add_parser("keyframe-prompt")
     keyframe_prompt_parser.add_argument("path", type=Path)
@@ -2347,6 +2517,7 @@ def main() -> int:
                 args.character_limit,
                 args.trace,
                 args.source_review,
+                args.recorded_dialogue,
             ),
             args.json,
         )

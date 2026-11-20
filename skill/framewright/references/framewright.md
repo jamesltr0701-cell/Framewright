@@ -1,6 +1,6 @@
 ---
 project_name: "Framewright"
-version: "4.2.6"
+version: "4.2.7"
 author: "Tairan Li"
 language: "en" # Language of this specification. Prompt prose follows §8.7.
 compiler_mode: "asset_aware_storyboard_to_video"
@@ -1010,6 +1010,7 @@ Never remove:
 - generation-unit start and end state;
 - material performance stimulus, ordered or concurrent response, selected carriers, listener effect, and residual state;
 - exact approved dialogue and each authorized added vocal event with its speaker, trigger, wording or nonlexical description, and count;
+- when recorded dialogue is selected, its audio authority, ordered speaker turns, and continuation through each cut;
 - environmental sound bed;
 - synchronized action cues;
 - active reference bindings.
@@ -1135,6 +1136,8 @@ This is an internal shape, not a new default artifact or parallel contract. A ma
 
 For material dialogue, reason through `trigger and preparation -> delivery control -> sentence ending -> residual aftermath -> listener reception`. Serialize only the parts needed to make the approved performance executable. Adverbs such as `sadly`, `coldly`, or `emotionally` are not sufficient by themselves.
 
+When a material change of thought calls for a bodily response, choose a specific gesture, shift of weight, action on a prop, or held posture that expresses what this character is doing about the thought. Relate its onset and any release to a specific beat of speaking or listening. The action may lead a line, land during a pause, or follow a word the character just heard. For recorded dialogue, take those timing cues from the selected performance. Keep a bodily cue in the shot plan when it carries meaning, and check that the frame can show it alongside any required lip sync. A restrained beat can use a small physical change or deliberate stillness.
+
 Match each carrier to shot scale and duration. Wide shots rely on posture, weight, path, spacing, and recovery; close shots may use eyelids, mouth tension, swallowing, or small breath changes. Do not instruct a detail the current image scale cannot read.
 
 Secondary motion follows a perceptible cause when the material and framing make it useful: head or body acceleration, contact, gravity, or established airflow -> slight local lag or deformation -> settling. Persistent hairstyle identity (color, length, hairline, tying) does not lock every transient strand position. Long loose hair, short hair, tight ties, wet hair, straps, soft fabric, and rigid armor respond differently. At low resolution favor readable clump, silhouette, and weight; do not claim individual strands become visible. Do not invent wind in a still room.
@@ -1185,6 +1188,16 @@ Each event has one speaker, beat, positive integer count, and either exact words
 Preserve a directed voice's relationship to the image, not just its words and speaker. A shot of a person's face does not turn their voiceover into visible speech; an off-screen reply does not require a cut to its speaker. Distinguish in-scene on-screen speech, an in-scene off-screen voice, and voiceover using the actual direction and context, not the word `offscreen` alone. Preserve explicitly directed action-before-speech, overlap, and sentence-ending cues without inventing numeric timing. Resolve a material ambiguity only when those readings would change the intended scene.
 
 When this relationship is explicit or materially resolved, extend that existing vocal event with `presentation: {placement: on_screen | off_screen | voiceover, lip_sync: required | forbidden | not_visible}`. A visible in-scene speaker may require synchronized lips; an off-screen speaker has no visible mouth; voiceover must not acquire synchronized visible speech. Occluded mouths may remain `not_visible`. In a temporary trace, also put `shot_id` and an exact `span` inside `presentation`, locating speaker, event content, and presentation wording together in the corresponding `prompt_shots` block from §16.1. For repeated content, use a list of these records, one per approved occurrence; a repeated line's global count alone cannot locate it. These optional fields do not change the default sound policy or require a new user form. Semantic review verifies what the wording means; the validator checks permitted combinations and shot-local evidence. Existing events without this extension remain valid.
+
+#### Recorded dialogue
+
+When the director explicitly selects a recorded performance to drive a scope's dialogue, the admitted audio determines the spoken words, phrasing, pace, pauses, breath, and each character's voice and timbre. Preserve the written script as story context and keep its dialogue, paraphrases, phonetic spellings, and fresh delivery instructions out of the model-facing speech. Adding another vocal event under a standing preference would change the performance. Audio attached for timbre or acting style alone keeps its separately approved, narrower authority. Ordinary AI dialogue continues to use the locked text path.
+
+Carry this choice into the first shot and GU plan. Use a meaningful change in thought or a recorded pause for a cut or gesture where the established staging benefits. Keep the normal GU boundaries, give the selected performance enough time at its original cadence, and assign each retained excerpt to the same character voice from the approved master. A unit may use one continuous excerpt from that master. Ask for a clip, range, or speaker assignment only if the active scope cannot be resolved from the admitted material or the director's description. Use relative cues or supplied times, and never infer unheard words or pauses. If the recording is pending, keep precise timing provisional in the shot plan.
+
+On a qualified adapter route, extend `sound_contract` with `recorded_dialogue: {material_key, speaker_order}`. Match `material_key` to one audio entry in `active_references` with that `material_key` and `media_type: audio`. `speaker_order` is the order supplied or established from the admitted excerpt, with one item per speaking turn even when the same character returns. Each turn is one `locked_dialogue` entry in `vocal_events` with `source_turn` numbered from 1 within the excerpt, `speaker`, `event_id`, and `allowed_count: 1`. Use ordered `recording_parts` of `{shot_id, placement, lip_sync}` for where the same turn is heard. Omit `exact_text`, `nonlexical_description`, and the occurrence-based `presentation` on these events. A pause within one person's turn stays in that turn. A turn heard off-screen and then on-screen starts only once and continues through the cut, with synced lips where the speaking mouth is visible. A part may carry its own `beat` when the silence boundary is finer than its `shot_id`. Where a silent reaction applies only to a listener, use `speaker` on the existing silence entry to limit its scope to that character.
+
+Use this branch for an explicitly recorded active scope with a single admitted dialogue excerpt. Confirm that the target route can use the excerpt with the required audio authority before serialization. Compare the actual prompt with the source to catch competing lines or delivery instructions. Use `video-prompt --recorded-dialogue --trace <temporary-trace>` with the current recorded-dialogue contract, vocal events, the adapter's binding, and actual shot text. Supply any known full script lines that must be absent as `excluded_script_lines` in the temporary trace for a literal leakage check. Audio fidelity, lip sync, and the physical performance require reviewing the take. When the production needs the exact recording in its final mix, retain the original as the post-production audio master.
 
 State the environmental bed once in `AUDIO`. Place action-synchronized sound cues inside the beat they control. Preserve both during compression.
 
@@ -1582,7 +1595,7 @@ video_prompt_ir:
 
 Core owns every semantic field, validates that the three beat scopes are disjoint, and sets `adapter_input_status: approved` only when material decisions are resolved. The IR may carry internal rationale needed for traceability, but adapters must not emit that rationale or other compiler metadata. It normally remains in memory; save it only when the director explicitly requests a diagnostic artifact.
 
-`performance_contract` may carry optional beat-level stimulus, interpretation or delay, coordinated carrier groups, listener response, secondary-motion cause, and residual state. `sound_contract` may carry the optional authorized `vocal_events` and scoped silence modes described in §8.12. These extend the existing 1.1 IR fields without adding a required top-level key or changing the meaning of older records. The adapter receives only the resolved, approved current-scope values; preference provenance stays internal while exact event content and count enter the clean prompt.
+`performance_contract` may carry optional beat-level stimulus, interpretation or delay, coordinated carrier groups, listener response, secondary-motion cause, and residual state. `sound_contract` may carry the optional authorized `vocal_events`, recorded dialogue authority, and scoped silence modes described in §8.12. These extend the existing 1.1 IR fields without adding a required top-level key or changing the meaning of older records. The adapter receives only the resolved, approved current-scope values; preference provenance stays internal. Serialize event counts and either the locked text or the admitted recording's turn assignments, as applicable.
 
 Every registered target, including Seedance 2.0, uses one formal subordinate adapter. The adapter receives the approved IR read-only, qualifies target-specific feasibility, and serializes one clean prompt. It may choose target syntax, block order, native material notation, route fields, compression tactics, and model-specific execution wording. It may not originate or change directing intention, directorial voice, scene structure, endpoint purpose, reference authority, continuity, generation-unit boundaries, or any director lock. If the IR is incomplete or incompatible, the adapter returns a compact conflict to Core instead of repairing creative meaning itself.
 
@@ -1827,7 +1840,7 @@ Applicable checks include:
 - Exactly one approved model-neutral Prompt IR, one target adapter, and one serialization owner apply to each model-facing prompt.
 - The adapter input is read-only, its unresolved material decisions are empty, and its completed/current/future beat scopes are disjoint.
 - The target model, scalar serialization owner, adapter ID, adapter profile contract, and compiler instruction sources match the one registered ownership route; no Core-native exception, platform, or external prompt skill owns serialization.
-- The actual Video Prompt file passed the ownership-aware validator, and clean prompt text contains no ownership or platform-serializer metadata. When material performance or added vocal events are active, a current-scope temporary trace was passed to `video-prompt --trace` to compare protected spans, exact events, counts, and silence with the final file; it is not a default saved artifact.
+- The actual Video Prompt file passed the ownership-aware validator, and clean prompt text contains no ownership or platform-serializer metadata. When material performance, added vocal events, or recorded dialogue are active, a current-scope temporary trace was passed to `video-prompt --trace` to compare protected spans, event ownership, counts, and silence with the final file. Recorded dialogue also used `--recorded-dialogue` to check the recording authority and turn sequence. The trace is temporary.
 - A target capability ceiling is not treated as default duration or feasibility proof.
 - Storyboard material appears in Video Prompt runtime only after explicit admission, with structural authority and denied sheet/final-look authority recorded.
 - Target-specific Run Card and UI instructions remain assistant-facing; only the clean prompt file is saved and no default `run_card.md` exists.
@@ -1890,7 +1903,7 @@ Run these compact meta-tests:
 
 - `Intent Coverage Test`: every active material director lock has an appropriate carrier, and its rationale still holds through structure and execution.
 - `Observable Intent Test`: every material abstract intent is translated into visible, audible, spatial, or temporal evidence rather than left as an orphan adjective.
-- `Embodied Dialogue Test`: material dialogue has at least one executable causal carrier in preparation, delivery, ending, aftermath, or listener response.
+- `Embodied Dialogue Test`: material dialogue has at least one executable causal carrier in preparation, delivery, ending, aftermath, or listener response. A material bodily response retains its trigger, physical action or hold, and readable framing in the final text. Its timing follows the selected vocal performance where applicable.
 - `Performance Process Survival Test`: when an emotional or bodily process is material, the actual final text still links stimulus, interpretation or delay when relevant, response, selected carrier, listener feedback, and residual state as applicable; a filled internal field cannot stand in for missing prompt text.
 - `Scoped Vocal Authorization Test`: each added short response or nonlexical sound has an applicable grant, one speaker and event count, appears at its approved beat, leaves original words unchanged, and respects strict or legacy silence.
 - `Shot-Scale Legibility Test`: every selected performance carrier is readable at the committed shot scale.

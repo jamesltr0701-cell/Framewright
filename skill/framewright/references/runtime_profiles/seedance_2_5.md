@@ -1,6 +1,6 @@
 ---
 profile_name: "Framewright Seedance 2.5 Runtime Profile"
-profile_version: "1.5.1"
+profile_version: "1.5.2"
 target_model: "Seedance 2.5"
 profile_role: "subordinate_video_prompt_adapter"
 maximum_declared_duration_seconds: 30
@@ -405,7 +405,7 @@ When explicit sound control or a recorded limited-vocal grant is active, resolve
 seedance_audio_policy:
   scope:
   source_audio_master:
-  dialogue: inherit | preserve | generate_locked_text | replace | remove
+  dialogue: inherit | preserve | generate_locked_text | follow_recording | replace | remove
   ambience: inherit_core_default | preserve | replace | remove
   sfx: inherit_core_default | preserve | generate | replace | remove
   music: no_music | preserve | generate_explicit_request | replace | remove
@@ -429,7 +429,7 @@ Rules:
 
 - Do not activate this policy merely because audio material is attached; the user's requested scope controls it.
 - Keep dialogue text, speaker, language, and any locked delivery exact. Timbre authority does not grant new wording, emotion, accent, or pacing.
-- Give every approved vocal event one speaker, beat, positive count, and exact text with language or a specific nonlexical sound. A new short event needs a current scope grant or recorded preference; serialize the selected event once at its trigger, never as an open invitation to improvise. Use a native mention as speaker only when its identity is unambiguous and actively bound.
+- Give text-driven vocal events one speaker, beat, positive count, and exact text with language or a specific nonlexical sound. A new short event needs a current scope grant or recorded preference; serialize the selected event once at its trigger, never as an open invitation to improvise. Use a native mention as speaker only when its identity is unambiguous and actively bound. Recorded events use the turn assignment below.
 - Serialize strict and legacy silent reactions without human vocal events. A `no_dialogue` reaction may carry only the separately authorized nonlexical sound. Do not add a whisper, repeated name, extra speech, subtitle, or visible text to fill silence.
 - Map an admitted audio reference with `@Audio n` only to its allowed properties and active beats.
 - In Smart Edit, source-video audio remains part of the sole editing master unless the explicit edit scope says preserve, remove, or replace a named component.
@@ -453,6 +453,30 @@ Omit inactive markers. Never add an empty `MUSIC` block to a default no-music pr
 When explicitly requested, Seedance-specific serialization uses the current guide's compact syntax: music in `(...)`, a discrete SFX event in `<...>`, spoken dialogue in `{...}`, and deliberately requested visible subtitle text in `■■...■■`. For non-Chinese dialogue, also state speaker, language, accent when material, and delivery. These marks serialize an already approved sound or text scope; they never create one. Negative controls such as `no BGM`, `no subtitles`, or removal of a named audio component remain valid when requested.
 
 The exact special-glyph mapping is snapshot-qualified from the reconciled Prompt Guide because the current Lark page confirmed the special-syntax section but did not provide a fresh native export. Preserve this evidence grade assistant-facing; never substitute invented punctuation.
+
+#### Recorded dialogue on Omni Reference
+
+Use `follow_recording` for an explicitly selected Core `recorded_dialogue` contract. This release qualifies one in-scene dialogue excerpt in `omni_reference` when the actual surface can bind it as audio. Give the Run Card the stable `material_key`, the approved clip or range, and its `@Audio N` mapping. Set `native_ref` and `prompt_language` (`zh` or `en`) on the copy of `recorded_dialogue` in the temporary trace. Keep the film's existing ambience, SFX, and no-music requirements. If the binding is unavailable, report the audio-authority conflict before serializing.
+
+Start `MATERIAL ROLES` with the localized role sentence for the assigned mention.
+
+```text
+@Audio 1: 所有对白只按这段录音表演，保留原话、语气、节奏、停顿和各角色音色。
+@Audio 1: Use only this recording for dialogue. Match its words, delivery, pacing, pauses, and each character's voice.
+```
+
+Keep only the applicable language. Within each shot block, give each recorded turn or continuation one short line. Use the character name and the turn number within the active excerpt. Use `开始` or `starts` on its first part and `继续` or `continues` through a cut.
+
+```text
+小孟在画外开始录音第2轮对白。
+小孟在画内继续录音第2轮对白，口型同步。
+小孟在画内继续录音第2轮对白，嘴部不可见。
+Meng starts recorded turn 2 off-screen.
+Meng continues recorded turn 2 on screen with synced lips.
+Meng continues recorded turn 2 on screen with their mouth out of view.
+```
+
+Keep action, camera, body response, and cut cues in ordinary prose adjacent to these lines. Use a pause, another audible landmark, or a supplied time for a cue. Keep transcript, written dialogue, lip-sync spellings, and Seedance `{...}` speech markers out of this branch. One speaker's silence may overlap another's authorized turn. Use the recording as a performance reference during generation and check the result against the original track. The prompt alone cannot ensure an exact match.
 
 ### 9.1 Conditional Numeric Timing
 

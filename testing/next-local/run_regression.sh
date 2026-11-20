@@ -27,6 +27,7 @@ fi
 PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_source_review.py"
 PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_spatial_source_review.py"
 PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_kling_4_0.py"
+PYTHONDONTWRITEBYTECODE=1 "$PYTHON_BIN" "$SCRIPT_DIR/test_recorded_dialogue.py"
 
 PROMPT_PATH=$(mktemp "${TMPDIR:-/tmp}/framewright-seedance20-adapter.XXXXXX")
 KEYFRAME_PROMPT_PATH=$(mktemp "${TMPDIR:-/tmp}/framewright-midjourney-v82-adapter.XXXXXX")
